@@ -8,7 +8,8 @@ const TARGET_Y: f32 = 500.0; // La ligne de validation en bas de l'écran
 struct Tile {
     col: i32,
     y: f32,
-    key: char,
+    hangul: String,
+    romanization: String,
     is_pressed: bool,
 }
 
@@ -39,13 +40,27 @@ impl GameState {
 
     fn spawn_tile(&mut self) {
         let col = rand::gen_range(0, COLS);
-        // Génère une lettre majuscule aléatoire entre A et Z
-        let key = (rand::gen_range(65, 91) as u8) as char;
         
+        // Notre dictionnaire d'apprentissage (Consonnes et Voyelles de base)
+        let alphabet_coreen = [
+            ("ㄱ", "g"),  ("ㄴ", "n"),  ("ㄷ", "d"),  ("ㄹ", "r"),
+            ("ㅁ", "m"),  ("ㅂ", "b"),  ("ㅅ", "s"),  ("ㅇ", "ng"),
+            ("ㅈ", "j"),  ("ㅊ", "ch"), ("ㅋ", "k"),  ("ㅌ", "t"),
+            ("ㅍ", "p"),  ("ㅎ", "h"),
+            ("ㅏ", "a"),  ("ㅑ", "ya"), ("ㅓ", "eo"), ("ㅕ", "yeo"),
+            ("ㅗ", "o"),  ("ㅛ", "yo"), ("ㅜ", "u"),  ("ㅠ", "yu"),
+            ("ㅡ", "eu"), ("ㅣ", "i")
+        ];
+
+        // Choisit un index au hasard dans le dictionnaire
+        let idx = rand::gen_range(0, alphabet_coreen.len());
+        let (hangul, romanization) = alphabet_coreen[idx];
+
         self.tiles.push(Tile {
             col,
-            y: -TILE_HEIGHT, // Démarre juste au-dessus de l'écran
-            key,
+            y: -TILE_HEIGHT,
+            hangul: hangul.to_string(),
+            romanization: romanization.to_string(),
             is_pressed: false,
         });
     }
@@ -99,6 +114,10 @@ async fn main() {
     rand::srand(miniquad::date::now() as u64);
     
     let mut state = GameState::new();
+
+    let font_data = include_bytes!("assets/fonts/NotoSansKR/NotoSansKR-Regular.ttf");
+    let korean_font = load_ttf_font_from_bytes(font_data)
+        .expect("Fichier de police invalide ou corrompu");
 
     loop {
         // --- GESTION DES ÉCRANS ---
@@ -181,26 +200,25 @@ async fn main() {
                 }
 
                 if let Some(c) = get_char_pressed() {
-                    // On ignore les espaces ou les touches spéciales, on ne garde que les lettres/chiffres
                     if c.is_alphanumeric() {
-                        state.input_buffer.push(c.to_ascii_uppercase());
+                        // Cette fois on enregistre en MINUSCULE car nos traductions sont en minuscules
+                        state.input_buffer.push(c.to_ascii_lowercase()); 
                     }
                 }
 
-                // Déplacement des tuiles et vérification des entrées
+                // --- 2. LOGIQUE DE VALIDATION ---
                 let mut missed_tile = false;
                 let input_validated = is_key_pressed(KeyCode::Space) || is_key_pressed(KeyCode::Enter);
-                
+
                 for tile in state.tiles.iter_mut() {
                     tile.y += state.speed * dt;
 
-                    // Si le joueur a demandé la validation ET que le buffer correspond à la tuile
-                    if input_validated && !tile.is_pressed && state.input_buffer.contains(tile.key) {
+                    // Le joueur doit avoir tapé EXACTEMENT la bonne romanisation
+                    if input_validated && !tile.is_pressed && state.input_buffer == tile.romanization {
                         tile.is_pressed = true;
                         state.score += 10;
                     }
 
-                    // Si la tuile dépasse le bas de l'écran sans être cliquée
                     if tile.y > screen_height() && !tile.is_pressed {
                         missed_tile = true;
                     }
@@ -242,18 +260,21 @@ async fn main() {
                 for tile in &state.tiles {
                     let x = start_x + tile.col as f32 * TILE_WIDTH;
                     
-                    // Couleur de la tuile
+                    // Dessin de la tuile (dans la boucle de rendu des tuiles)
                     let color = if tile.is_pressed { GREEN } else { BLACK };
                     draw_rectangle(x + 2.0, tile.y, TILE_WIDTH - 4.0, TILE_HEIGHT, color);
 
-                    // Affichage de la lettre au centre de la tuile
-                    let text = &tile.key.to_string();
-                    draw_text(
-                        text, 
-                        x + (TILE_WIDTH / 2.0) - 10.0, 
+                    // On affiche le caractère coréen !
+                    draw_text_ex(
+                        &tile.hangul, 
+                        x + (TILE_WIDTH / 2.0) - 15.0, 
                         tile.y + (TILE_HEIGHT / 2.0) + 10.0, 
-                        30.0, 
-                        WHITE
+                        TextParams {
+                            font: Some(&korean_font),
+                            font_size: 44,
+                            color: WHITE,
+                            ..Default::default()
+                        },
                     );
                 }
 
