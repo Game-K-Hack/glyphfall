@@ -189,23 +189,25 @@ async fn main() {
 
                 // Déplacement des tuiles et vérification des entrées
                 let mut missed_tile = false;
+                let input_validated = is_key_pressed(KeyCode::Space) || is_key_pressed(KeyCode::Enter);
                 
                 for tile in state.tiles.iter_mut() {
                     tile.y += state.speed * dt;
 
-                    // Si le joueur a écrit EXACTEMENT la lettre de la tuile dans sa barre
-                    // (Tu peux aussi adapter si tu veux qu'il écrive des mots entiers plus tard !)
-                    if !tile.is_pressed && state.input_buffer.contains(tile.key) {
+                    // Si le joueur a demandé la validation ET que le buffer correspond à la tuile
+                    if input_validated && !tile.is_pressed && state.input_buffer.contains(tile.key) {
                         tile.is_pressed = true;
                         state.score += 10;
-                        
-                        // On vide la barre une fois qu'on a validé la tuile
-                        state.input_buffer.clear();
                     }
 
+                    // Si la tuile dépasse le bas de l'écran sans être cliquée
                     if tile.y > screen_height() && !tile.is_pressed {
                         missed_tile = true;
                     }
+                }
+
+                if input_validated {
+                    state.input_buffer.clear();
                 }
 
                 // Sanction si une tuile est manquée
