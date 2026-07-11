@@ -20,6 +20,7 @@ struct GameState {
     spawn_timer: f32,
     game_over: bool,
     current_screen: Screen,
+    input_buffer: String,
 }
 
 impl GameState {
@@ -32,6 +33,7 @@ impl GameState {
             spawn_timer: 0.0,
             game_over: false,
             current_screen: Screen::MainMenu,
+            input_buffer: String::new(),
         }
     }
 
@@ -174,8 +176,16 @@ async fn main() {
                     state.speed += 5.0; 
                 }
 
-                // Capturer la touche pressée par le joueur ce framework renvoie un char
-                let pressed_char = get_char_pressed();
+                if is_key_pressed(KeyCode::Backspace) {
+                    state.input_buffer.pop();
+                }
+
+                if let Some(c) = get_char_pressed() {
+                    // On ignore les espaces ou les touches spéciales, on ne garde que les lettres/chiffres
+                    if c.is_alphanumeric() {
+                        state.input_buffer.push(c.to_ascii_uppercase());
+                    }
+                }
 
                 // Déplacement des tuiles et vérification des entrées
                 let mut missed_tile = false;
@@ -183,17 +193,16 @@ async fn main() {
                 for tile in state.tiles.iter_mut() {
                     tile.y += state.speed * dt;
 
-                    // Si le joueur appuie sur la bonne lettre au bon moment
-                    if let Some(c) = pressed_char {
-                        let upper_c = c.to_ascii_uppercase();
-                        if upper_c == tile.key && !tile.is_pressed {
-                            tile.is_pressed = true;
-                            state.score += 10;
-                            break; // Optionnel mais recommandé : détruit une seule tuile si deux ont la même lettre
-                        }
+                    // Si le joueur a écrit EXACTEMENT la lettre de la tuile dans sa barre
+                    // (Tu peux aussi adapter si tu veux qu'il écrive des mots entiers plus tard !)
+                    if !tile.is_pressed && state.input_buffer.contains(tile.key) {
+                        tile.is_pressed = true;
+                        state.score += 10;
+                        
+                        // On vide la barre une fois qu'on a validé la tuile
+                        state.input_buffer.clear();
                     }
 
-                    // Si la tuile dépasse le bas de l'écran sans être cliquée
                     if tile.y > screen_height() && !tile.is_pressed {
                         missed_tile = true;
                     }
@@ -249,6 +258,24 @@ async fn main() {
                 // Interface utilisateur (Score & Vies)
                 draw_text(&format!("SCORE: {}", state.score), 20.0, 40.0, 30.0, WHITE);
                 draw_text(&format!("VIES: {}", "❤️".repeat(state.lives as usize)), 20.0, 80.0, 30.0, RED);
+
+                let bar_width = 400.0;
+                let bar_height = 50.0;
+                let bar_x = (screen_width() - bar_width) / 2.0;
+                let bar_y = screen_height() - 80.0;
+
+                // Dessin du fond de la barre (Gris foncé avec une bordure blanche)
+                draw_rectangle(bar_x, bar_y, bar_width, bar_height, BLACK);
+                draw_rectangle_lines(bar_x, bar_y, bar_width, bar_height, 2.0, WHITE);
+
+                // Affichage du texte saisi à l'intérieur de la barre
+                if state.input_buffer.is_empty() {
+                    // Petit texte d'aide si la barre est vide
+                    draw_text("Tapez les lettres ici...", bar_x + 15.0, bar_y + 32.0, 20.0, GRAY);
+                } else {
+                    // Affiche la saisie actuelle du joueur
+                    draw_text(&state.input_buffer, bar_x + 15.0, bar_y + 35.0, 26.0, YELLOW);
+                }
 
             }
         }
