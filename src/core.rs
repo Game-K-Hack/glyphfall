@@ -5,6 +5,8 @@ pub const TILE_HEIGHT: f32 = 140.0;
 pub const COLS: i32 = 4; // 4 colonnes comme dans Piano Tiles
 pub const TARGET_Y: f32 = 500.0; // La ligne de validation en bas de l'écran
 
+const KOREAN_FONT: &str = "NotoSansKR-Regular.ttf";
+
 /// Ressources chargées une seule fois au démarrage puis partagées par tous les écrans.
 /// Les polices sont embarquées dans le binaire pour rester multiplateforme (WASM inclus).
 pub struct Assets {
@@ -13,10 +15,12 @@ pub struct Assets {
 
 impl Assets {
     pub fn load() -> Self {
-        let korean = load_ttf_font_from_bytes(include_bytes!(
-            "assets/fonts/NotoSansKR/NotoSansKR-Regular.ttf"
-        ))
-        .expect("Fichier de police invalide ou corrompu");
+        // Les polices viennent du même répertoire embarqué que les langues :
+        // un manifeste peut ainsi désigner la sienne par son nom de fichier.
+        let bytes = crate::data::font_bytes(KOREAN_FONT)
+            .unwrap_or_else(|| panic!("{KOREAN_FONT} est absent de assets/fonts/"));
+        let korean =
+            load_ttf_font_from_bytes(bytes).expect("Fichier de police invalide ou corrompu");
 
         Self { korean }
     }
