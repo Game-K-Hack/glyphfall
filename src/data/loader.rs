@@ -99,6 +99,33 @@ mod tests {
     }
 
     #[test]
+    fn every_glyph_is_drawable_by_its_language_font() {
+        // Un caractère absent de la police s'afficherait en tofu (□) sans que
+        // rien ne plante : ce test attrape le problème au moment du contenu.
+        let catalog = load_catalog().expect("catalogue valide");
+
+        for language in &catalog.languages {
+            let Some(font_name) = &language.font else { continue };
+            let bytes = font_bytes(font_name).expect("police déclarée présente");
+            let font = fontdue::Font::from_bytes(bytes, fontdue::FontSettings::default())
+                .unwrap_or_else(|error| panic!("« {font_name} » illisible : {error}"));
+
+            for level in &language.levels {
+                for glyph in &level.glyphs {
+                    for character in glyph.char.chars() {
+                        assert_ne!(
+                            font.lookup_glyph_index(character),
+                            0,
+                            "« {character} » (niveau {}) est absent de {font_name}",
+                            level.id
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn every_language_declares_a_font_that_exists() {
         let catalog = load_catalog().expect("catalogue valide");
 

@@ -1,0 +1,5 @@
+id = "ja-katakana"
+name = "Japonais — Katakana"
+native_name = "カタカナ"
+description = "Le syllabaire des mots étrangers et des onomatopées. Mêmes sons que les hiragana, tracés anguleux."
+font = "NotoSansJP-Regular.ttf"

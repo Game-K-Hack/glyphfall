@@ -1,0 +1,61 @@
+id = "kanji-n5-01"
+title = "Les chiffres"
+subtitle = "一 à 十, les kanji les plus fréquents"
+order = 1
+requires = []
+mode = "tile_fall"
+
+# Les kanji étant plus longs à reconnaître qu'un kana, on ralentit la chute
+# et on espace les apparitions.
+[rules]
+lives = 3
+duration = 90
+columns = 4
+spawn_interval = 1.8
+speed = { start = 85.0, ramp = 2.5, max = 300.0 }
+review_ratio = 0.0
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.88
+
+[[glyphs]]
+char = "一"
+answers = ["1", "un", "ichi"]
+
+[[glyphs]]
+char = "二"
+answers = ["2", "deux", "ni"]
+
+[[glyphs]]
+char = "三"
+answers = ["3", "trois", "san"]
+
+[[glyphs]]
+char = "四"
+answers = ["4", "quatre", "shi", "yon"]
+
+[[glyphs]]
+char = "五"
+answers = ["5", "cinq", "go"]
+
+[[glyphs]]
+char = "六"
+answers = ["6", "six", "roku"]
+
+[[glyphs]]
+char = "七"
+answers = ["7", "sept", "shichi", "nana"]
+
+[[glyphs]]
+char = "八"
+answers = ["8", "huit", "hachi"]
+
+[[glyphs]]
+char = "九"
+answers = ["9", "neuf", "kyu", "ku"]
+
+[[glyphs]]
+char = "十"
+answers = ["10", "dix", "ju"]

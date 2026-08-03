@@ -1,0 +1,119 @@
+id = "kata-04"
+title = "Dakuten et handakuten"
+subtitle = "Les deux marques qui sonorisent : ゛et ゜"
+order = 4
+requires = ["kata-03"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 120
+columns = 4
+spawn_interval = 1.5
+speed = { start = 100.0, ramp = 3.0, max = 360.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.88
+
+[[glyphs]]
+char = "ガ"
+answers = ["ga"]
+
+[[glyphs]]
+char = "ギ"
+answers = ["gi"]
+
+[[glyphs]]
+char = "グ"
+answers = ["gu"]
+
+[[glyphs]]
+char = "ゲ"
+answers = ["ge"]
+
+[[glyphs]]
+char = "ゴ"
+answers = ["go"]
+
+[[glyphs]]
+char = "ザ"
+answers = ["za"]
+
+[[glyphs]]
+char = "ジ"
+answers = ["ji", "zi"]
+
+[[glyphs]]
+char = "ズ"
+answers = ["zu"]
+
+[[glyphs]]
+char = "ゼ"
+answers = ["ze"]
+
+[[glyphs]]
+char = "ゾ"
+answers = ["zo"]
+
+[[glyphs]]
+char = "ダ"
+answers = ["da"]
+
+[[glyphs]]
+char = "ヂ"
+answers = ["ji", "di"]
+
+[[glyphs]]
+char = "ヅ"
+answers = ["zu", "du"]
+
+[[glyphs]]
+char = "デ"
+answers = ["de"]
+
+[[glyphs]]
+char = "ド"
+answers = ["do"]
+
+[[glyphs]]
+char = "バ"
+answers = ["ba"]
+
+[[glyphs]]
+char = "ビ"
+answers = ["bi"]
+
+[[glyphs]]
+char = "ブ"
+answers = ["bu"]
+
+[[glyphs]]
+char = "ベ"
+answers = ["be"]
+
+[[glyphs]]
+char = "ボ"
+answers = ["bo"]
+
+[[glyphs]]
+char = "パ"
+answers = ["pa"]
+
+[[glyphs]]
+char = "ピ"
+answers = ["pi"]
+
+[[glyphs]]
+char = "プ"
+answers = ["pu"]
+
+[[glyphs]]
+char = "ペ"
+answers = ["pe"]
+
+[[glyphs]]
+char = "ポ"
+answers = ["po"]

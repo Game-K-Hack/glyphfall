@@ -1,0 +1,65 @@
+id = "kata-03"
+title = "Y, R, W et ン"
+subtitle = "Les dernières lignes du gojūon"
+order = 3
+requires = ["kata-02"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 90
+columns = 4
+spawn_interval = 1.4
+speed = { start = 110.0, ramp = 3.0, max = 380.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.75
+three = 0.90
+
+[[glyphs]]
+char = "ヤ"
+answers = ["ya"]
+
+[[glyphs]]
+char = "ユ"
+answers = ["yu"]
+
+[[glyphs]]
+char = "ヨ"
+answers = ["yo"]
+
+[[glyphs]]
+char = "ラ"
+answers = ["ra"]
+
+[[glyphs]]
+char = "リ"
+answers = ["ri"]
+
+[[glyphs]]
+char = "ル"
+answers = ["ru"]
+
+[[glyphs]]
+char = "レ"
+answers = ["re"]
+
+[[glyphs]]
+char = "ロ"
+answers = ["ro"]
+hint = "un carré parfait, contrairement à コ ouvert"
+
+[[glyphs]]
+char = "ワ"
+answers = ["wa"]
+
+[[glyphs]]
+char = "ヲ"
+answers = ["wo", "o"]
+
+[[glyphs]]
+char = "ン"
+answers = ["n"]
+hint = "un seul trait qui monte, à ne pas confondre avec ソ"

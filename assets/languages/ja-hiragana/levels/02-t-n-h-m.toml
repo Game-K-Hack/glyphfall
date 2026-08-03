@@ -1,0 +1,103 @@
+id = "hira-02"
+title = "T, N, H et M"
+subtitle = "Vingt signes de plus"
+order = 2
+requires = ["hira-01"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 100
+columns = 4
+spawn_interval = 1.4
+speed = { start = 110.0, ramp = 3.0, max = 380.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.75
+three = 0.90
+
+[[glyphs]]
+char = "た"
+answers = ["ta"]
+
+[[glyphs]]
+char = "ち"
+answers = ["chi", "ti"]
+hint = "se prononce « tchi »"
+
+[[glyphs]]
+char = "つ"
+answers = ["tsu", "tu"]
+
+[[glyphs]]
+char = "て"
+answers = ["te"]
+
+[[glyphs]]
+char = "と"
+answers = ["to"]
+
+[[glyphs]]
+char = "な"
+answers = ["na"]
+
+[[glyphs]]
+char = "に"
+answers = ["ni"]
+
+[[glyphs]]
+char = "ぬ"
+answers = ["nu"]
+hint = "à ne pas confondre avec め"
+
+[[glyphs]]
+char = "ね"
+answers = ["ne"]
+
+[[glyphs]]
+char = "の"
+answers = ["no"]
+
+[[glyphs]]
+char = "は"
+answers = ["ha"]
+
+[[glyphs]]
+char = "ひ"
+answers = ["hi"]
+
+[[glyphs]]
+char = "ふ"
+answers = ["fu", "hu"]
+
+[[glyphs]]
+char = "へ"
+answers = ["he"]
+
+[[glyphs]]
+char = "ほ"
+answers = ["ho"]
+hint = "は avec une barre en plus"
+
+[[glyphs]]
+char = "ま"
+answers = ["ma"]
+
+[[glyphs]]
+char = "み"
+answers = ["mi"]
+
+[[glyphs]]
+char = "む"
+answers = ["mu"]
+
+[[glyphs]]
+char = "め"
+answers = ["me"]
+hint = "à ne pas confondre avec ぬ"
+
+[[glyphs]]
+char = "も"
+answers = ["mo"]

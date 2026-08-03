@@ -1,0 +1,69 @@
+id = "ko-02"
+title = "Voyelles de base"
+subtitle = "Les 10 jamo vocaliques"
+order = 2
+requires = ["ko-01"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 90
+columns = 4
+spawn_interval = 1.4
+speed = { start = 110.0, ramp = 3.0, max = 380.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.75
+three = 0.90
+
+[[glyphs]]
+char = "ㅏ"
+answers = ["a"]
+hint = "trait vers la droite : le son sort devant"
+
+[[glyphs]]
+char = "ㅑ"
+answers = ["ya"]
+hint = "ㅏ avec deux traits : on ajoute le y"
+
+[[glyphs]]
+char = "ㅓ"
+answers = ["eo"]
+hint = "trait vers la gauche : le miroir de ㅏ"
+
+[[glyphs]]
+char = "ㅕ"
+answers = ["yeo"]
+hint = "ㅓ avec deux traits"
+
+[[glyphs]]
+char = "ㅗ"
+answers = ["o"]
+hint = "trait vers le haut"
+
+[[glyphs]]
+char = "ㅛ"
+answers = ["yo"]
+hint = "ㅗ avec deux traits"
+
+[[glyphs]]
+char = "ㅜ"
+answers = ["u"]
+hint = "trait vers le bas : le miroir de ㅗ"
+
+[[glyphs]]
+char = "ㅠ"
+answers = ["yu"]
+hint = "ㅜ avec deux traits"
+
+[[glyphs]]
+char = "ㅡ"
+answers = ["eu"]
+hint = "la barre horizontale, la terre"
+
+[[glyphs]]
+char = "ㅣ"
+answers = ["i"]
+hint = "la barre verticale, l'humain debout"
