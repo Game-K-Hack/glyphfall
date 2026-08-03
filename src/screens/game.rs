@@ -1,15 +1,15 @@
 use macroquad::prelude::*;
 use crate::core::{
-    GameState, 
-    Screen, 
+    Assets,
+    GameState,
+    Screen,
     TILE_WIDTH,
     TILE_HEIGHT,
     COLS,
     TARGET_Y,
-    korean_font
 };
 
-pub fn game_screen(state: &mut GameState) {
+pub fn game_screen(state: &mut GameState, assets: &Assets) {
     if state.game_over {
         // --- ÉCRAN DE GAME OVER ---
         clear_background(BLACK);
@@ -25,8 +25,8 @@ pub fn game_screen(state: &mut GameState) {
         if is_key_pressed(KeyCode::Escape) {
             state.current_screen = Screen::MainMenu;
         }
-        next_frame().await;
-        continue;
+        // La boucle de frames vit dans `main`, cet écran se contente de rendre une frame.
+        return;
     }
 
     // --- 1. LOGIQUE & MISES À JOUR (UPDATE) ---
@@ -113,11 +113,11 @@ pub fn game_screen(state: &mut GameState) {
 
         // On affiche le caractère coréen !
         draw_text_ex(
-            &tile.hangul, 
-            x + (TILE_WIDTH / 2.0) - 15.0, 
-            tile.y + (TILE_HEIGHT / 2.0) + 10.0, 
+            &tile.glyph,
+            x + (TILE_WIDTH / 2.0) - 15.0,
+            tile.y + (TILE_HEIGHT / 2.0) + 10.0,
             TextParams {
-                font: Some(&korean_font),
+                font: Some(&assets.korean),
                 font_size: 44,
                 color: WHITE,
                 ..Default::default()
@@ -127,7 +127,8 @@ pub fn game_screen(state: &mut GameState) {
 
     // Interface utilisateur (Score & Vies)
     draw_text(&format!("SCORE: {}", state.score), 20.0, 40.0, 30.0, WHITE);
-    draw_text(&format!("VIES: {}", "❤️".repeat(state.lives as usize)), 20.0, 80.0, 30.0, RED);
+    // La police par défaut de macroquad n'a pas d'emoji : on reste en ASCII.
+    draw_text(&format!("VIES: {}", "<3 ".repeat(state.lives as usize)), 20.0, 80.0, 30.0, RED);
 
     let bar_width = 400.0;
     let bar_height = 50.0;
