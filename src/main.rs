@@ -27,7 +27,7 @@ use crate::screens::briefing::briefing_screen;
 use crate::screens::game::game_screen;
 use crate::screens::results::results_screen;
 use crate::screens::language_select::language_select_screen;
-use crate::screens::learning_path::learning_path_screen;
+use crate::screens::learning_path::{PathView, learning_path_screen};
 use crate::screens::options::options_screen;
 use crate::screens::title::title_screen;
 use crate::window::window_conf;
@@ -71,7 +71,10 @@ async fn main() {
     if let Ok(start) = std::env::var("ALPHATILES_START") {
         let screen = match start.split_once(':') {
             Some(("path", language)) => {
-                Some(Screen::LearningPath { language: language.to_string(), selected: None })
+                Some(Screen::LearningPath {
+                    language: language.to_string(),
+                    view: PathView::new(),
+                })
             }
             Some(("briefing", target)) => target.split_once('/').map(|(language, level)| {
                 Screen::Briefing { language: language.to_string(), level: level.to_string() }
@@ -107,8 +110,8 @@ async fn main() {
             Screen::Title => title_screen(&app, mouse),
             Screen::LanguageSelect { selected } => language_select_screen(&app, selected, mouse),
             Screen::Options { selected } => options_screen(&mut app, selected, mouse),
-            Screen::LearningPath { language, selected } => {
-                learning_path_screen(&app, language, selected, mouse)
+            Screen::LearningPath { language, view } => {
+                learning_path_screen(&app, language, view, mouse)
             }
             Screen::Briefing { language, level } => {
                 briefing_screen(&app, language, level, mouse)

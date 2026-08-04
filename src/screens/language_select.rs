@@ -10,6 +10,7 @@ use crate::data::Language;
 use crate::gfx::palette::role;
 use crate::gfx::ui;
 use crate::gfx::{Fonts, canvas, fonts};
+use crate::screens::learning_path::PathView;
 
 const CARD_X: f32 = 32.0;
 const CARD_WIDTH: f32 = 320.0;
@@ -96,7 +97,7 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
             app.sfx.confirm();
             Transition::Push(Screen::LearningPath {
                 language: language.id.clone(),
-                selected: None,
+                view: PathView::new(),
             })
         }
         None => Transition::Stay,

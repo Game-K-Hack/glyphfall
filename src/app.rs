@@ -15,6 +15,7 @@ use crate::music::Music;
 use crate::gfx::Fonts;
 use crate::progress::Progress;
 use crate::settings::Settings;
+use crate::screens::learning_path::PathView;
 use crate::session::{Outcome, Session};
 
 /// Ce qui vit pour toute la durée du programme.
@@ -39,9 +40,8 @@ pub enum Screen {
     },
     LearningPath {
         language: String,
-        /// `None` tant que l'écran n'a pas choisi où se placer : il se cale
-        /// alors sur l'étape en cours plutôt que sur la première.
-        selected: Option<usize>,
+        /// Sélection et défilement, conservés d'une frame à l'autre.
+        view: PathView,
     },
     Briefing {
         language: String,
@@ -133,7 +133,7 @@ mod tests {
         navigator.apply(Transition::Push(Screen::LanguageSelect { selected: 0 }));
         navigator.apply(Transition::Push(Screen::LearningPath {
             language: "ko".into(),
-            selected: None,
+            view: PathView::new(),
         }));
         navigator
     }

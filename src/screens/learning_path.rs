@@ -23,10 +23,47 @@ const ROW_HEIGHT: f32 = 24.0;
 const ROW_STEP: f32 = 34.0;
 const TEXT_X: f32 = NODE_X + NODE_SIZE + 10.0;
 
+/// Hauteur utile du cadre, marges déduites.
+const VIEW_HEIGHT: f32 = VIEWPORT_BOTTOM - VIEWPORT_TOP - 8.0;
+
+/// Déplacement par cran de molette, en pixels virtuels.
+///
+/// La *magnitude* envoyée par la molette n'est pas portable — 120 par cran sous
+/// Windows, un nombre de pixels ou de lignes selon le navigateur. On n'en garde
+/// donc que le sens, et on applique un pas maison de moins d'une ligne.
+const WHEEL_STEP: f32 = 20.0;
+
+/// Au-delà de ce déplacement, un appui devient un glissement et ne vaut plus
+/// pour un clic. En dessous, c'est la main qui tremble.
+const DRAG_SLOP: f32 = 4.0;
+
+/// L'état de l'écran, conservé d'une frame à l'autre.
+pub struct PathView {
+    /// `None` tant que l'écran ne s'est pas placé sur l'étape en cours.
+    selected: Option<usize>,
+    /// Décalage du contenu vers le haut, en pixels virtuels.
+    scroll: f32,
+    /// Appui en cours, à la souris ou au doigt.
+    drag: Option<Drag>,
+}
+
+/// Un appui maintenu, qui fait défiler tant qu'il se déplace.
+struct Drag {
+    last_y: f32,
+    /// Distance parcourue depuis l'appui, pour distinguer un glissement d'un clic.
+    travelled: f32,
+}
+
+impl PathView {
+    pub fn new() -> Self {
+        Self { selected: None, scroll: 0.0, drag: None }
+    }
+}
+
 pub fn learning_path_screen(
     app: &App,
     language_id: &str,
-    selected: &mut Option<usize>,
+    view: &mut PathView,
     mouse: Vec2,
 ) -> Transition {
     clear_background(role::BACKGROUND);
@@ -36,74 +73,126 @@ pub fn learning_path_screen(
         // mais mieux vaut revenir en arrière que d'indexer dans le vide.
         return Transition::Pop;
     };
+    let count = language.levels.len();
+    let limit = max_scroll(count);
+
+    // --- Entrées, avant le rendu -----------------------------------------
+    // Les traiter après dessinerait l'état de la frame précédente : au
+    // glissement, ce retard d'une image se sent immédiatement.
 
     // À l'ouverture, on se place sur la première étape non terminée. Sur un
     // chemin d'une quinzaine de niveaux, repartir du premier à chaque visite
     // obligerait à redescendre toute la liste.
-    let selected = selected.get_or_insert_with(|| {
+    let first_visit = view.selected.is_none();
+    let mut selected = view.selected.unwrap_or_else(|| {
         language
             .levels
             .iter()
             .position(|level| !app.progress.is_completed(&level.id))
-            .unwrap_or(language.levels.len() - 1)
+            .unwrap_or(count - 1)
     });
+    selected = selected.min(count.saturating_sub(1));
 
-    *selected = (*selected).min(language.levels.len() - 1);
-    draw_header(&app.fonts, language, &app.progress);
+    if is_key_pressed(KeyCode::Down) {
+        selected = (selected + 1) % count;
+        view.scroll = scrolled_into_view(view.scroll, selected);
+        app.sfx.navigate();
+    }
+    if is_key_pressed(KeyCode::Up) {
+        selected = (selected + count - 1) % count;
+        view.scroll = scrolled_into_view(view.scroll, selected);
+        app.sfx.navigate();
+    }
+    if first_visit {
+        view.scroll = scrolled_into_view(view.scroll, selected);
+    }
 
-    let scroll = scroll_offset(*selected, language.levels.len());
+    // La molette défile sans toucher à la sélection : on veut pouvoir parcourir
+    // la liste des yeux sans perdre l'étape que l'on visait.
+    let wheel = mouse_wheel().1;
+    if wheel != 0.0 {
+        view.scroll -= wheel.signum() * WHEEL_STEP;
+    }
+
+    // Maintenir et tirer fait défiler. macroquad traduit les touchers en
+    // événements souris : le même code sert donc au doigt, seule façon de faire
+    // défiler sur un téléphone, où il n'y a ni molette ni flèches.
+    if is_mouse_button_pressed(MouseButton::Left) {
+        view.drag = Some(Drag { last_y: mouse.y, travelled: 0.0 });
+    }
+    if is_mouse_button_down(MouseButton::Left) {
+        if let Some(drag) = &mut view.drag {
+            let delta = mouse.y - drag.last_y;
+            view.scroll -= delta;
+            drag.travelled += delta.abs();
+            drag.last_y = mouse.y;
+        }
+    }
+
+    let mut tapped = false;
+    if is_mouse_button_released(MouseButton::Left) {
+        // Un glissement ne vaut pas pour un clic : sans cela, tirer la liste en
+        // partant d'une étape la lancerait.
+        tapped = view.drag.take().is_some_and(|drag| drag.travelled <= DRAG_SLOP);
+    }
+
+    view.scroll = view.scroll.clamp(0.0, limit);
+
+    // --- Rendu ------------------------------------------------------------
+    // Le survol est cherché avant de dessiner : sans cela, les lignes situées
+    // au-dessus de celle survolée seraient dessinées avec l'ancienne sélection.
+    for index in 0..count {
+        if ui::hit(row_rect(index, view.scroll), mouse) {
+            selected = index;
+        }
+    }
+
     let mut chosen = None;
-
     for (index, level) in language.levels.iter().enumerate() {
-        let row = row_rect(index, scroll);
-
-        // On ne dessine que les lignes entièrement visibles : une ligne coupée
-        // en deux par le bord du panneau se lirait mal.
-        if row.y < VIEWPORT_TOP || row.y + row.h > VIEWPORT_BOTTOM {
+        let row = row_rect(index, view.scroll);
+        if row.y + row.h <= VIEWPORT_TOP || row.y >= VIEWPORT_BOTTOM {
             continue;
         }
 
         let unlocked = app.progress.is_unlocked(level);
-
-        if ui::hit(row, mouse) {
-            *selected = index;
-            if unlocked && is_mouse_button_pressed(MouseButton::Left) {
-                chosen = Some(level);
-            }
+        if unlocked && tapped && ui::hit(row, mouse) {
+            chosen = Some(level);
         }
 
         // Le trait qui relie cette étape à la suivante.
-        if index + 1 < language.levels.len() {
-            let next = row_rect(index + 1, scroll);
-            if next.y < VIEWPORT_BOTTOM {
-                ui::dotted_line(
-                    NODE_X + NODE_SIZE / 2.0,
-                    row.y + NODE_SIZE,
-                    next.y.min(VIEWPORT_BOTTOM),
-                    role::TEXT_DISABLED,
-                );
-            }
+        if index + 1 < count {
+            ui::dotted_line(
+                NODE_X + NODE_SIZE / 2.0,
+                row.y + NODE_SIZE,
+                row_rect(index + 1, view.scroll).y,
+                role::TEXT_DISABLED,
+            );
         }
 
-        draw_row(&app.fonts, level, row, index == *selected, unlocked, app.progress.stars(&level.id));
+        draw_row(&app.fonts, level, row, index == selected, unlocked, app.progress.stars(&level.id));
     }
 
-    draw_footer(&app.fonts, language, *selected, &app.progress);
+    // Les lignes sont dessinées entières, quitte à déborder, puis on recouvre ce
+    // qui dépasse. Ne pas dessiner les lignes incomplètes ferait disparaître
+    // d'un coup toute ligne à moitié sortie et laisserait un trou dans le cadre.
+    ui::fill(Rect::new(0.0, 0.0, canvas::WIDTH, VIEWPORT_TOP), role::BACKGROUND);
+    ui::fill(
+        Rect::new(0.0, VIEWPORT_BOTTOM, canvas::WIDTH, canvas::HEIGHT - VIEWPORT_BOTTOM),
+        role::BACKGROUND,
+    );
 
-    if is_key_pressed(KeyCode::Down) {
-        *selected = (*selected + 1) % language.levels.len();
-        app.sfx.navigate();
-    }
-    if is_key_pressed(KeyCode::Up) {
-        *selected = (*selected + language.levels.len() - 1) % language.levels.len();
-        app.sfx.navigate();
-    }
+    draw_header(&app.fonts, language, &app.progress);
+    draw_scrollbar(view.scroll, limit);
+    draw_footer(&app.fonts, language, selected, &app.progress);
+
     if is_key_pressed(KeyCode::Enter) {
-        let level = &language.levels[*selected];
+        let level = &language.levels[selected];
         if app.progress.is_unlocked(level) {
             chosen = Some(level);
         }
     }
+
+    view.selected = Some(selected);
 
     match chosen {
         Some(level) => {
@@ -117,20 +206,62 @@ pub fn learning_path_screen(
     }
 }
 
-/// Décale le contenu pour garder la ligne sélectionnée à peu près centrée,
-/// sans jamais dépasser les extrémités de la liste.
-fn scroll_offset(selected: usize, count: usize) -> f32 {
-    let viewport_height = VIEWPORT_BOTTOM - VIEWPORT_TOP;
-    let content_height = count as f32 * ROW_STEP;
-    let max_scroll = (content_height - viewport_height).max(0.0);
+/// Hauteur totale de la liste, en pixels virtuels.
+fn content_height(count: usize) -> f32 {
+    count.saturating_sub(1) as f32 * ROW_STEP + ROW_HEIGHT
+}
 
-    let centered = selected as f32 * ROW_STEP - (viewport_height - ROW_HEIGHT) / 2.0;
-    centered.clamp(0.0, max_scroll).floor()
+fn max_scroll(count: usize) -> f32 {
+    (content_height(count) - VIEW_HEIGHT).max(0.0)
+}
+
+/// Décale la liste juste assez pour ramener une étape dans le cadre.
+///
+/// Sauter au centre serait plus simple mais désorientant : la liste bougerait
+/// même quand l'étape suivante est déjà sous les yeux.
+fn scrolled_into_view(scroll: f32, index: usize) -> f32 {
+    let top = index as f32 * ROW_STEP;
+    let bottom = top + ROW_HEIGHT;
+
+    if top < scroll {
+        top
+    } else if bottom > scroll + VIEW_HEIGHT {
+        bottom - VIEW_HEIGHT
+    } else {
+        scroll
+    }
 }
 
 fn row_rect(index: usize, scroll: f32) -> Rect {
     let y = VIEWPORT_TOP + 4.0 + index as f32 * ROW_STEP - scroll;
-    Rect::new(NODE_X - 4.0, y, canvas::WIDTH - (NODE_X - 4.0) * 2.0, ROW_HEIGHT)
+    Rect::new(NODE_X - 4.0, y.round(), canvas::WIDTH - (NODE_X - 4.0) * 2.0, ROW_HEIGHT)
+}
+
+/// Une barre discrète à droite, qui dit où l'on se trouve dans la liste.
+///
+/// Sans elle, rien n'indique qu'il reste des étapes hors du cadre.
+fn draw_scrollbar(scroll: f32, limit: f32) {
+    if limit <= 0.0 {
+        return;
+    }
+
+    const WIDTH: f32 = 2.0;
+    let track = Rect::new(
+        canvas::WIDTH - 6.0,
+        VIEWPORT_TOP + 4.0,
+        WIDTH,
+        VIEWPORT_BOTTOM - VIEWPORT_TOP - 8.0,
+    );
+    ui::fill(track, role::PANEL);
+
+    let visible_part = VIEW_HEIGHT / (VIEW_HEIGHT + limit);
+    let height = (track.h * visible_part).max(6.0).floor();
+    let travel = track.h - height;
+
+    ui::fill(
+        Rect::new(track.x, track.y + (travel * scroll / limit).floor(), WIDTH, height),
+        role::TEXT_MUTED,
+    );
 }
 
 fn draw_header(fonts_set: &Fonts, language: &Language, progress: &Progress) {
@@ -217,4 +348,51 @@ fn draw_footer(fonts_set: &Fonts, language: &Language, selected: usize, progress
     };
 
     ui::text_centered(fonts_set, hint, canvas::WIDTH / 2.0, 200.0, fonts::TEXT, role::TEXT_DISABLED);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Quinze étapes, comme le chemin coréen.
+    const COUNT: usize = 15;
+
+    #[test]
+    fn the_frame_only_moves_when_the_selection_leaves_it() {
+        // Une étape déjà visible ne doit rien faire bouger.
+        assert_eq!(scrolled_into_view(0.0, 2), 0.0);
+
+        // Juste en dessous du cadre : il descend du strict nécessaire.
+        let just_below = scrolled_into_view(0.0, 5);
+        assert!(just_below > 0.0 && just_below < ROW_STEP * 2.0, "décalage : {just_below}");
+
+        // Au-dessus : il remonte pile sur l'étape choisie.
+        assert_eq!(scrolled_into_view(200.0, 2), 2.0 * ROW_STEP);
+    }
+
+    #[test]
+    fn the_last_step_can_be_reached() {
+        // Une fois la liste défilée à fond, la dernière étape doit tenir
+        // entièrement dans le cadre, sinon elle resterait inatteignable.
+        let limit = max_scroll(COUNT);
+
+        assert_eq!(scrolled_into_view(0.0, COUNT - 1), limit);
+    }
+
+    #[test]
+    fn a_short_list_never_scrolls() {
+        // Moins d'étapes que de place : rien à faire défiler, et un calcul non
+        // borné donnerait ici une limite négative.
+        assert_eq!(max_scroll(3), 0.0);
+        assert_eq!(max_scroll(0), 0.0);
+        assert_eq!(scrolled_into_view(0.0, 2), 0.0);
+    }
+
+    #[test]
+    fn one_wheel_notch_moves_less_than_a_row() {
+        // La magnitude envoyée par la molette n'est pas portable : sous Windows
+        // un cran vaut 120. L'employer telle quelle envoyait la liste en butée
+        // dès le premier cran.
+        assert!(WHEEL_STEP < ROW_STEP, "un cran ne doit pas sauter une étape entière");
+    }
 }
