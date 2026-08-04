@@ -33,7 +33,7 @@ async fn main() {
     };
 
     let fonts = Fonts::load(&catalog);
-    let app = App { catalog, fonts, progress: Progress::new() };
+    let mut app = App { catalog, fonts, progress: Progress::new() };
 
     let mut canvas = Canvas::new();
     let mut navigator = Navigator::new(Screen::Title);
@@ -70,7 +70,7 @@ async fn main() {
         canvas.begin();
         let mouse = canvas.mouse();
 
-        let transition = match navigator.top_mut() {
+        let mut transition = match navigator.top_mut() {
             Screen::Title => title_screen(&app.fonts, mouse),
             Screen::LanguageSelect { selected } => language_select_screen(&app, selected, mouse),
             Screen::LearningPath { language, selected } => {
@@ -80,8 +80,16 @@ async fn main() {
                 briefing_screen(&app, language, level, mouse)
             }
             Screen::Playing(session) => game_screen(&app, session),
-            Screen::Results(outcome) => results_screen(&app, outcome, mouse),
+            Screen::Results { outcome, elapsed } => {
+                results_screen(&app, outcome, elapsed, mouse)
+            }
         };
+
+        // La progression s'enregistre au moment de la transition, et non a
+        // chaque frame de l'ecran de resultats qui reste affiche longtemps.
+        if let Transition::Replace(Screen::Results { outcome, .. }) = &mut transition {
+            outcome.is_record = app.progress.record(&outcome.level_id, outcome.stars);
+        }
 
         // Échap revient en arrière partout, sauf sur l'écran-titre où il n'y a
         // rien en dessous. Les écrans n'ont donc pas à s'en préoccuper.

@@ -86,6 +86,8 @@ pub struct Outcome {
     pub accuracy: f32,
     pub stars: u8,
     pub reason: EndReason,
+    /// Renseigne par la boucle principale : ce resultat bat-il le precedent ?
+    pub is_record: bool,
     /// Les glyphes ratés, sans doublon, pour la correction de fin.
     pub missed_glyphs: Vec<String>,
 }
@@ -283,6 +285,7 @@ impl Session {
             accuracy,
             stars: self.stars.rate(accuracy),
             reason,
+            is_record: false,
             missed_glyphs: self.missed_glyphs.clone(),
         }
     }

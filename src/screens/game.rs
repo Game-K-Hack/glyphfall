@@ -19,7 +19,9 @@ pub fn game_screen(app: &App, session: &mut Session) -> Transition {
         // `Replace` et non `Push` : l'écran de résultats prend la place de la
         // manche, pour que « retour » ramène au briefing et non à une partie
         // déjà finie.
-        Some(outcome) => Transition::Replace(Screen::Results(Box::new(outcome))),
+        Some(outcome) => {
+            Transition::Replace(Screen::Results { outcome: Box::new(outcome), elapsed: 0.0 })
+        }
         None => Transition::Stay,
     }
 }

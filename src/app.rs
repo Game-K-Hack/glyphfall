@@ -38,7 +38,11 @@ pub enum Screen {
     /// Les manches et leurs bilans sont volumineux : les mettre en boite
     /// garde l'enumeration compacte, elle qui est copiee a chaque transition.
     Playing(Box<Session>),
-    Results(Box<Outcome>),
+    /// `elapsed` fait apparaitre les etoiles une a une.
+    Results {
+        outcome: Box<Outcome>,
+        elapsed: f32,
+    },
 }
 
 /// Ce qu'un écran demande à la boucle principale de faire de la pile.
