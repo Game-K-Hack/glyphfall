@@ -32,7 +32,7 @@ pub fn title_screen(fonts_set: &Fonts, mouse: Vec2) -> Transition {
 
     let play = Rect::new(x, 116.0, BUTTON_WIDTH, BUTTON_HEIGHT);
     if ui::button(fonts_set, mouse, Button::new(play, "JOUER")) || is_key_pressed(KeyCode::Enter) {
-        return Transition::Push(Screen::Playing(GameState::new()));
+        return Transition::Push(Screen::LanguageSelect { selected: 0 });
     }
 
     let quit = Rect::new(x, 144.0, BUTTON_WIDTH, BUTTON_HEIGHT);

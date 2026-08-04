@@ -12,6 +12,7 @@ use crate::core::GameState;
 use crate::gfx::{Canvas, Fonts};
 use crate::screens::game::game_screen;
 use crate::screens::game_over::game_over_screen;
+use crate::screens::language_select::language_select_screen;
 use crate::screens::title::title_screen;
 use crate::window::window_conf;
 
@@ -35,9 +36,11 @@ async fn main() {
     let mut capture = Capture::from_environment();
 
     // Raccourci de développement : démarrer directement sur un écran donné.
-    if std::env::var("ALPHATILES_START").as_deref() == Ok("playing") {
-        navigator.apply(Transition::Push(Screen::Playing(GameState::new())));
-    }
+    match std::env::var("ALPHATILES_START").as_deref() {
+        Ok("languages") => navigator.apply(Transition::Push(Screen::LanguageSelect { selected: 0 })),
+        Ok("playing") => navigator.apply(Transition::Push(Screen::Playing(GameState::new()))),
+        _ => true,
+    };
 
     loop {
         // Tout est dessiné sur la toile virtuelle, jamais directement à la
@@ -47,6 +50,7 @@ async fn main() {
 
         let transition = match navigator.top_mut() {
             Screen::Title => title_screen(&app.fonts, mouse),
+            Screen::LanguageSelect { selected } => language_select_screen(&app, selected, mouse),
             Screen::Playing(state) => game_screen(state, &app.fonts),
             Screen::GameOver { score } => game_over_screen(*score, &app.fonts, mouse),
         };

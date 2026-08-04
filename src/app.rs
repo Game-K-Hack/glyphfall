@@ -21,6 +21,10 @@ pub struct App {
 
 pub enum Screen {
     Title,
+    /// `selected` survit d'une frame à l'autre : c'est la carte mise en avant.
+    LanguageSelect {
+        selected: usize,
+    },
     Playing(GameState),
     GameOver { score: u32 },
 }

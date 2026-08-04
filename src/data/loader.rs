@@ -126,6 +126,46 @@ mod tests {
     }
 
     #[test]
+    fn the_ui_font_covers_every_text_it_will_display() {
+        // Les noms et descriptions de langues sont écrits en français avec la
+        // police pixel : un accent manquant passerait inaperçu jusqu'à ce que
+        // « Coréen » s'affiche « Cor en ».
+        let catalog = load_catalog().expect("catalogue valide");
+        let bytes = font_bytes(crate::gfx::fonts::UI_FONT_FILE).expect("police d'interface");
+        let font = fontdue::Font::from_bytes(bytes, fontdue::FontSettings::default())
+            .expect("police d'interface lisible");
+
+        let mut texts = Vec::new();
+        for language in &catalog.languages {
+            texts.push(language.name.clone());
+            texts.push(language.description.clone());
+            for level in &language.levels {
+                texts.push(level.title.clone());
+                texts.push(level.subtitle.clone());
+                for glyph in &level.glyphs {
+                    texts.push(glyph.hint.clone());
+                    texts.extend(glyph.answers.iter().cloned());
+                }
+            }
+        }
+
+        for text in texts {
+            for character in text.chars() {
+                // Les glyphes cités dans les aides sont dessinés avec la police
+                // de la langue, pas celle de l'interface.
+                if (character as u32) > 0x2000 {
+                    continue;
+                }
+                assert_ne!(
+                    font.lookup_glyph_index(character),
+                    0,
+                    "« {character} » (dans « {text} ») est absent de la police d'interface"
+                );
+            }
+        }
+    }
+
+    #[test]
     fn every_language_declares_a_font_that_exists() {
         let catalog = load_catalog().expect("catalogue valide");
 

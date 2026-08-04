@@ -85,6 +85,24 @@ pub fn glyph_centered(font: &Font, content: &str, rect: Rect, size: u16, color: 
     );
 }
 
+/// Comme `glyph_centered`, mais réduit la taille jusqu'à ce que le texte tienne
+/// dans `rect`.
+///
+/// Les noms natifs ne font pas tous la même longueur — « 漢字 » tient à l'aise
+/// là où « ひらがな » déborde — et une taille fixe en laisserait fuir certains
+/// hors de leur pavé.
+pub fn glyph_fitted(font: &Font, content: &str, rect: Rect, max_size: u16, color: Color) {
+    const MIN_SIZE: u16 = 7;
+    const PADDING: f32 = 2.0;
+
+    let mut size = max_size;
+    while size > MIN_SIZE && measure_text(content, Some(font), size, 1.0).width > rect.w - PADDING {
+        size -= 1;
+    }
+
+    glyph_centered(font, content, rect, size, color);
+}
+
 /// Découpe un texte pour qu'aucune ligne ne dépasse `max_width`.
 pub fn wrap(fonts: &Fonts, content: &str, size: u16, max_width: f32) -> Vec<String> {
     let mut lines = Vec::new();

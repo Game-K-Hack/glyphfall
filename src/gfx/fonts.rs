@@ -66,6 +66,9 @@ impl Fonts {
     }
 }
 
+/// Le nom de fichier de la police d'interface, pour les tests de couverture.
+pub const UI_FONT_FILE: &str = UI_FONT;
+
 fn load(file_name: &str) -> Option<Font> {
     let mut font = load_ttf_font_from_bytes(font_bytes(file_name)?).ok()?;
     // Sans cela, macroquad lisserait l'atlas et les pixels deviendraient flous.
