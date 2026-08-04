@@ -1,20 +1,20 @@
 use macroquad::prelude::*;
 
 mod app;
-mod core;
 mod data;
 mod gfx;
 mod progress;
 mod screens;
+mod session;
 mod window;
 
 use crate::app::{App, Navigator, Screen, Transition};
-use crate::core::GameState;
 use crate::gfx::{Canvas, Fonts};
 use crate::progress::Progress;
+use crate::session::Session;
 use crate::screens::briefing::briefing_screen;
 use crate::screens::game::game_screen;
-use crate::screens::game_over::game_over_screen;
+use crate::screens::results::results_screen;
 use crate::screens::language_select::language_select_screen;
 use crate::screens::learning_path::learning_path_screen;
 use crate::screens::title::title_screen;
@@ -49,9 +49,12 @@ async fn main() {
             Some(("briefing", target)) => target.split_once('/').map(|(language, level)| {
                 Screen::Briefing { language: language.to_string(), level: level.to_string() }
             }),
+            Some(("play", target)) => target.split_once('/').and_then(|(language, level)| {
+                Session::new(&app.catalog, language, level)
+                    .map(|session| Screen::Playing(Box::new(session)))
+            }),
             _ => match start.as_str() {
                 "languages" => Some(Screen::LanguageSelect { selected: 0 }),
-                "playing" => Some(Screen::Playing(GameState::new())),
                 _ => None,
             },
         };
@@ -76,8 +79,8 @@ async fn main() {
             Screen::Briefing { language, level } => {
                 briefing_screen(&app, language, level, mouse)
             }
-            Screen::Playing(state) => game_screen(state, &app.fonts),
-            Screen::GameOver { score } => game_over_screen(*score, &app.fonts, mouse),
+            Screen::Playing(session) => game_screen(&app, session),
+            Screen::Results(outcome) => results_screen(&app, outcome, mouse),
         };
 
         // Échap revient en arrière partout, sauf sur l'écran-titre où il n'y a

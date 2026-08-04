@@ -1,119 +1,110 @@
+//! La manche : les tuiles tombent, le joueur tape la lecture avant la ligne.
+
 use macroquad::prelude::*;
 
-use crate::app::{Screen, Transition};
-use crate::core::{COLS, GameState, TARGET_Y, TILE_HEIGHT, TILE_WIDTH};
+use crate::app::{App, Screen, Transition};
 use crate::gfx::palette::role;
 use crate::gfx::ui;
 use crate::gfx::{Fonts, canvas, fonts};
+use crate::session::{PLAYFIELD_WIDTH, Session, TARGET_Y, TILE_HEIGHT};
 
-/// Provisoire : la langue jouée viendra du niveau choisi.
-const LANGUAGE: &str = "ko";
+/// Taille des glyphes sur les tuiles.
+const GLYPH_SIZE: u16 = 24;
 
-/// Bord gauche de la grille, centrée sur la toile.
-const PLAYFIELD_X: f32 = (canvas::WIDTH - COLS as f32 * TILE_WIDTH) / 2.0;
+pub fn game_screen(app: &App, session: &mut Session) -> Transition {
+    let outcome = session.update(get_frame_time());
+    draw(app, session);
 
-pub fn game_screen(state: &mut GameState, fonts_set: &Fonts) -> Transition {
-    let transition = update(state);
-    draw(state, fonts_set);
-    transition
+    match outcome {
+        // `Replace` et non `Push` : l'écran de résultats prend la place de la
+        // manche, pour que « retour » ramène au briefing et non à une partie
+        // déjà finie.
+        Some(outcome) => Transition::Replace(Screen::Results(Box::new(outcome))),
+        None => Transition::Stay,
+    }
 }
 
-fn update(state: &mut GameState) -> Transition {
-    let dt = get_frame_time();
-
-    state.spawn_timer += dt;
-    if state.spawn_timer > 1.4 {
-        state.spawn_tile();
-        state.spawn_timer = 0.0;
-        state.speed += 1.5;
-    }
-
-    if is_key_pressed(KeyCode::Backspace) {
-        state.input_buffer.pop();
-    }
-    if let Some(character) = get_char_pressed() {
-        if character.is_alphanumeric() {
-            state.input_buffer.push(character.to_ascii_lowercase());
-        }
-    }
-
-    let validated = is_key_pressed(KeyCode::Space) || is_key_pressed(KeyCode::Enter);
-    let mut missed = 0;
-
-    for tile in state.tiles.iter_mut() {
-        tile.y += state.speed * dt;
-
-        if validated && !tile.is_pressed && state.input_buffer == tile.romanization {
-            tile.is_pressed = true;
-            state.score += 10;
-        }
-
-        if tile.y > canvas::HEIGHT && !tile.is_pressed {
-            missed += 1;
-        }
-    }
-
-    if validated {
-        state.input_buffer.clear();
-    }
-
-    state.lives = state.lives.saturating_sub(missed);
-    state.tiles.retain(|tile| tile.y < canvas::HEIGHT && !tile.is_pressed);
-
-    if state.lives == 0 {
-        // `Replace` et non `Push` : l'écran de fin prend la place de la partie,
-        // pour que « retour » ramène là d'où la partie a été lancée.
-        return Transition::Replace(Screen::GameOver { score: state.score });
-    }
-
-    Transition::Stay
-}
-
-fn draw(state: &GameState, fonts_set: &Fonts) {
+fn draw(app: &App, session: &Session) {
     clear_background(role::BACKGROUND);
 
-    let playfield = Rect::new(PLAYFIELD_X, 0.0, COLS as f32 * TILE_WIDTH, canvas::HEIGHT);
-    ui::fill(playfield, role::PANEL);
+    let tile_width = session.tile_width();
+    let playfield_x = session.playfield_x();
+    let playfield_width = tile_width * session.rules.columns as f32;
 
-    for column in 0..=COLS {
-        let x = PLAYFIELD_X + column as f32 * TILE_WIDTH;
+    ui::fill(Rect::new(playfield_x, 0.0, playfield_width, canvas::HEIGHT), role::PANEL);
+    for column in 0..=session.rules.columns {
+        let x = playfield_x + column as f32 * tile_width;
         draw_rectangle(x, 0.0, 1.0, canvas::HEIGHT, role::BORDER);
     }
 
-    // La ligne de validation : passé ce trait, la tuile est perdue.
-    draw_rectangle(playfield.x, TARGET_Y, playfield.w, 1.0, role::DANGER);
+    // Sous la ligne, tout est perdu : elle est dessinée avant les tuiles pour
+    // qu'une tuile sur le point de mourir passe visiblement par-dessus.
+    draw_rectangle(playfield_x, TARGET_Y, playfield_width, 1.0, role::DANGER);
 
-    let script = fonts_set.script(LANGUAGE);
-    for tile in &state.tiles {
+    let script = app.fonts.script(&session.language_id);
+    for tile in &session.tiles {
         let rect = Rect::new(
-            PLAYFIELD_X + tile.col as f32 * TILE_WIDTH + 1.0,
+            playfield_x + tile.column as f32 * tile_width + 1.0,
             tile.y.floor(),
-            TILE_WIDTH - 2.0,
+            tile_width - 2.0,
             TILE_HEIGHT,
         );
 
-        ui::panel(rect, if tile.is_pressed { role::SUCCESS } else { role::BORDER });
-        ui::glyph_centered(script, &tile.glyph, rect, 24, role::TEXT);
+        let background = if tile.cleared.is_some() { role::SUCCESS } else { role::BORDER };
+        ui::panel(rect, background);
+        ui::glyph_fitted(script, &tile.glyph.char, rect, GLYPH_SIZE, role::TEXT);
     }
 
-    draw_hud(state, fonts_set);
-    draw_input_bar(state, fonts_set);
+    draw_hud(&app.fonts, session);
+    draw_input_bar(&app.fonts, session);
 }
 
-fn draw_hud(state: &GameState, fonts_set: &Fonts) {
-    ui::text(fonts_set, &format!("{:05}", state.score), 6.0, 6.0, fonts::TEXT, role::TEXT);
-    ui::hearts_row(6.0, 18.0, state.lives, 3);
+fn draw_hud(fonts_set: &Fonts, session: &Session) {
+    ui::text(fonts_set, &format!("{:05}", session.score), 6.0, 6.0, fonts::TEXT, role::TEXT);
+    ui::hearts_row(6.0, 18.0, session.lives, session.rules.lives);
+
+    // La gouttière est étroite : le titre y passe sur plusieurs lignes plutôt
+    // que d'être coupé au troisième mot.
+    let gutter = session.playfield_x() - 12.0;
+    for (index, line) in ui::wrap(fonts_set, &session.level_title, fonts::TEXT, gutter)
+        .iter()
+        .take(3)
+        .enumerate()
+    {
+        ui::text(fonts_set, line, 6.0, 34.0 + index as f32 * 10.0, fonts::TEXT, role::TEXT_DISABLED);
+    }
+
+    if session.rules.is_timed() {
+        draw_timer(fonts_set, session);
+    }
 }
 
-fn draw_input_bar(state: &GameState, fonts_set: &Fonts) {
+/// Le temps restant, en jauge et en chiffres, à droite de la zone de jeu.
+fn draw_timer(fonts_set: &Fonts, session: &Session) {
+    let x = session.playfield_x() + PLAYFIELD_WIDTH + 12.0;
+    let width = canvas::WIDTH - x - 6.0;
+
+    let remaining = session.time_left.ceil() as u32;
+    let label = format!("{remaining}S");
+    let label_width = ui::text_width(fonts_set, &label, fonts::TEXT);
+    ui::text(fonts_set, &label, canvas::WIDTH - 6.0 - label_width, 6.0, fonts::TEXT, role::TEXT);
+
+    // La jauge vire au rouge sur la fin : le chiffre seul se remarque mal quand
+    // on a les yeux sur les tuiles.
+    let ratio = session.time_ratio();
+    let color = if ratio < 0.2 { role::DANGER } else { role::ACCENT };
+    ui::progress_bar(Rect::new(x, 18.0, width, 8.0), ratio, color);
+}
+
+fn draw_input_bar(fonts_set: &Fonts, session: &Session) {
     const WIDTH: f32 = 160.0;
     let bar = Rect::new(((canvas::WIDTH - WIDTH) / 2.0).floor(), 192.0, WIDTH, 16.0);
     ui::panel(bar, role::BORDER);
 
-    let (content, color) = if state.input_buffer.is_empty() {
+    let (content, color) = if session.input.is_empty() {
         ("tapez la lecture", role::TEXT_DISABLED)
     } else {
-        (state.input_buffer.as_str(), role::STAR)
+        (session.input.as_str(), role::STAR)
     };
-    ui::text(fonts_set, content, bar.x + 5.0, bar.y + 4.0, fonts::TEXT, color);
+    ui::text_truncated(fonts_set, content, bar.x + 5.0, bar.y + 4.0, fonts::TEXT, color, WIDTH - 10.0);
 }

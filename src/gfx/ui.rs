@@ -30,10 +30,26 @@ pub fn stroke(rect: Rect, color: Color) {
 
 /// Dessine une image faite de pixels : `#` allumé, tout le reste éteint.
 pub fn blit(pattern: &[&str], x: f32, y: f32, color: Color) {
+    blit_scaled(pattern, x, y, 1.0, color);
+}
+
+/// Comme `blit`, mais chaque pixel du motif devient un carré de `scale` côtés.
+///
+/// Agrandir le motif plutôt que d'étirer une image garde les bords parfaitement
+/// nets, quel que soit le facteur.
+pub fn blit_scaled(pattern: &[&str], x: f32, y: f32, scale: f32, color: Color) {
+    let scale = scale.max(1.0).floor();
+
     for (row, line) in pattern.iter().enumerate() {
         for (column, cell) in line.chars().enumerate() {
             if cell == '#' {
-                draw_rectangle(x.floor() + column as f32, y.floor() + row as f32, 1.0, 1.0, color);
+                draw_rectangle(
+                    x.floor() + column as f32 * scale,
+                    y.floor() + row as f32 * scale,
+                    scale,
+                    scale,
+                    color,
+                );
             }
         }
     }
@@ -274,7 +290,11 @@ pub const STAR_HEIGHT: f32 = 7.0;
 pub const HEART_WIDTH: f32 = 7.0;
 
 pub fn star(x: f32, y: f32, earned: bool) {
-    blit(&STAR, x, y, if earned { role::STAR } else { role::STAR_EMPTY });
+    star_scaled(x, y, 1.0, earned);
+}
+
+pub fn star_scaled(x: f32, y: f32, scale: f32, earned: bool) {
+    blit_scaled(&STAR, x, y, scale, if earned { role::STAR } else { role::STAR_EMPTY });
 }
 
 pub fn heart(x: f32, y: f32, remaining: bool) {

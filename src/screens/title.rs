@@ -1,7 +1,6 @@
 use macroquad::prelude::*;
 
 use crate::app::{Screen, Transition};
-use crate::core::GameState;
 use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};

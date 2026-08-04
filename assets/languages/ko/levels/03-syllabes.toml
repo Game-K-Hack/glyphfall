@@ -10,7 +10,7 @@ lives = 3
 duration = 120
 columns = 4
 spawn_interval = 1.6
-speed = { start = 100.0, ramp = 3.0, max = 360.0 }
+speed = { start = 48.0, ramp = 1.2, max = 150.0 }
 review_ratio = 0.20
 
 [stars]

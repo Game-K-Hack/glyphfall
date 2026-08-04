@@ -8,7 +8,6 @@
 use macroquad::prelude::*;
 
 use crate::app::{App, Screen, Transition};
-use crate::core::GameState;
 use crate::data::{Language, Level};
 use crate::gfx::palette::role;
 use crate::gfx::ui;

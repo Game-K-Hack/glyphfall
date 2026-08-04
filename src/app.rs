@@ -9,10 +9,10 @@
 //! que la boucle principale applique. Cela évite qu'un écran se retire du
 //! dessous de ses propres pieds au milieu de son rendu.
 
-use crate::core::GameState;
 use crate::data::Catalog;
 use crate::gfx::Fonts;
 use crate::progress::Progress;
+use crate::session::{Outcome, Session};
 
 /// Ce qui vit pour toute la durée du programme.
 pub struct App {
@@ -35,8 +35,10 @@ pub enum Screen {
         language: String,
         level: String,
     },
-    Playing(GameState),
-    GameOver { score: u32 },
+    /// Les manches et leurs bilans sont volumineux : les mettre en boite
+    /// garde l'enumeration compacte, elle qui est copiee a chaque transition.
+    Playing(Box<Session>),
+    Results(Box<Outcome>),
 }
 
 /// Ce qu'un écran demande à la boucle principale de faire de la pile.

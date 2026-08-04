@@ -7,12 +7,12 @@
 use macroquad::prelude::*;
 
 use crate::app::{App, Screen, Transition};
-use crate::core::GameState;
 use crate::data::{Language, Level};
 use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 use crate::progress::MAX_STARS;
+use crate::session::Session;
 
 const GRID_X: f32 = 16.0;
 const GRID_Y: f32 = 32.0;
@@ -55,8 +55,9 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
     );
 
     if pressed || is_key_pressed(KeyCode::Enter) {
-        // Provisoire : la partie ne connaît pas encore les règles du niveau.
-        return Transition::Push(Screen::Playing(GameState::new()));
+        if let Some(session) = Session::new(&app.catalog, language_id, level_id) {
+            return Transition::Push(Screen::Playing(Box::new(session)));
+        }
     }
 
     Transition::Stay
