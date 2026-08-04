@@ -1,0 +1,39 @@
+id = "ko-09"
+title = "Les voyelles en Y"
+subtitle = "Les memes, avec un trait de plus"
+order = 9
+requires = ["ko-08"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "ㅑ"
+answers = ["ya"]
+hint = "le a avec deux traits : on ajoute le y"
+
+[[glyphs]]
+char = "ㅕ"
+answers = ["yeo"]
+hint = "le eo avec deux traits"
+
+[[glyphs]]
+char = "ㅛ"
+answers = ["yo"]
+hint = "le o avec deux traits"
+
+[[glyphs]]
+char = "ㅠ"
+answers = ["yu"]
+hint = "le u avec deux traits"

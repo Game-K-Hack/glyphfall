@@ -96,7 +96,7 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
             app.sfx.confirm();
             Transition::Push(Screen::LearningPath {
                 language: language.id.clone(),
-                selected: 0,
+                selected: None,
             })
         }
         None => Transition::Stay,

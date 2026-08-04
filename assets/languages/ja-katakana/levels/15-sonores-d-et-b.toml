@@ -1,0 +1,59 @@
+id = "kata-15"
+title = "Sonores D et B"
+subtitle = "Dix de plus sur le meme principe"
+order = 15
+requires = ["kata-14"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "ダ"
+answers = ["da"]
+
+[[glyphs]]
+char = "ヂ"
+answers = ["ji", "di"]
+
+[[glyphs]]
+char = "ヅ"
+answers = ["zu", "du"]
+
+[[glyphs]]
+char = "デ"
+answers = ["de"]
+
+[[glyphs]]
+char = "ド"
+answers = ["do"]
+
+[[glyphs]]
+char = "バ"
+answers = ["ba"]
+
+[[glyphs]]
+char = "ビ"
+answers = ["bi"]
+
+[[glyphs]]
+char = "ブ"
+answers = ["bu"]
+
+[[glyphs]]
+char = "ベ"
+answers = ["be"]
+
+[[glyphs]]
+char = "ボ"
+answers = ["bo"]

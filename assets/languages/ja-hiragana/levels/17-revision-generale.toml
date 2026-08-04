@@ -1,0 +1,54 @@
+id = "hira-17"
+title = "Revision generale"
+subtitle = "Tout le syllabaire"
+order = 17
+requires = ["hira-16"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 90
+columns = 4
+spawn_interval = 1.4
+speed = { start = 55.0, ramp = 1.5, max = 165.0 }
+review_ratio = 0.50
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.90
+
+[[glyphs]]
+char = "が"
+answers = ["ga"]
+hint = "le ka sonorise par les deux petits traits"
+
+[[glyphs]]
+char = "じ"
+answers = ["ji", "zi"]
+hint = "le shi sonorise se lit ji, pas zi"
+
+[[glyphs]]
+char = "づ"
+answers = ["zu", "du"]
+
+[[glyphs]]
+char = "ぱ"
+answers = ["pa"]
+hint = "le ha avec un petit rond : le son devient P"
+
+[[glyphs]]
+char = "ぴ"
+answers = ["pi"]
+
+[[glyphs]]
+char = "ぶ"
+answers = ["bu"]
+
+[[glyphs]]
+char = "べ"
+answers = ["be"]
+
+[[glyphs]]
+char = "ぞ"
+answers = ["zo"]

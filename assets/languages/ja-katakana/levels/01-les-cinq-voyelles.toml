@@ -1,0 +1,39 @@
+id = "kata-01"
+title = "Les cinq voyelles"
+subtitle = "Le point de depart de tout"
+order = 1
+requires = []
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.00
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "ア"
+answers = ["a"]
+
+[[glyphs]]
+char = "イ"
+answers = ["i"]
+
+[[glyphs]]
+char = "ウ"
+answers = ["u"]
+
+[[glyphs]]
+char = "エ"
+answers = ["e"]
+
+[[glyphs]]
+char = "オ"
+answers = ["o"]

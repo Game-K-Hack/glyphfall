@@ -1,0 +1,34 @@
+id = "kanji-07"
+title = "Terre, montagne, riviere"
+subtitle = "Le paysage"
+order = 7
+requires = ["kanji-06"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "土"
+answers = ["terre", "sol"]
+hint = "le jour de la terre, le samedi"
+
+[[glyphs]]
+char = "山"
+answers = ["montagne"]
+hint = "trois pics"
+
+[[glyphs]]
+char = "川"
+answers = ["riviere", "fleuve"]
+hint = "trois filets d'eau qui coulent"

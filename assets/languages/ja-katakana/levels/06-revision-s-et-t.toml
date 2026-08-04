@@ -1,0 +1,62 @@
+id = "kata-06"
+title = "Revision : S et T"
+subtitle = "On consolide avant la suite"
+order = 6
+requires = ["kata-05"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 75
+columns = 4
+spawn_interval = 1.5
+speed = { start = 52.0, ramp = 1.2, max = 150.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.88
+
+[[glyphs]]
+char = "サ"
+answers = ["sa"]
+
+[[glyphs]]
+char = "シ"
+answers = ["shi", "si"]
+hint = "traits qui montent - a ne pas confondre avec le tsu"
+
+[[glyphs]]
+char = "ス"
+answers = ["su"]
+
+[[glyphs]]
+char = "セ"
+answers = ["se"]
+
+[[glyphs]]
+char = "ソ"
+answers = ["so"]
+hint = "traits qui descendent - a ne pas confondre avec le n"
+
+[[glyphs]]
+char = "タ"
+answers = ["ta"]
+
+[[glyphs]]
+char = "チ"
+answers = ["chi", "ti"]
+
+[[glyphs]]
+char = "ツ"
+answers = ["tsu", "tu"]
+hint = "traits penches - a ne pas confondre avec le shi"
+
+[[glyphs]]
+char = "テ"
+answers = ["te"]
+
+[[glyphs]]
+char = "ト"
+answers = ["to"]

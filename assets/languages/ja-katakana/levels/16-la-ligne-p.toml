@@ -1,0 +1,39 @@
+id = "kata-16"
+title = "La ligne P"
+subtitle = "Un petit rond cette fois"
+order = 16
+requires = ["kata-15"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "パ"
+answers = ["pa"]
+
+[[glyphs]]
+char = "ピ"
+answers = ["pi"]
+
+[[glyphs]]
+char = "プ"
+answers = ["pu"]
+
+[[glyphs]]
+char = "ペ"
+answers = ["pe"]
+
+[[glyphs]]
+char = "ポ"
+answers = ["po"]

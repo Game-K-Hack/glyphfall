@@ -71,7 +71,7 @@ async fn main() {
     if let Ok(start) = std::env::var("ALPHATILES_START") {
         let screen = match start.split_once(':') {
             Some(("path", language)) => {
-                Some(Screen::LearningPath { language: language.to_string(), selected: 0 })
+                Some(Screen::LearningPath { language: language.to_string(), selected: None })
             }
             Some(("briefing", target)) => target.split_once('/').map(|(language, level)| {
                 Screen::Briefing { language: language.to_string(), level: level.to_string() }

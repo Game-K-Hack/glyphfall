@@ -1,0 +1,64 @@
+id = "hira-13"
+title = "Revision : le syllabaire"
+subtitle = "Les 46 signes de base"
+order = 13
+requires = ["hira-12"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 90
+columns = 4
+spawn_interval = 1.4
+speed = { start = 55.0, ramp = 1.5, max = 165.0 }
+review_ratio = 0.50
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.90
+
+[[glyphs]]
+char = "お"
+answers = ["o"]
+hint = "a ne pas confondre avec le a"
+
+[[glyphs]]
+char = "し"
+answers = ["shi", "si"]
+hint = "se prononce shi, jamais si"
+
+[[glyphs]]
+char = "ち"
+answers = ["chi", "ti"]
+hint = "se prononce tchi"
+
+[[glyphs]]
+char = "ぬ"
+answers = ["nu"]
+hint = "a ne pas confondre avec me"
+
+[[glyphs]]
+char = "め"
+answers = ["me"]
+hint = "a ne pas confondre avec nu"
+
+[[glyphs]]
+char = "ほ"
+answers = ["ho"]
+hint = "le ha avec une barre en plus"
+
+[[glyphs]]
+char = "る"
+answers = ["ru"]
+hint = "boucle fermee, contrairement au ro"
+
+[[glyphs]]
+char = "ん"
+answers = ["n"]
+hint = "la seule consonne qui vit seule"
+
+[[glyphs]]
+char = "を"
+answers = ["wo", "o"]
+hint = "ne sert que de particule d'objet direct"

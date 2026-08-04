@@ -1,0 +1,61 @@
+id = "kata-09"
+title = "Revision : N et H"
+subtitle = "La moitie du chemin"
+order = 9
+requires = ["kata-08"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 75
+columns = 4
+spawn_interval = 1.5
+speed = { start = 52.0, ramp = 1.2, max = 150.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.88
+
+[[glyphs]]
+char = "ナ"
+answers = ["na"]
+
+[[glyphs]]
+char = "ニ"
+answers = ["ni"]
+
+[[glyphs]]
+char = "ヌ"
+answers = ["nu"]
+
+[[glyphs]]
+char = "ネ"
+answers = ["ne"]
+
+[[glyphs]]
+char = "ノ"
+answers = ["no"]
+
+[[glyphs]]
+char = "ハ"
+answers = ["ha"]
+
+[[glyphs]]
+char = "ヒ"
+answers = ["hi"]
+
+[[glyphs]]
+char = "フ"
+answers = ["fu", "hu"]
+hint = "a ne pas confondre avec le wa et le ku"
+
+[[glyphs]]
+char = "ヘ"
+answers = ["he"]
+hint = "identique au signe hiragana"
+
+[[glyphs]]
+char = "ホ"
+answers = ["ho"]

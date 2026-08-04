@@ -1,22 +1,22 @@
-id = "ko-02"
-title = "Voyelles de base"
-subtitle = "Les 10 jamo vocaliques"
-order = 2
-requires = ["ko-01"]
+id = "ko-11"
+title = "Revision : les 10 voyelles"
+subtitle = "Rien que des voyelles"
+order = 11
+requires = ["ko-10"]
 mode = "tile_fall"
 
 [rules]
 lives = 3
-duration = 90
+duration = 75
 columns = 4
-spawn_interval = 1.4
-speed = { start = 55.0, ramp = 1.5, max = 170.0 }
-review_ratio = 0.25
+spawn_interval = 1.5
+speed = { start = 52.0, ramp = 1.2, max = 150.0 }
+review_ratio = 0.20
 
 [stars]
 one = 0.50
-two = 0.75
-three = 0.90
+two = 0.72
+three = 0.88
 
 [[glyphs]]
 char = "ㅏ"
@@ -26,17 +26,17 @@ hint = "trait vers la droite : le son sort devant"
 [[glyphs]]
 char = "ㅑ"
 answers = ["ya"]
-hint = "ㅏ avec deux traits : on ajoute le y"
+hint = "le a avec deux traits : on ajoute le y"
 
 [[glyphs]]
 char = "ㅓ"
 answers = ["eo"]
-hint = "trait vers la gauche : le miroir de ㅏ"
+hint = "trait vers la gauche : le miroir du a"
 
 [[glyphs]]
 char = "ㅕ"
 answers = ["yeo"]
-hint = "ㅓ avec deux traits"
+hint = "le eo avec deux traits"
 
 [[glyphs]]
 char = "ㅗ"
@@ -46,17 +46,17 @@ hint = "trait vers le haut"
 [[glyphs]]
 char = "ㅛ"
 answers = ["yo"]
-hint = "ㅗ avec deux traits"
+hint = "le o avec deux traits"
 
 [[glyphs]]
 char = "ㅜ"
 answers = ["u"]
-hint = "trait vers le bas : le miroir de ㅗ"
+hint = "trait vers le bas : le miroir du o"
 
 [[glyphs]]
 char = "ㅠ"
 answers = ["yu"]
-hint = "ㅜ avec deux traits"
+hint = "le u avec deux traits"
 
 [[glyphs]]
 char = "ㅡ"

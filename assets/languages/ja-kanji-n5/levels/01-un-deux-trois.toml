@@ -1,0 +1,31 @@
+id = "kanji-01"
+title = "Un, deux, trois"
+subtitle = "Compter les traits suffit"
+order = 1
+requires = []
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.00
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "一"
+answers = ["1", "un", "ichi"]
+
+[[glyphs]]
+char = "二"
+answers = ["2", "deux", "ni"]
+
+[[glyphs]]
+char = "三"
+answers = ["3", "trois", "san"]

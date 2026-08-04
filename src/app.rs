@@ -39,7 +39,9 @@ pub enum Screen {
     },
     LearningPath {
         language: String,
-        selected: usize,
+        /// `None` tant que l'écran n'a pas choisi où se placer : il se cale
+        /// alors sur l'étape en cours plutôt que sur la première.
+        selected: Option<usize>,
     },
     Briefing {
         language: String,
@@ -131,7 +133,7 @@ mod tests {
         navigator.apply(Transition::Push(Screen::LanguageSelect { selected: 0 }));
         navigator.apply(Transition::Push(Screen::LearningPath {
             language: "ko".into(),
-            selected: 0,
+            selected: None,
         }));
         navigator
     }

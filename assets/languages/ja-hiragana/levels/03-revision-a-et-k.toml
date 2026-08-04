@@ -1,0 +1,60 @@
+id = "hira-03"
+title = "Revision : A et K"
+subtitle = "Dix signes deja"
+order = 3
+requires = ["hira-02"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 75
+columns = 4
+spawn_interval = 1.5
+speed = { start = 52.0, ramp = 1.2, max = 150.0 }
+review_ratio = 0.00
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.88
+
+[[glyphs]]
+char = "あ"
+answers = ["a"]
+
+[[glyphs]]
+char = "い"
+answers = ["i"]
+
+[[glyphs]]
+char = "う"
+answers = ["u"]
+
+[[glyphs]]
+char = "え"
+answers = ["e"]
+
+[[glyphs]]
+char = "お"
+answers = ["o"]
+hint = "a ne pas confondre avec le a"
+
+[[glyphs]]
+char = "か"
+answers = ["ka"]
+
+[[glyphs]]
+char = "き"
+answers = ["ki"]
+
+[[glyphs]]
+char = "く"
+answers = ["ku"]
+
+[[glyphs]]
+char = "け"
+answers = ["ke"]
+
+[[glyphs]]
+char = "こ"
+answers = ["ko"]

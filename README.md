@@ -11,7 +11,8 @@ sur Windows, macOS, Linux et dans un navigateur.
 
 1. **Choix de l'alphabet** — chaque écriture s'annonce dans ses propres signes.
 2. **Chemin d'apprentissage** — les étapes s'enchaînent, une étoile suffit à
-   ouvrir la suivante.
+   ouvrir la suivante. Chaque écriture en compte une quinzaine : trois à cinq
+   signes nouveaux par étape, et une révision toutes les deux ou trois.
 3. **Briefing** — tous les signes de l'étape avec leur lecture, les règles et
    les seuils à viser. Survolez un signe pour son aide mnémotechnique.
 4. **La manche** — trois vies et un chronomètre.
@@ -112,6 +113,24 @@ char = "α"
 answers = ["a"]                    # toutes les lectures acceptées
 hint = "alpha — l'ancêtre du A"    # facultatif, affiché au briefing
 ```
+
+### Comment découper un chemin
+
+Un niveau qui présente quatorze signes d'un coup n'en apprend aucun. Le
+découpage suit trois règles simples :
+
+- **Trois à cinq signes nouveaux par étape**, pas plus. Une étape doit se
+  gagner du premier coup ou presque.
+- **Une révision toutes les deux ou trois étapes**, qui ne présente aucun signe
+  nouveau et rebrasse ce qui précède.
+- **`review_ratio` monte avec le chemin.** Il puise dans **toute** la chaîne de
+  `requires`, pas seulement dans l'étape précédente : à la quinzième étape, un
+  tirage sur deux revient sur ce qui a été appris depuis le début.
+
+Les étapes de découverte sont volontairement lentes et courtes — `duration`
+autour de 50 s, `speed.start` vers 42 — et se durcissent au fil du chemin. Un
+signe qu'on découvre demande le temps de le reconnaître ; un signe qu'on révise
+doit venir tout seul.
 
 ### Ce que le jeu vérifie au démarrage
 

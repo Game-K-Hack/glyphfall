@@ -7,7 +7,9 @@
 
 use macroquad::prelude::*;
 
-use crate::data::{Catalog, GameMode, Glyph, Rules, Stars};
+use std::collections::HashSet;
+
+use crate::data::{Catalog, GameMode, Glyph, Language, Level, Rules, Stars};
 
 /// Hauteur d'une tuile, en pixels virtuels.
 pub const TILE_HEIGHT: f32 = 40.0;
@@ -122,14 +124,7 @@ impl Session {
             GameMode::TileFall => {}
         }
 
-        // La révision pioche dans les prérequis directs : ce que l'on vient
-        // d'apprendre, pas tout l'historique de la langue.
-        let review = level
-            .requires
-            .iter()
-            .filter_map(|required| language.level(required))
-            .flat_map(|required| required.glyphs.iter().cloned())
-            .collect();
+        let review = review_pool(language, level);
 
         Some(Self {
             language_id: language_id.to_string(),
@@ -350,6 +345,37 @@ impl Session {
     }
 }
 
+/// Tous les signes déjà rencontrés avant ce niveau.
+///
+/// La collecte remonte **toute** la chaîne de prérequis, pas seulement le
+/// niveau juste avant. Sur un chemin d'une quinzaine d'étapes, ne réviser que
+/// l'étape précédente laisserait le début s'effacer : c'est précisément ce
+/// qu'un apprentissage progressif doit empêcher.
+fn review_pool(language: &Language, level: &Level) -> Vec<Glyph> {
+    let mut pending: Vec<&str> = level.requires.iter().map(String::as_str).collect();
+    let mut visited: HashSet<&str> = HashSet::new();
+    let mut seen_chars: HashSet<&str> = HashSet::new();
+    let mut pool = Vec::new();
+
+    while let Some(id) = pending.pop() {
+        if !visited.insert(id) {
+            continue;
+        }
+        let Some(previous) = language.level(id) else { continue };
+
+        for glyph in &previous.glyphs {
+            // Un signe réintroduit par un niveau de révision ne doit pas peser
+            // double dans le tirage.
+            if seen_chars.insert(glyph.char.as_str()) {
+                pool.push(glyph.clone());
+            }
+        }
+        pending.extend(previous.requires.iter().map(String::as_str));
+    }
+
+    pool
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -509,6 +535,40 @@ mod tests {
 
         assert_eq!(session.review.len(), 1);
         assert_eq!(session.review[0].char, "ㄱ");
+    }
+
+    #[test]
+    fn review_reaches_back_through_the_whole_chain() {
+        // Sur un chemin d'une quinzaine d'etapes, ne reviser que l'etape
+        // precedente laisserait le debut s'effacer.
+        let levels = vec![
+            level("ko-01", &[], vec![glyph("ㄱ", "g")]),
+            level("ko-02", &["ko-01"], vec![glyph("ㄴ", "n")]),
+            level("ko-03", &["ko-02"], vec![glyph("ㄷ", "d")]),
+            level("ko-04", &["ko-03"], vec![glyph("ㄹ", "r")]),
+        ];
+        let session = session(levels, "ko-04");
+
+        let mut revised: Vec<&str> = session.review.iter().map(|g| g.char.as_str()).collect();
+        revised.sort_unstable();
+        assert_eq!(revised, vec!["ㄱ", "ㄴ", "ㄷ"]);
+    }
+
+    #[test]
+    fn a_sign_repeated_by_a_revision_level_is_not_drawn_twice_as_often() {
+        // Les niveaux de revision reprennent des signes deja enseignes ; sans
+        // dedoublonnage, ceux-la sortiraient deux fois plus souvent que les
+        // autres dans le tirage.
+        let levels = vec![
+            level("ko-01", &[], vec![glyph("ㄱ", "g")]),
+            level("ko-02", &["ko-01"], vec![glyph("ㄴ", "n")]),
+            // Une revision qui reprend les deux precedents.
+            level("ko-03", &["ko-02"], vec![glyph("ㄱ", "g"), glyph("ㄴ", "n")]),
+            level("ko-04", &["ko-03"], vec![glyph("ㄷ", "d")]),
+        ];
+        let session = session(levels, "ko-04");
+
+        assert_eq!(session.review.len(), 2, "chaque signe ne doit compter qu'une fois");
     }
 
     #[test]

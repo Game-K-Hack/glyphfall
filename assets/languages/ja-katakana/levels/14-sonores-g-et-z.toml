@@ -1,0 +1,59 @@
+id = "kata-14"
+title = "Sonores G et Z"
+subtitle = "Deux petits traits changent tout"
+order = 14
+requires = ["kata-13"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "ガ"
+answers = ["ga"]
+
+[[glyphs]]
+char = "ギ"
+answers = ["gi"]
+
+[[glyphs]]
+char = "グ"
+answers = ["gu"]
+
+[[glyphs]]
+char = "ゲ"
+answers = ["ge"]
+
+[[glyphs]]
+char = "ゴ"
+answers = ["go"]
+
+[[glyphs]]
+char = "ザ"
+answers = ["za"]
+
+[[glyphs]]
+char = "ジ"
+answers = ["ji", "zi"]
+
+[[glyphs]]
+char = "ズ"
+answers = ["zu"]
+
+[[glyphs]]
+char = "ゼ"
+answers = ["ze"]
+
+[[glyphs]]
+char = "ゾ"
+answers = ["zo"]

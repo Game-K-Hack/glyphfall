@@ -26,7 +26,7 @@ const TEXT_X: f32 = NODE_X + NODE_SIZE + 10.0;
 pub fn learning_path_screen(
     app: &App,
     language_id: &str,
-    selected: &mut usize,
+    selected: &mut Option<usize>,
     mouse: Vec2,
 ) -> Transition {
     clear_background(role::BACKGROUND);
@@ -36,6 +36,17 @@ pub fn learning_path_screen(
         // mais mieux vaut revenir en arrière que d'indexer dans le vide.
         return Transition::Pop;
     };
+
+    // À l'ouverture, on se place sur la première étape non terminée. Sur un
+    // chemin d'une quinzaine de niveaux, repartir du premier à chaque visite
+    // obligerait à redescendre toute la liste.
+    let selected = selected.get_or_insert_with(|| {
+        language
+            .levels
+            .iter()
+            .position(|level| !app.progress.is_completed(&level.id))
+            .unwrap_or(language.levels.len() - 1)
+    });
 
     *selected = (*selected).min(language.levels.len() - 1);
     draw_header(&app.fonts, language, &app.progress);

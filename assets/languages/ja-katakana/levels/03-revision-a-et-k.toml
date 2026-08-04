@@ -1,0 +1,60 @@
+id = "kata-03"
+title = "Revision : A et K"
+subtitle = "Dix signes deja"
+order = 3
+requires = ["kata-02"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 75
+columns = 4
+spawn_interval = 1.5
+speed = { start = 52.0, ramp = 1.2, max = 150.0 }
+review_ratio = 0.00
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.88
+
+[[glyphs]]
+char = "ア"
+answers = ["a"]
+
+[[glyphs]]
+char = "イ"
+answers = ["i"]
+
+[[glyphs]]
+char = "ウ"
+answers = ["u"]
+
+[[glyphs]]
+char = "エ"
+answers = ["e"]
+
+[[glyphs]]
+char = "オ"
+answers = ["o"]
+
+[[glyphs]]
+char = "カ"
+answers = ["ka"]
+
+[[glyphs]]
+char = "キ"
+answers = ["ki"]
+
+[[glyphs]]
+char = "ク"
+answers = ["ku"]
+hint = "a ne pas confondre avec le wa et le ta"
+
+[[glyphs]]
+char = "ケ"
+answers = ["ke"]
+
+[[glyphs]]
+char = "コ"
+answers = ["ko"]

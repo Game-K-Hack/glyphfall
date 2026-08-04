@@ -1,19 +1,17 @@
-id = "kanji-n5-01"
-title = "Les chiffres"
-subtitle = "De 1 à 10, les kanji les plus fréquents"
-order = 1
-requires = []
+id = "kanji-04"
+title = "Revision : les nombres"
+subtitle = "De un a dix"
+order = 4
+requires = ["kanji-03"]
 mode = "tile_fall"
 
-# Les kanji étant plus longs à reconnaître qu'un kana, on ralentit la chute
-# et on espace les apparitions.
 [rules]
 lives = 3
-duration = 90
+duration = 75
 columns = 4
-spawn_interval = 1.8
-speed = { start = 42.0, ramp = 1.0, max = 130.0 }
-review_ratio = 0.0
+spawn_interval = 1.5
+speed = { start = 52.0, ramp = 1.2, max = 150.0 }
+review_ratio = 0.00
 
 [stars]
 one = 0.50

@@ -1,16 +1,16 @@
 ---
 id: "ajout-de-musique-de-fond-2026-08-04"
-status: "review"
+status: "done"
 priority: "medium"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-04T00:36:28.805Z"
-modified: "2026-08-04T02:09:39.522Z"
-completedAt: null
+modified: "2026-08-04T14:21:32.517Z"
+completedAt: "2026-08-04T14:21:32.517Z"
 labels: []
-order: "a0"
+order: "aD"
 ---
 # Musique de fond
 
-Ajouter une musique dans les menusu jeu
+Ajouter une musique dans les menus jeu

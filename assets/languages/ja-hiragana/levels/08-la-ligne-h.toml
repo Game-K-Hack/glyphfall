@@ -1,0 +1,40 @@
+id = "hira-08"
+title = "La ligne H"
+subtitle = "Le F se cache dedans"
+order = 8
+requires = ["hira-07"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "は"
+answers = ["ha"]
+
+[[glyphs]]
+char = "ひ"
+answers = ["hi"]
+
+[[glyphs]]
+char = "ふ"
+answers = ["fu", "hu"]
+
+[[glyphs]]
+char = "へ"
+answers = ["he"]
+
+[[glyphs]]
+char = "ほ"
+answers = ["ho"]
+hint = "le ha avec une barre en plus"

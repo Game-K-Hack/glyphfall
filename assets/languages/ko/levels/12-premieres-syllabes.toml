@@ -1,0 +1,40 @@
+id = "ko-12"
+title = "Premieres syllabes"
+subtitle = "Consonne et voyelle reunies"
+order = 12
+requires = ["ko-11"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 70
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 1.0, max = 130.0 }
+review_ratio = 0.20
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "가"
+answers = ["ga", "ka"]
+hint = "consonne + voyelle verticale : elle se place a droite"
+
+[[glyphs]]
+char = "나"
+answers = ["na"]
+
+[[glyphs]]
+char = "다"
+answers = ["da", "ta"]
+
+[[glyphs]]
+char = "라"
+answers = ["ra", "la"]
+
+[[glyphs]]
+char = "마"
+answers = ["ma"]

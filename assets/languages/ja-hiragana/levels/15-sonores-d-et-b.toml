@@ -1,0 +1,60 @@
+id = "hira-15"
+title = "Sonores D et B"
+subtitle = "Dix de plus sur le meme principe"
+order = 15
+requires = ["hira-14"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "だ"
+answers = ["da"]
+
+[[glyphs]]
+char = "ぢ"
+answers = ["ji", "di"]
+hint = "meme son que le ji precedent, mais tres rare"
+
+[[glyphs]]
+char = "づ"
+answers = ["zu", "du"]
+
+[[glyphs]]
+char = "で"
+answers = ["de"]
+
+[[glyphs]]
+char = "ど"
+answers = ["do"]
+
+[[glyphs]]
+char = "ば"
+answers = ["ba"]
+
+[[glyphs]]
+char = "び"
+answers = ["bi"]
+
+[[glyphs]]
+char = "ぶ"
+answers = ["bu"]
+
+[[glyphs]]
+char = "べ"
+answers = ["be"]
+
+[[glyphs]]
+char = "ぼ"
+answers = ["bo"]

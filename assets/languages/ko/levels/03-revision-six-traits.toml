@@ -1,0 +1,49 @@
+id = "ko-03"
+title = "Revision : six traits"
+subtitle = "Tout ce que l'on sait deja"
+order = 3
+requires = ["ko-02"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 75
+columns = 4
+spawn_interval = 1.5
+speed = { start = 52.0, ramp = 1.2, max = 150.0 }
+review_ratio = 0.00
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.88
+
+[[glyphs]]
+char = "ㄱ"
+answers = ["g", "k"]
+hint = "giyeok - un coin, comme un G qui a perdu sa boucle"
+
+[[glyphs]]
+char = "ㄴ"
+answers = ["n"]
+hint = "nieun - la langue contre les dents, vue de profil"
+
+[[glyphs]]
+char = "ㄷ"
+answers = ["d", "t"]
+hint = "digeut - le nieun que l'on referme"
+
+[[glyphs]]
+char = "ㄹ"
+answers = ["r", "l"]
+hint = "rieul - le zigzag de la langue qui roule"
+
+[[glyphs]]
+char = "ㅁ"
+answers = ["m"]
+hint = "mieum - la bouche fermee, un carre"
+
+[[glyphs]]
+char = "ㅂ"
+answers = ["b", "p"]
+hint = "bieup - le mieum ouvert, la bouche qui s'entrouvre"

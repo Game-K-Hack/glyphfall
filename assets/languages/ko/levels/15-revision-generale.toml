@@ -1,0 +1,43 @@
+id = "ko-15"
+title = "Revision generale"
+subtitle = "Tout le hangeul appris"
+order = 15
+requires = ["ko-14"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 90
+columns = 4
+spawn_interval = 1.4
+speed = { start = 55.0, ramp = 1.5, max = 165.0 }
+review_ratio = 0.50
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.90
+
+[[glyphs]]
+char = "그"
+answers = ["geu", "keu"]
+
+[[glyphs]]
+char = "기"
+answers = ["gi", "ki"]
+
+[[glyphs]]
+char = "니"
+answers = ["ni"]
+
+[[glyphs]]
+char = "디"
+answers = ["di", "ti"]
+
+[[glyphs]]
+char = "리"
+answers = ["ri", "li"]
+
+[[glyphs]]
+char = "미"
+answers = ["mi"]

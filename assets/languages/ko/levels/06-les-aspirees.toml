@@ -1,0 +1,34 @@
+id = "ko-06"
+title = "Les aspirees"
+subtitle = "Un trait de plus, un souffle de plus"
+order = 6
+requires = ["ko-05"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "ㅋ"
+answers = ["k"]
+hint = "kieuk - le giyeok aspire : un trait de plus"
+
+[[glyphs]]
+char = "ㅌ"
+answers = ["t"]
+hint = "tieut - le digeut aspire : un trait de plus"
+
+[[glyphs]]
+char = "ㅍ"
+answers = ["p"]
+hint = "pieup - le bieup aspire, pose a plat"

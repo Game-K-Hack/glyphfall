@@ -1,0 +1,39 @@
+id = "kata-10"
+title = "La ligne M"
+subtitle = "Presque au bout"
+order = 10
+requires = ["kata-09"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "マ"
+answers = ["ma"]
+
+[[glyphs]]
+char = "ミ"
+answers = ["mi"]
+
+[[glyphs]]
+char = "ム"
+answers = ["mu"]
+
+[[glyphs]]
+char = "メ"
+answers = ["me"]
+
+[[glyphs]]
+char = "モ"
+answers = ["mo"]

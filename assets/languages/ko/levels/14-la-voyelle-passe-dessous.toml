@@ -1,0 +1,44 @@
+id = "ko-14"
+title = "La voyelle passe dessous"
+subtitle = "Quand elle est horizontale"
+order = 14
+requires = ["ko-13"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 70
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 1.0, max = 130.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "고"
+answers = ["go", "ko"]
+hint = "voyelle horizontale : elle se place dessous"
+
+[[glyphs]]
+char = "노"
+answers = ["no"]
+
+[[glyphs]]
+char = "도"
+answers = ["do", "to"]
+
+[[glyphs]]
+char = "무"
+answers = ["mu"]
+
+[[glyphs]]
+char = "부"
+answers = ["bu", "pu"]
+
+[[glyphs]]
+char = "수"
+answers = ["su"]

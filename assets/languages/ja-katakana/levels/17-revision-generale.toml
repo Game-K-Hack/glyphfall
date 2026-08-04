@@ -1,0 +1,51 @@
+id = "kata-17"
+title = "Revision generale"
+subtitle = "Tout le syllabaire"
+order = 17
+requires = ["kata-16"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 90
+columns = 4
+spawn_interval = 1.4
+speed = { start = 55.0, ramp = 1.5, max = 165.0 }
+review_ratio = 0.50
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.90
+
+[[glyphs]]
+char = "ガ"
+answers = ["ga"]
+
+[[glyphs]]
+char = "ジ"
+answers = ["ji", "zi"]
+
+[[glyphs]]
+char = "ヅ"
+answers = ["zu", "du"]
+
+[[glyphs]]
+char = "パ"
+answers = ["pa"]
+
+[[glyphs]]
+char = "ピ"
+answers = ["pi"]
+
+[[glyphs]]
+char = "ブ"
+answers = ["bu"]
+
+[[glyphs]]
+char = "ベ"
+answers = ["be"]
+
+[[glyphs]]
+char = "ゾ"
+answers = ["zo"]

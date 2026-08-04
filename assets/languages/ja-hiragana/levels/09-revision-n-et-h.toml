@@ -1,0 +1,61 @@
+id = "hira-09"
+title = "Revision : N et H"
+subtitle = "La moitie du chemin"
+order = 9
+requires = ["hira-08"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 75
+columns = 4
+spawn_interval = 1.5
+speed = { start = 52.0, ramp = 1.2, max = 150.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.88
+
+[[glyphs]]
+char = "な"
+answers = ["na"]
+
+[[glyphs]]
+char = "に"
+answers = ["ni"]
+
+[[glyphs]]
+char = "ぬ"
+answers = ["nu"]
+hint = "a ne pas confondre avec me"
+
+[[glyphs]]
+char = "ね"
+answers = ["ne"]
+
+[[glyphs]]
+char = "の"
+answers = ["no"]
+
+[[glyphs]]
+char = "は"
+answers = ["ha"]
+
+[[glyphs]]
+char = "ひ"
+answers = ["hi"]
+
+[[glyphs]]
+char = "ふ"
+answers = ["fu", "hu"]
+
+[[glyphs]]
+char = "へ"
+answers = ["he"]
+
+[[glyphs]]
+char = "ほ"
+answers = ["ho"]
+hint = "le ha avec une barre en plus"

@@ -1,0 +1,34 @@
+id = "ko-02"
+title = "Trois de plus"
+subtitle = "On ferme, on zigzague, on ouvre"
+order = 2
+requires = ["ko-01"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.35
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "ㄷ"
+answers = ["d", "t"]
+hint = "digeut - le nieun que l'on referme"
+
+[[glyphs]]
+char = "ㄹ"
+answers = ["r", "l"]
+hint = "rieul - le zigzag de la langue qui roule"
+
+[[glyphs]]
+char = "ㅂ"
+answers = ["b", "p"]
+hint = "bieup - le mieum ouvert, la bouche qui s'entrouvre"

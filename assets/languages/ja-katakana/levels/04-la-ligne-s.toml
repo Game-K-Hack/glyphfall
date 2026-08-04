@@ -1,0 +1,41 @@
+id = "kata-04"
+title = "La ligne S"
+subtitle = "Attention au troisieme"
+order = 4
+requires = ["kata-03"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "サ"
+answers = ["sa"]
+
+[[glyphs]]
+char = "シ"
+answers = ["shi", "si"]
+hint = "traits qui montent - a ne pas confondre avec le tsu"
+
+[[glyphs]]
+char = "ス"
+answers = ["su"]
+
+[[glyphs]]
+char = "セ"
+answers = ["se"]
+
+[[glyphs]]
+char = "ソ"
+answers = ["so"]
+hint = "traits qui descendent - a ne pas confondre avec le n"

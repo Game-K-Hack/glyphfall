@@ -1,0 +1,40 @@
+id = "ko-13"
+title = "Encore des syllabes"
+subtitle = "La voyelle reste a droite"
+order = 13
+requires = ["ko-12"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 70
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 1.0, max = 130.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "바"
+answers = ["ba", "pa"]
+
+[[glyphs]]
+char = "사"
+answers = ["sa"]
+
+[[glyphs]]
+char = "아"
+answers = ["a"]
+hint = "le cercle est muet a l'initiale : il porte la voyelle"
+
+[[glyphs]]
+char = "자"
+answers = ["ja"]
+
+[[glyphs]]
+char = "하"
+answers = ["ha"]

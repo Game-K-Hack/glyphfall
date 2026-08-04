@@ -1,0 +1,40 @@
+id = "kata-02"
+title = "La ligne K"
+subtitle = "Cinq signes de plus"
+order = 2
+requires = ["kata-01"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "カ"
+answers = ["ka"]
+
+[[glyphs]]
+char = "キ"
+answers = ["ki"]
+
+[[glyphs]]
+char = "ク"
+answers = ["ku"]
+hint = "a ne pas confondre avec le wa et le ta"
+
+[[glyphs]]
+char = "ケ"
+answers = ["ke"]
+
+[[glyphs]]
+char = "コ"
+answers = ["ko"]

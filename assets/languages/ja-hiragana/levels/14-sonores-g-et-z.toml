@@ -1,0 +1,61 @@
+id = "hira-14"
+title = "Sonores G et Z"
+subtitle = "Deux petits traits changent tout"
+order = 14
+requires = ["hira-13"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "が"
+answers = ["ga"]
+hint = "le ka sonorise par les deux petits traits"
+
+[[glyphs]]
+char = "ぎ"
+answers = ["gi"]
+
+[[glyphs]]
+char = "ぐ"
+answers = ["gu"]
+
+[[glyphs]]
+char = "げ"
+answers = ["ge"]
+
+[[glyphs]]
+char = "ご"
+answers = ["go"]
+
+[[glyphs]]
+char = "ざ"
+answers = ["za"]
+
+[[glyphs]]
+char = "じ"
+answers = ["ji", "zi"]
+hint = "le shi sonorise se lit ji, pas zi"
+
+[[glyphs]]
+char = "ず"
+answers = ["zu"]
+
+[[glyphs]]
+char = "ぜ"
+answers = ["ze"]
+
+[[glyphs]]
+char = "ぞ"
+answers = ["zo"]

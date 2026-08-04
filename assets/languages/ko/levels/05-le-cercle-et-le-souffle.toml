@@ -1,0 +1,29 @@
+id = "ko-05"
+title = "Le cercle et le souffle"
+subtitle = "Deux signes a part"
+order = 5
+requires = ["ko-04"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.30
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "ㅇ"
+answers = ["ng"]
+hint = "ieung - muet en debut de syllabe, ng en fin"
+
+[[glyphs]]
+char = "ㅎ"
+answers = ["h"]
+hint = "hieut - un chapeau sur un cercle, le souffle"

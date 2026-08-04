@@ -1,0 +1,34 @@
+id = "kanji-05"
+title = "Soleil, lune, feu"
+subtitle = "Les trois premiers jours"
+order = 5
+requires = ["kanji-04"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 50
+columns = 4
+spawn_interval = 1.7
+speed = { start = 42.0, ramp = 0.8, max = 120.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.70
+three = 0.85
+
+[[glyphs]]
+char = "日"
+answers = ["soleil", "jour"]
+hint = "le jour du soleil ouvre la semaine"
+
+[[glyphs]]
+char = "月"
+answers = ["lune", "mois"]
+hint = "le jour de la lune, le lundi"
+
+[[glyphs]]
+char = "火"
+answers = ["feu"]
+hint = "le jour du feu, le mardi"

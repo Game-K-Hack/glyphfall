@@ -1,0 +1,61 @@
+id = "hira-06"
+title = "Revision : S et T"
+subtitle = "On consolide avant la suite"
+order = 6
+requires = ["hira-05"]
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 75
+columns = 4
+spawn_interval = 1.5
+speed = { start = 52.0, ramp = 1.2, max = 150.0 }
+review_ratio = 0.25
+
+[stars]
+one = 0.50
+two = 0.72
+three = 0.88
+
+[[glyphs]]
+char = "さ"
+answers = ["sa"]
+
+[[glyphs]]
+char = "し"
+answers = ["shi", "si"]
+hint = "se prononce shi, jamais si"
+
+[[glyphs]]
+char = "す"
+answers = ["su"]
+
+[[glyphs]]
+char = "せ"
+answers = ["se"]
+
+[[glyphs]]
+char = "そ"
+answers = ["so"]
+
+[[glyphs]]
+char = "た"
+answers = ["ta"]
+
+[[glyphs]]
+char = "ち"
+answers = ["chi", "ti"]
+hint = "se prononce tchi"
+
+[[glyphs]]
+char = "つ"
+answers = ["tsu", "tu"]
+
+[[glyphs]]
+char = "て"
+answers = ["te"]
+
+[[glyphs]]
+char = "と"
+answers = ["to"]
