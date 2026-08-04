@@ -14,6 +14,7 @@ use crate::data::Catalog;
 use crate::music::Music;
 use crate::gfx::Fonts;
 use crate::progress::Progress;
+use crate::settings::Settings;
 use crate::session::{Outcome, Session};
 
 /// Ce qui vit pour toute la durée du programme.
@@ -23,12 +24,17 @@ pub struct App {
     pub sfx: Sfx,
     pub music: Music,
     pub progress: Progress,
+    pub settings: Settings,
 }
 
 pub enum Screen {
     Title,
     /// `selected` survit d'une frame à l'autre : c'est la carte mise en avant.
     LanguageSelect {
+        selected: usize,
+    },
+    /// `selected` retient la ligne de réglage mise en avant.
+    Options {
         selected: usize,
     },
     LearningPath {

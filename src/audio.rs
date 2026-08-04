@@ -8,7 +8,7 @@
 //! Si le périphérique audio est indisponible — machine sans carte son, onglet
 //! muet — les sons valent `None` et le jeu reste parfaitement jouable.
 
-use macroquad::audio::{Sound, load_sound_from_bytes, play_sound_once};
+use macroquad::audio::{PlaySoundParams, Sound, load_sound_from_bytes, play_sound};
 
 /// Fréquence d'échantillonnage. 22 050 Hz suffit largement pour des blips et
 /// divise par deux le temps de synthèse au démarrage.
@@ -25,10 +25,12 @@ pub struct Sfx {
     navigate: Option<Sound>,
     /// Validation d'un choix, lancement d'une manche.
     confirm: Option<Sound>,
+    /// Multiplicateur venant des réglages, entre 0 et 1.
+    volume: f32,
 }
 
 impl Sfx {
-    pub async fn load() -> Self {
+    pub async fn load(volume: f32) -> Self {
         Self {
             // Deux notes qui montent : la récompense se lit à l'oreille.
             hit: tone(&[(660.0, 0.04), (990.0, 0.06)], 0.35).await,
@@ -38,33 +40,44 @@ impl Sfx {
             missed: tone(&[(440.0, 0.06), (220.0, 0.12)], 0.35).await,
             navigate: tone(&[(520.0, 0.03)], 0.20).await,
             confirm: tone(&[(523.0, 0.05), (784.0, 0.05), (1046.0, 0.09)], 0.30).await,
+            volume,
         }
     }
 
+    pub fn set_volume(&mut self, volume: f32) {
+        self.volume = volume.clamp(0.0, 1.0);
+    }
+
     pub fn hit(&self) {
-        play(&self.hit);
+        self.play(&self.hit);
     }
 
     pub fn wrong(&self) {
-        play(&self.wrong);
+        self.play(&self.wrong);
     }
 
     pub fn missed(&self) {
-        play(&self.missed);
+        self.play(&self.missed);
     }
 
     pub fn navigate(&self) {
-        play(&self.navigate);
+        self.play(&self.navigate);
     }
 
     pub fn confirm(&self) {
-        play(&self.confirm);
+        self.play(&self.confirm);
     }
-}
 
-fn play(sound: &Option<Sound>) {
-    if let Some(sound) = sound {
-        play_sound_once(sound);
+    fn play(&self, sound: &Option<Sound>) {
+        // À volume nul, ne rien émettre du tout plutôt qu'un son inaudible :
+        // le moteur audio n'a alors aucune voix à gérer.
+        if self.volume <= 0.0 {
+            return;
+        }
+
+        if let Some(sound) = sound {
+            play_sound(sound, PlaySoundParams { looped: false, volume: self.volume });
+        }
     }
 }
 

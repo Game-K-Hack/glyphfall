@@ -36,7 +36,13 @@ pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
         return Transition::Push(Screen::LanguageSelect { selected: 0 });
     }
 
-    let quit = Rect::new(x, 144.0, BUTTON_WIDTH, BUTTON_HEIGHT);
+    let options = Rect::new(x, 144.0, BUTTON_WIDTH, BUTTON_HEIGHT);
+    if ui::button(fonts_set, mouse, Button::new(options, "OPTIONS")) {
+        app.sfx.confirm();
+        return Transition::Push(Screen::Options { selected: 0 });
+    }
+
+    let quit = Rect::new(x, 172.0, BUTTON_WIDTH, BUTTON_HEIGHT);
     if ui::button(fonts_set, mouse, Button::new(quit, "QUITTER").accent(role::DANGER)) {
         return Transition::Quit;
     }

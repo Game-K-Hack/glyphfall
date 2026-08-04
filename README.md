@@ -18,7 +18,8 @@ sur Windows, macOS, Linux et dans un navigateur.
 5. **Résultats** — de zéro à trois étoiles, et surtout la liste des signes
    ratés avec la lecture qu'il fallait taper.
 
-La progression est enregistrée automatiquement.
+La progression est enregistrée automatiquement, tout comme les volumes réglés
+depuis l'écran d'options.
 
 ## Commandes
 
@@ -28,6 +29,7 @@ La progression est enregistrée automatiquement.
 | `Entrée` / `Espace` | Valider la saisie |
 | `Retour arrière` | Corriger |
 | `↑` `↓` | Naviguer dans les menus |
+| `←` `→` | Régler un volume, dans les options |
 | `Échap` | Revenir en arrière |
 
 La souris fonctionne partout où le clavier fonctionne.
@@ -167,7 +169,8 @@ n'ajoutez que celles qui servent, et une seule graisse.
 | `src/screens/` | Un fichier par écran |
 | `src/session.rs` | Une manche : règles, tuiles, score, bilan |
 | `src/progress.rs` | Étoiles gagnées, déverrouillage |
-| `src/storage.rs` | Sauvegarde, fichier ou stockage navigateur |
+| `src/settings.rs` | Réglages du joueur, volumes |
+| `src/storage.rs` | Sauvegardes, fichiers ou stockage navigateur |
 | `src/audio.rs` | Bruitages synthétisés au démarrage |
 | `src/music.rs` | Playlist des menus, décodage des morceaux |
 | `src/compose.rs` | Le générateur de la musique « Claude » |
@@ -181,6 +184,7 @@ raisonnent donc en pixels virtuels et n'appellent jamais `screen_width()`.
 
 ```sh
 ALPHATILES_START=languages           cargo run
+ALPHATILES_START=options             cargo run
 ALPHATILES_START=path:ja-hiragana    cargo run
 ALPHATILES_START=briefing:ko/ko-01   cargo run
 ALPHATILES_START=play:ko/ko-03       cargo run

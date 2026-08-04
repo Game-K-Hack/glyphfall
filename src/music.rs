@@ -17,7 +17,9 @@
 use std::io::Cursor;
 
 use include_dir::{Dir, File, include_dir};
-use macroquad::audio::{PlaySoundParams, Sound, load_sound_from_bytes, stop_sound};
+use macroquad::audio::{
+    PlaySoundParams, Sound, load_sound_from_bytes, set_sound_volume, stop_sound,
+};
 use macroquad::prelude::rand;
 use symphonia::core::audio::SampleBuffer;
 use symphonia::core::codecs::DecoderOptions;
@@ -61,7 +63,7 @@ struct Playing {
 }
 
 impl Music {
-    pub fn load() -> Self {
+    pub fn load(volume: f32) -> Self {
         let mut tracks: Vec<_> = MENU_MUSIC
             .files()
             .filter(|file| {
@@ -78,7 +80,7 @@ impl Music {
         tracks.sort_by_key(|file| file.path());
 
         let mut music =
-            Self { tracks, order: Vec::new(), next: 0, playing: None, silence: 0.0, volume: 0.6 };
+            Self { tracks, order: Vec::new(), next: 0, playing: None, silence: 0.0, volume };
         music.reshuffle();
         music
     }
@@ -108,6 +110,16 @@ impl Music {
         self.silence -= dt;
         if self.silence <= 0.0 {
             self.start_next().await;
+        }
+    }
+
+    /// Change le volume, y compris celui du morceau en cours : le réglage doit
+    /// s'entendre pendant qu'on le bouge, pas au morceau suivant.
+    pub fn set_volume(&mut self, volume: f32) {
+        self.volume = volume.clamp(0.0, 1.0);
+
+        if let Some(playing) = &self.playing {
+            set_sound_volume(&playing.sound, self.volume);
         }
     }
 
@@ -250,7 +262,7 @@ mod tests {
     fn only_audio_files_are_picked_up() {
         // Le dossier contient une notice en Markdown, qui ne doit pas se
         // retrouver dans la playlist.
-        let music = Music::load();
+        let music = Music::load(1.0);
 
         for track in &music.tracks {
             let extension = track.path().extension().and_then(|value| value.to_str()).unwrap_or("");
@@ -266,7 +278,7 @@ mod tests {
     fn every_shipped_track_can_be_decoded() {
         // Un MP3 exotique ou un fichier tronqué serait silencieusement saute en
         // jeu : mieux vaut le savoir en lançant les tests.
-        let music = Music::load();
+        let music = Music::load(1.0);
 
         for track in &music.tracks {
             let decoded = decode(track);
@@ -281,7 +293,7 @@ mod tests {
 
     #[test]
     fn the_order_covers_every_track_exactly_once() {
-        let mut music = Music::load();
+        let mut music = Music::load(1.0);
         if music.tracks.len() < 2 {
             return;
         }
@@ -296,7 +308,7 @@ mod tests {
     #[test]
     fn an_empty_folder_is_not_an_error() {
         // Le jeu doit se lancer avant que la moindre musique n'ait ete ajoutee.
-        let mut music = Music::load();
+        let mut music = Music::load(1.0);
         music.tracks.clear();
         music.reshuffle();
 

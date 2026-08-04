@@ -2,6 +2,9 @@ use macroquad::prelude::*;
 
 mod app;
 mod audio;
+/// Outil de développement : il génère la musique et n'a rien à faire dans la
+/// version navigateur, où il ne serait que du code mort.
+#[cfg(not(target_arch = "wasm32"))]
 mod compose;
 mod data;
 mod gfx;
@@ -9,6 +12,7 @@ mod music;
 mod progress;
 mod screens;
 mod session;
+mod settings;
 mod storage;
 mod window;
 
@@ -17,12 +21,14 @@ use crate::audio::Sfx;
 use crate::gfx::{Canvas, Fonts};
 use crate::music::Music;
 use crate::progress::Progress;
+use crate::settings::Settings;
 use crate::session::Session;
 use crate::screens::briefing::briefing_screen;
 use crate::screens::game::game_screen;
 use crate::screens::results::results_screen;
 use crate::screens::language_select::language_select_screen;
 use crate::screens::learning_path::learning_path_screen;
+use crate::screens::options::options_screen;
 use crate::screens::title::title_screen;
 use crate::window::window_conf;
 
@@ -39,9 +45,15 @@ async fn main() {
     };
 
     let fonts = Fonts::load(&catalog);
-    let sfx = Sfx::load().await;
-    let music = Music::load();
-    let mut app = App { catalog, fonts, sfx, music, progress: Progress::load() };
+    // Les réglages viennent avant le son : les volumes sont appliqués dès la
+    // création, sans passer par un état par défaut audible une fraction de
+    // seconde.
+    let settings = Settings::load();
+    let sfx = Sfx::load(settings.sfx_gain()).await;
+    let music = Music::load(settings.music_gain());
+
+    let mut app =
+        App { catalog, fonts, sfx, music, progress: Progress::load(), settings };
 
     // Génère la musique d'ambiance puis quitte, sans ouvrir de fenêtre de jeu.
     #[cfg(not(target_arch = "wasm32"))]
@@ -70,6 +82,7 @@ async fn main() {
             }),
             _ => match start.as_str() {
                 "languages" => Some(Screen::LanguageSelect { selected: 0 }),
+                "options" => Some(Screen::Options { selected: 0 }),
                 _ => None,
             },
         };
@@ -93,6 +106,7 @@ async fn main() {
         let mut transition = match navigator.top_mut() {
             Screen::Title => title_screen(&app, mouse),
             Screen::LanguageSelect { selected } => language_select_screen(&app, selected, mouse),
+            Screen::Options { selected } => options_screen(&mut app, selected, mouse),
             Screen::LearningPath { language, selected } => {
                 learning_path_screen(&app, language, selected, mouse)
             }

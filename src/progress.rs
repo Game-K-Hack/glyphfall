@@ -14,6 +14,9 @@ use crate::storage;
 /// Étoiles maximales pour un niveau.
 pub const MAX_STARS: u8 = 3;
 
+/// Nom du fichier de sauvegarde, ou clé de stockage en navigateur.
+const SAVE_NAME: &str = "progress.toml";
+
 /// Version du format de sauvegarde. Une sauvegarde d'une version inconnue est
 /// ignorée plutôt que mal interprétée : mieux vaut repartir de zéro qu'ouvrir
 /// des niveaux au hasard.
@@ -39,7 +42,7 @@ impl Progress {
     /// Relit la sauvegarde. Une sauvegarde absente, illisible ou d'un format
     /// inconnu donne une progression vide.
     pub fn load() -> Self {
-        let Some(content) = storage::read() else { return Self::new() };
+        let Some(content) = storage::read(SAVE_NAME) else { return Self::new() };
 
         match toml::from_str::<Self>(&content) {
             Ok(progress) if progress.version == FORMAT_VERSION => progress,
@@ -51,7 +54,7 @@ impl Progress {
     /// doit pas interrompre une partie en cours.
     pub fn save(&self) {
         if let Ok(content) = toml::to_string(self) {
-            storage::write(&content);
+            storage::write(SAVE_NAME, &content);
         }
     }
 
