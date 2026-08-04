@@ -50,6 +50,8 @@ pub mod role {
     pub const TEXT: Color = WHITE;
     /// Titre d'écran.
     pub const TITLE: Color = GOLD;
+    /// Aide mnémotechnique.
+    pub const HINT: Color = GOLD;
     /// Texte secondaire : sous-titres, aides, unités.
     pub const TEXT_MUTED: Color = SILVER;
     /// Texte sur un élément désactivé.

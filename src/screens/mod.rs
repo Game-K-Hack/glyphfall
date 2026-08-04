@@ -1,3 +1,4 @@
+pub mod briefing;
 pub mod game;
 pub mod game_over;
 pub mod language_select;

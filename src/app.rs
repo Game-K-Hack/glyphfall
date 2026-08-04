@@ -31,6 +31,10 @@ pub enum Screen {
         language: String,
         selected: usize,
     },
+    Briefing {
+        language: String,
+        level: String,
+    },
     Playing(GameState),
     GameOver { score: u32 },
 }

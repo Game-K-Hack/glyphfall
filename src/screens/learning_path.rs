@@ -94,8 +94,10 @@ pub fn learning_path_screen(
     }
 
     match chosen {
-        // Provisoire : mènera à l'écran de briefing du niveau.
-        Some(_) => Transition::Push(Screen::Playing(GameState::new())),
+        Some(level) => Transition::Push(Screen::Briefing {
+            language: language.id.clone(),
+            level: level.id.clone(),
+        }),
         None => Transition::Stay,
     }
 }

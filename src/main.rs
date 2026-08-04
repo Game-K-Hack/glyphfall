@@ -12,6 +12,7 @@ use crate::app::{App, Navigator, Screen, Transition};
 use crate::core::GameState;
 use crate::gfx::{Canvas, Fonts};
 use crate::progress::Progress;
+use crate::screens::briefing::briefing_screen;
 use crate::screens::game::game_screen;
 use crate::screens::game_over::game_over_screen;
 use crate::screens::language_select::language_select_screen;
@@ -45,6 +46,9 @@ async fn main() {
             Some(("path", language)) => {
                 Some(Screen::LearningPath { language: language.to_string(), selected: 0 })
             }
+            Some(("briefing", target)) => target.split_once('/').map(|(language, level)| {
+                Screen::Briefing { language: language.to_string(), level: level.to_string() }
+            }),
             _ => match start.as_str() {
                 "languages" => Some(Screen::LanguageSelect { selected: 0 }),
                 "playing" => Some(Screen::Playing(GameState::new())),
@@ -68,6 +72,9 @@ async fn main() {
             Screen::LanguageSelect { selected } => language_select_screen(&app, selected, mouse),
             Screen::LearningPath { language, selected } => {
                 learning_path_screen(&app, language, selected, mouse)
+            }
+            Screen::Briefing { language, level } => {
+                briefing_screen(&app, language, level, mouse)
             }
             Screen::Playing(state) => game_screen(state, &app.fonts),
             Screen::GameOver { score } => game_over_screen(*score, &app.fonts, mouse),
