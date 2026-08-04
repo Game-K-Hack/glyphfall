@@ -12,17 +12,23 @@
 use crate::core::GameState;
 use crate::data::Catalog;
 use crate::gfx::Fonts;
+use crate::progress::Progress;
 
 /// Ce qui vit pour toute la durée du programme.
 pub struct App {
     pub catalog: Catalog,
     pub fonts: Fonts,
+    pub progress: Progress,
 }
 
 pub enum Screen {
     Title,
     /// `selected` survit d'une frame à l'autre : c'est la carte mise en avant.
     LanguageSelect {
+        selected: usize,
+    },
+    LearningPath {
+        language: String,
         selected: usize,
     },
     Playing(GameState),

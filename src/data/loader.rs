@@ -135,6 +135,9 @@ mod tests {
         let font = fontdue::Font::from_bytes(bytes, fontdue::FontSettings::default())
             .expect("police d'interface lisible");
 
+        // Les aides mnémotechniques sont volontairement absentes : elles citent
+        // les glyphes de la langue et sont donc rendues avec la police de la
+        // langue, qui couvre aussi le latin.
         let mut texts = Vec::new();
         for language in &catalog.languages {
             texts.push(language.name.clone());
@@ -142,20 +145,12 @@ mod tests {
             for level in &language.levels {
                 texts.push(level.title.clone());
                 texts.push(level.subtitle.clone());
-                for glyph in &level.glyphs {
-                    texts.push(glyph.hint.clone());
-                    texts.extend(glyph.answers.iter().cloned());
-                }
+                texts.extend(level.glyphs.iter().flat_map(|glyph| glyph.answers.iter().cloned()));
             }
         }
 
         for text in texts {
             for character in text.chars() {
-                // Les glyphes cités dans les aides sont dessinés avec la police
-                // de la langue, pas celle de l'interface.
-                if (character as u32) > 0x2000 {
-                    continue;
-                }
                 assert_ne!(
                     font.lookup_glyph_index(character),
                     0,

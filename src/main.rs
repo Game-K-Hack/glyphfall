@@ -4,15 +4,18 @@ mod app;
 mod core;
 mod data;
 mod gfx;
+mod progress;
 mod screens;
 mod window;
 
 use crate::app::{App, Navigator, Screen, Transition};
 use crate::core::GameState;
 use crate::gfx::{Canvas, Fonts};
+use crate::progress::Progress;
 use crate::screens::game::game_screen;
 use crate::screens::game_over::game_over_screen;
 use crate::screens::language_select::language_select_screen;
+use crate::screens::learning_path::learning_path_screen;
 use crate::screens::title::title_screen;
 use crate::window::window_conf;
 
@@ -29,18 +32,30 @@ async fn main() {
     };
 
     let fonts = Fonts::load(&catalog);
-    let app = App { catalog, fonts };
+    let app = App { catalog, fonts, progress: Progress::new() };
 
     let mut canvas = Canvas::new();
     let mut navigator = Navigator::new(Screen::Title);
     let mut capture = Capture::from_environment();
 
-    // Raccourci de développement : démarrer directement sur un écran donné.
-    match std::env::var("ALPHATILES_START").as_deref() {
-        Ok("languages") => navigator.apply(Transition::Push(Screen::LanguageSelect { selected: 0 })),
-        Ok("playing") => navigator.apply(Transition::Push(Screen::Playing(GameState::new()))),
-        _ => true,
-    };
+    // Raccourci de développement : démarrer directement sur un écran donné,
+    // par exemple `ALPHATILES_START=path:ja-hiragana`.
+    if let Ok(start) = std::env::var("ALPHATILES_START") {
+        let screen = match start.split_once(':') {
+            Some(("path", language)) => {
+                Some(Screen::LearningPath { language: language.to_string(), selected: 0 })
+            }
+            _ => match start.as_str() {
+                "languages" => Some(Screen::LanguageSelect { selected: 0 }),
+                "playing" => Some(Screen::Playing(GameState::new())),
+                _ => None,
+            },
+        };
+
+        if let Some(screen) = screen {
+            navigator.apply(Transition::Push(screen));
+        }
+    }
 
     loop {
         // Tout est dessiné sur la toile virtuelle, jamais directement à la
@@ -51,6 +66,9 @@ async fn main() {
         let transition = match navigator.top_mut() {
             Screen::Title => title_screen(&app.fonts, mouse),
             Screen::LanguageSelect { selected } => language_select_screen(&app, selected, mouse),
+            Screen::LearningPath { language, selected } => {
+                learning_path_screen(&app, language, selected, mouse)
+            }
             Screen::Playing(state) => game_screen(state, &app.fonts),
             Screen::GameOver { score } => game_over_screen(*score, &app.fonts, mouse),
         };

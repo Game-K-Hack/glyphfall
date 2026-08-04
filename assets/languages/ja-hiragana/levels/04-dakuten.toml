@@ -1,6 +1,6 @@
 id = "hira-04"
 title = "Dakuten et handakuten"
-subtitle = "Les deux marques qui sonorisent : ゛et ゜"
+subtitle = "Les marques qui sonorisent"
 order = 4
 requires = ["hira-03"]
 mode = "tile_fall"

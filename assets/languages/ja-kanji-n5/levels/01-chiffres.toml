@@ -1,6 +1,6 @@
 id = "kanji-n5-01"
 title = "Les chiffres"
-subtitle = "一 à 十, les kanji les plus fréquents"
+subtitle = "De 1 à 10, les kanji les plus fréquents"
 order = 1
 requires = []
 mode = "tile_fall"

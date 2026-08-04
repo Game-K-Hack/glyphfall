@@ -1,5 +1,5 @@
 id = "hira-03"
-title = "Y, R, W et ん"
+title = "Y, R, W et le N final"
 subtitle = "Les dernières lignes du gojūon"
 order = 3
 requires = ["hira-02"]

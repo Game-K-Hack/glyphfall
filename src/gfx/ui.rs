@@ -62,6 +62,38 @@ pub fn text_width(fonts: &Fonts, content: &str, size: u16) -> f32 {
     measure_text(content, Some(&fonts.ui), size, 1.0).width
 }
 
+/// Écrit sur une ligne, en coupant avec des points de suspension ce qui
+/// dépasserait `max_width`.
+///
+/// Les titres viennent de fichiers TOML écrits à la main : mieux vaut un texte
+/// tronqué proprement qu'un texte qui sort de l'écran.
+pub fn text_truncated(
+    fonts: &Fonts,
+    content: &str,
+    x: f32,
+    y: f32,
+    size: u16,
+    color: Color,
+    max_width: f32,
+) {
+    const ELLIPSIS: &str = "...";
+
+    if text_width(fonts, content, size) <= max_width {
+        text(fonts, content, x, y, size, color);
+        return;
+    }
+
+    let mut shortened = content.to_string();
+    while !shortened.is_empty()
+        && text_width(fonts, &format!("{shortened}{ELLIPSIS}"), size) > max_width
+    {
+        shortened.pop();
+    }
+    shortened.push_str(ELLIPSIS);
+
+    text(fonts, &shortened, x, y, size, color);
+}
+
 /// Écrit centré horizontalement sur `center_x`.
 pub fn text_centered(fonts: &Fonts, content: &str, center_x: f32, y: f32, size: u16, color: Color) {
     let x = center_x - text_width(fonts, content, size) / 2.0;
@@ -227,6 +259,16 @@ const HEART: [&str; 6] = [
     "   #   ",
 ];
 
+const LOCK: [&str; 7] = [
+    "  ###  ",
+    " #   # ",
+    " #   # ",
+    "#######",
+    "### ###",
+    "### ###",
+    "#######",
+];
+
 pub const STAR_WIDTH: f32 = 7.0;
 pub const STAR_HEIGHT: f32 = 7.0;
 pub const HEART_WIDTH: f32 = 7.0;
@@ -237,6 +279,19 @@ pub fn star(x: f32, y: f32, earned: bool) {
 
 pub fn heart(x: f32, y: f32, remaining: bool) {
     blit(&HEART, x, y, if remaining { role::DANGER } else { role::TEXT_DISABLED });
+}
+
+pub fn lock(x: f32, y: f32, color: Color) {
+    blit(&LOCK, x, y, color);
+}
+
+/// Un trait vertical pointillé, qui relie deux étapes du chemin.
+pub fn dotted_line(x: f32, from_y: f32, to_y: f32, color: Color) {
+    let mut y = from_y.floor();
+    while y < to_y {
+        draw_rectangle(x.floor(), y, 1.0, 1.0, color);
+        y += 3.0;
+    }
 }
 
 /// Trois étoiles alignées, dont `earned` sont gagnées.
