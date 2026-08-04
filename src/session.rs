@@ -124,7 +124,6 @@ pub enum EndReason {
 pub struct Outcome {
     pub language_id: String,
     pub level_id: String,
-    pub level_title: String,
     pub score: u32,
     pub hits: u32,
     pub accuracy: f32,
@@ -404,7 +403,6 @@ impl Session {
         Outcome {
             language_id: self.language_id.clone(),
             level_id: self.level_id.clone(),
-            level_title: self.level_title.clone(),
             score: self.score,
             hits: self.hits,
             accuracy,

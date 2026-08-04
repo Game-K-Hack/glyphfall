@@ -12,6 +12,11 @@ use crate::session::{EndReason, Outcome, Session};
 
 /// Les étoiles du bilan sont dessinées plus grandes que celles des listes.
 const STAR_SCALE: f32 = 3.0;
+/// Temps mort avant la première étoile.
+///
+/// Sans lui, la première est déjà posée quand l'écran apparaît : on ne voit
+/// jamais l'animation, seulement son résultat.
+const STAR_OPENING: f32 = 0.6;
 /// Délai entre l'apparition de deux étoiles, en secondes.
 const STAR_DELAY: f32 = 0.35;
 /// Durée du petit rebond à l'apparition d'une étoile.
@@ -29,7 +34,7 @@ const MAX_MISSED_SHOWN: usize = 8;
 ///
 /// Il couvre aussi l'apparition des étoiles : agir avant qu'elles ne soient
 /// posées reviendrait à sauter sa propre récompense.
-const GRACE: f32 = 0.9;
+const GRACE: f32 = 1.5;
 
 pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Vec2) -> Transition {
     clear_background(role::BACKGROUND);
@@ -80,15 +85,6 @@ fn draw_verdict(fonts_set: &Fonts, outcome: &Outcome) {
     };
 
     ui::text_centered(fonts_set, verdict, canvas::WIDTH / 2.0, 10.0, fonts::TITLE, color);
-    ui::text_truncated(
-        fonts_set,
-        &outcome.level_title,
-        8.0,
-        30.0,
-        fonts::TEXT,
-        role::TEXT_MUTED,
-        canvas::WIDTH - 16.0,
-    );
 }
 
 /// Les trois étoiles, dessinées pixel par pixel puis agrandies : les redessiner
@@ -105,7 +101,7 @@ fn draw_stars(earned: u8, elapsed: f32) {
 
     for index in 0..MAX_STARS {
         let x = start_x + index as f32 * (size + gap);
-        let due = STAR_DELAY * index as f32;
+        let due = STAR_OPENING + STAR_DELAY * index as f32;
 
         // Les étoiles non gagnées restent en place dès le début : ce sont des
         // emplacements vides, pas des récompenses à annoncer.
@@ -248,7 +244,7 @@ mod tests {
     fn the_delay_outlasts_the_star_animation() {
         // Pouvoir relancer avant que les etoiles ne soient posees reviendrait a
         // sauter sa propre recompense.
-        let animation_end = STAR_DELAY * (MAX_STARS - 1) as f32 + STAR_POP;
+        let animation_end = STAR_OPENING + STAR_DELAY * (MAX_STARS - 1) as f32 + STAR_POP;
 
         assert!(GRACE >= animation_end, "delai {GRACE}, animation {animation_end}");
     }
