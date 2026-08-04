@@ -41,13 +41,6 @@ const AUDIO_EXTENSIONS: [&str; 3] = ["mp3", "ogg", "wav"];
 /// l'impression d'un seul morceau incohérent.
 const GAP: f32 = 1.5;
 
-/// La musique de manche joue plus bas que celle des menus.
-///
-/// C'est par les bruitages que passe l'information pendant une partie — un
-/// signe reconnu, une vie perdue. Une musique à plein volume les couvrirait au
-/// moment précis où ils comptent.
-const GAME_LEVEL: f32 = 0.6;
-
 /// Quelle ambiance l'écran courant demande.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Ambience {
@@ -141,8 +134,13 @@ pub struct Music {
     playing: Option<Playing>,
     /// Décompte du silence entre deux morceaux.
     silence: f32,
-    /// Volume voulu par le joueur, avant la baisse propre à la manche.
-    volume: f32,
+    /// Volume voulu par le joueur, pour chaque ambiance.
+    menus_volume: f32,
+    game_volume: f32,
+    /// Ambiance dont on veut entendre le volume sans y être, le temps de le
+    /// régler depuis les options. Réarmée à chaque frame par l'écran.
+    preview: Option<Ambience>,
+    requested_preview: Option<Ambience>,
 }
 
 struct Playing {
@@ -153,19 +151,38 @@ struct Playing {
 }
 
 impl Music {
-    pub fn load(volume: f32) -> Self {
+    pub fn load(menus_volume: f32, game_volume: f32) -> Self {
         Self {
             menus: Playlist::new(&MENU_MUSIC),
             game: Playlist::new(&GAME_MUSIC),
             current: None,
             playing: None,
             silence: 0.0,
-            volume,
+            menus_volume,
+            game_volume,
+            preview: None,
+            requested_preview: None,
         }
+    }
+
+    /// Fait entendre le volume d'une ambiance sans y être.
+    ///
+    /// Sans cela, régler la musique de manche depuis les menus reviendrait à
+    /// bouger un curseur les oreilles bouchées. À réarmer à chaque frame :
+    /// c'est ce qui rend le retour à la normale automatique en quittant
+    /// l'écran, y compris quand on en sort par Échap.
+    pub fn preview(&mut self, ambience: Ambience) {
+        self.requested_preview = Some(ambience);
     }
 
     /// Fait vivre la playlist. À appeler une fois par frame.
     pub async fn update(&mut self, dt: f32, ambience: Ambience) {
+        let requested = self.requested_preview.take();
+        if requested != self.preview {
+            self.preview = requested;
+            self.apply_volume();
+        }
+
         if self.current != Some(ambience) {
             // Changement d'ambiance : on coupe net et on enchaîne sans attendre.
             // Laisser finir le morceau des menus par-dessus une manche déjà
@@ -194,11 +211,15 @@ impl Music {
         }
     }
 
-    /// Change le volume, y compris celui du morceau en cours : le réglage doit
-    /// s'entendre pendant qu'on le bouge, pas au morceau suivant.
-    pub fn set_volume(&mut self, volume: f32) {
-        self.volume = volume.clamp(0.0, 1.0);
+    /// Change les volumes, y compris celui du morceau en cours : le réglage
+    /// doit s'entendre pendant qu'on le bouge, pas au morceau suivant.
+    pub fn set_volumes(&mut self, menus: f32, game: f32) {
+        self.menus_volume = menus.clamp(0.0, 1.0);
+        self.game_volume = game.clamp(0.0, 1.0);
+        self.apply_volume();
+    }
 
+    fn apply_volume(&self) {
         if let Some(playing) = &self.playing {
             set_sound_volume(&playing.sound, self.gain());
         }
@@ -210,11 +231,11 @@ impl Music {
         }
     }
 
-    /// Le volume réellement appliqué, baisse de manche comprise.
+    /// Le volume réellement appliqué, aperçu compris.
     fn gain(&self) -> f32 {
-        match self.current {
-            Some(Ambience::Game) => self.volume * GAME_LEVEL,
-            _ => self.volume,
+        match self.preview.or(self.current) {
+            Some(Ambience::Game) => self.game_volume,
+            _ => self.menus_volume,
         }
     }
 
@@ -404,15 +425,25 @@ mod tests {
     }
 
     #[test]
-    fn the_round_plays_quieter_than_the_menus() {
-        // Les bruitages portent l'information pendant une partie : une musique
-        // a plein volume les couvrirait au moment ou ils comptent.
-        let mut music = Music::load(1.0);
+    fn each_ambience_uses_its_own_volume() {
+        let mut music = Music::load(1.0, 0.4);
 
         music.current = Some(Ambience::Menus);
-        let menus = music.gain();
-        music.current = Some(Ambience::Game);
+        assert_eq!(music.gain(), 1.0);
 
-        assert!(music.gain() < menus);
+        music.current = Some(Ambience::Game);
+        assert_eq!(music.gain(), 0.4);
+    }
+
+    #[test]
+    fn a_preview_lets_you_hear_the_other_ambience() {
+        // Regler la musique de manche depuis les menus, sans apercu, reviendrait
+        // a bouger un curseur les oreilles bouchees.
+        let mut music = Music::load(1.0, 0.4);
+        music.current = Some(Ambience::Menus);
+
+        music.preview = Some(Ambience::Game);
+
+        assert_eq!(music.gain(), 0.4);
     }
 }

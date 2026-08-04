@@ -23,9 +23,16 @@ pub const MAX_LEVEL: u8 = 10;
 pub struct Settings {
     #[serde(default)]
     version: u32,
-    /// Volume de la musique de fond, de 0 à `MAX_LEVEL`.
+    /// Volume de la musique des menus, de 0 à `MAX_LEVEL`.
     #[serde(default = "default_music")]
     pub music: u8,
+    /// Volume de la musique pendant une manche.
+    ///
+    /// Séparé de celui des menus, et plus bas par défaut : en partie,
+    /// l'information passe par les bruitages, qu'une musique trop forte
+    /// couvrirait au moment précis où ils comptent.
+    #[serde(default = "default_music_game")]
+    pub music_game: u8,
     /// Volume des bruitages, de 0 à `MAX_LEVEL`.
     #[serde(default = "default_sfx")]
     pub sfx: u8,
@@ -33,7 +40,12 @@ pub struct Settings {
 
 impl Default for Settings {
     fn default() -> Self {
-        Self { version: FORMAT_VERSION, music: default_music(), sfx: default_sfx() }
+        Self {
+            version: FORMAT_VERSION,
+            music: default_music(),
+            music_game: default_music_game(),
+            sfx: default_sfx(),
+        }
     }
 }
 
@@ -60,6 +72,11 @@ impl Settings {
         gain(self.music)
     }
 
+    /// Le volume de la musique pendant une manche.
+    pub fn music_game_gain(&self) -> f32 {
+        gain(self.music_game)
+    }
+
     pub fn sfx_gain(&self) -> f32 {
         gain(self.sfx)
     }
@@ -68,6 +85,7 @@ impl Settings {
     /// laisse pas cette valeur atteindre le moteur audio.
     fn clamped(mut self) -> Self {
         self.music = self.music.min(MAX_LEVEL);
+        self.music_game = self.music_game.min(MAX_LEVEL);
         self.sfx = self.sfx.min(MAX_LEVEL);
         self
     }
@@ -79,6 +97,10 @@ fn gain(level: u8) -> f32 {
 
 fn default_music() -> u8 {
     6
+}
+
+fn default_music_game() -> u8 {
+    4
 }
 
 fn default_sfx() -> u8 {
@@ -104,25 +126,35 @@ mod tests {
     }
 
     #[test]
+    fn the_round_is_quieter_than_the_menus_by_default() {
+        // Les bruitages portent l'information pendant une partie.
+        let settings = Settings::default();
+
+        assert!(settings.music_game < settings.music);
+    }
+
+    #[test]
     fn settings_survive_a_round_trip() {
-        let settings = Settings { version: FORMAT_VERSION, music: 3, sfx: 9 };
+        let settings = Settings { version: FORMAT_VERSION, music: 3, music_game: 2, sfx: 9 };
 
         let written = toml::to_string(&settings).expect("réglages sérialisables");
         let read: Settings = toml::from_str(&written).expect("réglages relisibles");
 
         assert_eq!(read.music, 3);
+        assert_eq!(read.music_game, 2);
         assert_eq!(read.sfx, 9);
     }
 
     #[test]
     fn a_hand_edited_file_cannot_push_the_volume_past_the_maximum() {
-        let parsed: Settings =
-            toml::from_str("version = 1\nmusic = 200\nsfx = 42\n").expect("TOML valide");
+        let parsed: Settings = toml::from_str("version = 1\nmusic = 200\nsfx = 42\nmusic_game = 99\n")
+            .expect("TOML valide");
 
         let settings = parsed.clamped();
 
         assert_eq!(settings.music, MAX_LEVEL);
         assert_eq!(settings.sfx, MAX_LEVEL);
+        assert_eq!(settings.music_game, MAX_LEVEL);
         assert_eq!(settings.music_gain(), 1.0);
     }
 

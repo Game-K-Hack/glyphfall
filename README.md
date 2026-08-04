@@ -197,10 +197,14 @@ ordre aléatoire.
 | `assets/music/menu/` | Partout sauf en partie |
 | `assets/music/game/` | Pendant les manches, à 60 % du volume |
 
-La manche joue plus bas parce que l'information y passe par les bruitages : un
-signe reconnu, une vie perdue. Le passage d'une ambiance à l'autre coupe net —
-laisser finir un morceau de menu par-dessus une partie déjà lancée serait pire
-qu'une coupure.
+Les deux volumes se règlent séparément dans les options, la manche étant plus
+basse par défaut : l'information y passe par les bruitages — un signe reconnu,
+une vie perdue — qu'une musique trop forte couvrirait au moment où ils
+comptent. Tant que la ligne « musique jeu » est choisie, elle s'entend au
+volume de la manche, faute de quoi on réglerait à l'aveugle.
+
+Le passage d'une ambiance à l'autre coupe net : laisser finir un morceau de
+menu par-dessus une partie déjà lancée serait pire qu'une coupure.
 
 Le moteur audio ne sait pas lire le MP3 : le jeu décode lui-même les morceaux
 puis les lui confie en WAV brut. C'est ce décodage qui donne aussi leur durée

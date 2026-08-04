@@ -10,28 +10,32 @@ use crate::app::{App, Transition};
 use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
+use crate::music::Ambience;
 use crate::settings::MAX_LEVEL;
 
 const ROW_X: f32 = 40.0;
 const ROW_WIDTH: f32 = canvas::WIDTH - ROW_X * 2.0;
 const ROW_HEIGHT: f32 = 26.0;
-const FIRST_ROW_Y: f32 = 72.0;
-const ROW_STEP: f32 = 34.0;
+const FIRST_ROW_Y: f32 = 62.0;
+const ROW_STEP: f32 = 32.0;
 
-/// Largeur du libellé, avant la jauge.
-const LABEL_WIDTH: f32 = 88.0;
+/// Largeur du libellé, avant la jauge. « MUSIQUE MENUS » est le plus long.
+const LABEL_WIDTH: f32 = 122.0;
 /// Un cran de la jauge.
-const SEGMENT_WIDTH: f32 = 13.0;
+const SEGMENT_WIDTH: f32 = 11.0;
 const SEGMENT_GAP: f32 = 2.0;
 
-/// Les deux réglages, dans l'ordre d'affichage.
+/// Les réglages, dans l'ordre d'affichage.
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Row {
+    /// Musique des menus.
     Music,
+    /// Musique pendant une manche, réglée à part.
+    MusicGame,
     Sfx,
 }
 
-const ROWS: [Row; 2] = [Row::Music, Row::Sfx];
+const ROWS: [Row; 3] = [Row::Music, Row::MusicGame, Row::Sfx];
 
 pub fn options_screen(app: &mut App, selected: &mut usize, mouse: Vec2) -> Transition {
     clear_background(role::BACKGROUND);
@@ -91,11 +95,18 @@ pub fn options_screen(app: &mut App, selected: &mut usize, mouse: Vec2) -> Trans
         apply(app, row, delta);
     }
 
+    // Tant que la ligne de la manche est choisie, la musique des menus se joue
+    // au volume de la manche : sans cet aperçu, on réglerait à l'aveugle un son
+    // qui ne s'entend qu'en partie.
+    if ROWS[*selected] == Row::MusicGame {
+        app.music.preview(Ambience::Game);
+    }
+
     ui::text_centered(
         &app.fonts,
         "GAUCHE ET DROITE POUR REGLER",
         canvas::WIDTH / 2.0,
-        150.0,
+        162.0,
         fonts::TEXT,
         role::TEXT_DISABLED,
     );
@@ -121,6 +132,7 @@ fn gauge_rect(bounds: Rect) -> Rect {
 fn level_of(app: &App, row: Row) -> u8 {
     match row {
         Row::Music => app.settings.music,
+        Row::MusicGame => app.settings.music_game,
         Row::Sfx => app.settings.sfx,
     }
 }
@@ -149,9 +161,13 @@ fn apply(app: &mut App, row: Row, delta: i8) {
     }
 
     match row {
-        Row::Music => {
-            app.settings.music = next;
-            app.music.set_volume(app.settings.music_gain());
+        Row::Music | Row::MusicGame => {
+            if row == Row::Music {
+                app.settings.music = next;
+            } else {
+                app.settings.music_game = next;
+            }
+            app.music.set_volumes(app.settings.music_gain(), app.settings.music_game_gain());
         }
         Row::Sfx => {
             app.settings.sfx = next;
@@ -171,7 +187,8 @@ fn draw_row(fonts_set: &Fonts, bounds: Rect, row: Row, level: u8, selected: bool
     }
 
     let label = match row {
-        Row::Music => "MUSIQUE",
+        Row::Music => "MUSIQUE MENUS",
+        Row::MusicGame => "MUSIQUE JEU",
         Row::Sfx => "BRUITAGES",
     };
     ui::text(

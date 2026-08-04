@@ -51,7 +51,7 @@ async fn main() {
     // seconde.
     let settings = Settings::load();
     let sfx = Sfx::load(settings.sfx_gain()).await;
-    let music = Music::load(settings.music_gain());
+    let music = Music::load(settings.music_gain(), settings.music_game_gain());
 
     let mut app =
         App { catalog, fonts, sfx, music, progress: Progress::load(), settings };
