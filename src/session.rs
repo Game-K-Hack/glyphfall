@@ -501,7 +501,7 @@ mod tests {
         Glyph {
             char: character.to_string(),
             answers: vec![answer.to_string()],
-            hint: String::new(),
+            mnemonics: vec!["un moyen".to_string()],
         }
     }
 

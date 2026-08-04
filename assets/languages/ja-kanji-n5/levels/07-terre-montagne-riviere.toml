@@ -21,14 +21,21 @@ three = 0.85
 [[glyphs]]
 char = "土"
 answers = ["terre", "sol"]
-hint = "le jour de la terre, le samedi"
+mnemonics = [
+    "Une pousse qui sort du sol.",
+    "Samedi est le jour de la terre.",
+]
 
 [[glyphs]]
 char = "山"
 answers = ["montagne"]
-hint = "trois pics"
+mnemonics = [
+    "Trois pics, celui du milieu plus haut.",
+]
 
 [[glyphs]]
 char = "川"
 answers = ["riviere", "fleuve"]
-hint = "trois filets d'eau qui coulent"
+mnemonics = [
+    "Trois filets d'eau qui coulent en parallele.",
+]

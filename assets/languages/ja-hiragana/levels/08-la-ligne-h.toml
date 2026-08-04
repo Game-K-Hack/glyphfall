@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "は"
 answers = ["ha"]
+mnemonics = [
+    "Cursive du kanji signifiant feuille.",
+    "Un h dont la barre est traversee.",
+]
 
 [[glyphs]]
 char = "ひ"
 answers = ["hi"]
+mnemonics = [
+    "Cursive du kanji signifiant comparer.",
+    "Un nez de profil, ou un sourire.",
+]
 
 [[glyphs]]
 char = "ふ"
 answers = ["fu", "hu"]
+mnemonics = [
+    "Cursive du kanji signifiant inegal.",
+    "Un mont Fuji stylise, avec des flocons de part et d'autre.",
+]
 
 [[glyphs]]
 char = "へ"
 answers = ["he"]
+mnemonics = [
+    "Cursive du kanji signifiant partie.",
+    "Une colline. Le plus simple des kana, identique en katakana.",
+]
 
 [[glyphs]]
 char = "ほ"
 answers = ["ho"]
-hint = "le ha avec une barre en plus"
+mnemonics = [
+    "Cursive du kanji signifiant garantir.",
+    "Le ha avec une barre de plus en haut.",
+]

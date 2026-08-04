@@ -164,7 +164,11 @@ mod tests {
             mode: Default::default(),
             rules: Default::default(),
             stars: Stars { one: 0.5, two: 0.75, three: 0.9 },
-            glyphs: vec![Glyph { char: "ㄱ".into(), answers: vec!["g".into()], hint: String::new() }],
+            glyphs: vec![Glyph {
+                char: "ㄱ".into(),
+                answers: vec!["g".into()],
+                mnemonics: vec!["un coin".into()],
+            }],
         }
     }
 

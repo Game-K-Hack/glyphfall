@@ -21,11 +21,21 @@ three = 0.85
 [[glyphs]]
 char = "四"
 answers = ["4", "quatre", "shi", "yon"]
+mnemonics = [
+    "Une bouche avec deux jambes dedans.",
+    "On evite souvent shi, homophone de la mort : on dit yon.",
+]
 
 [[glyphs]]
 char = "五"
 answers = ["5", "cinq", "go"]
+mnemonics = [
+    "Un sablier entre deux barres.",
+]
 
 [[glyphs]]
 char = "六"
 answers = ["6", "six", "roku"]
+mnemonics = [
+    "Un chapeau sur deux jambes.",
+]

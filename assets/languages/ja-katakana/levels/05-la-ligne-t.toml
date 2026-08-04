@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "タ"
 answers = ["ta"]
+mnemonics = [
+    "Morceau du kanji signifiant beaucoup.",
+    "Un ku barre d'un trait.",
+]
 
 [[glyphs]]
 char = "チ"
 answers = ["chi", "ti"]
+mnemonics = [
+    "Morceau du kanji signifiant mille.",
+    "Un 7 barre. Se prononce tchi.",
+]
 
 [[glyphs]]
 char = "ツ"
 answers = ["tsu", "tu"]
-hint = "traits penches - a ne pas confondre avec le shi"
+mnemonics = [
+    "Morceau du meme kanji que le tsu hiragana.",
+    "Trois traits qui MONTENT. Le shi a deux points, le tsu en a trois.",
+]
 
 [[glyphs]]
 char = "テ"
 answers = ["te"]
+mnemonics = [
+    "Morceau du kanji signifiant ciel.",
+    "Deux barres et une jambe.",
+]
 
 [[glyphs]]
 char = "ト"
 answers = ["to"]
+mnemonics = [
+    "Morceau du kanji signifiant s'arreter.",
+    "Un trait vertical avec un ergot.",
+]

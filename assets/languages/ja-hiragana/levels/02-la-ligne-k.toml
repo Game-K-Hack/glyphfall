@@ -21,19 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "か"
 answers = ["ka"]
+mnemonics = [
+    "Cursive du kanji signifiant ajouter.",
+    "Une croix penchee suivie d'une virgule.",
+]
 
 [[glyphs]]
 char = "き"
 answers = ["ki"]
+mnemonics = [
+    "Cursive du kanji signifiant plusieurs.",
+    "Une cle avec deux barres.",
+]
 
 [[glyphs]]
 char = "く"
 answers = ["ku"]
+mnemonics = [
+    "Cursive du kanji signifiant longtemps.",
+    "Un bec ouvert vers la droite.",
+]
 
 [[glyphs]]
 char = "け"
 answers = ["ke"]
+mnemonics = [
+    "Cursive du kanji signifiant calcul.",
+    "Un k dont la barre verticale est detachee.",
+]
 
 [[glyphs]]
 char = "こ"
 answers = ["ko"]
+mnemonics = [
+    "Cursive du kanji signifiant soi.",
+    "Deux traits couches, comme deux cordes.",
+]

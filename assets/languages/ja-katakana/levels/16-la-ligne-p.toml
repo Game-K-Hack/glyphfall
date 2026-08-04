@@ -21,19 +21,34 @@ three = 0.85
 [[glyphs]]
 char = "パ"
 answers = ["pa"]
+mnemonics = [
+    "Le ha avec le petit rond : le rond donne toujours un P, ha donne pa.",
+]
 
 [[glyphs]]
 char = "ピ"
 answers = ["pi"]
+mnemonics = [
+    "Le hi avec le petit rond : le rond donne toujours un P, hi donne pi.",
+]
 
 [[glyphs]]
 char = "プ"
 answers = ["pu"]
+mnemonics = [
+    "Le fu avec le petit rond : le rond donne toujours un P, fu donne pu.",
+]
 
 [[glyphs]]
 char = "ペ"
 answers = ["pe"]
+mnemonics = [
+    "Le he avec le petit rond : le rond donne toujours un P, he donne pe.",
+]
 
 [[glyphs]]
 char = "ポ"
 answers = ["po"]
+mnemonics = [
+    "Le ho avec le petit rond : le rond donne toujours un P, ho donne po.",
+]

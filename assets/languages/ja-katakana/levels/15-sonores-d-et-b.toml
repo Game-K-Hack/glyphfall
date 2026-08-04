@@ -21,39 +21,69 @@ three = 0.85
 [[glyphs]]
 char = "ダ"
 answers = ["da"]
+mnemonics = [
+    "Le ta avec les deux petits traits : la sourde devient sonore, ta donne da.",
+]
 
 [[glyphs]]
 char = "ヂ"
 answers = ["ji", "di"]
+mnemonics = [
+    "Le chi avec les deux petits traits. Meme son que le ji precedent, mais tres rare.",
+]
 
 [[glyphs]]
 char = "ヅ"
 answers = ["zu", "du"]
+mnemonics = [
+    "Le tsu avec les deux petits traits. Meme son que le zu precedent, mais rare.",
+]
 
 [[glyphs]]
 char = "デ"
 answers = ["de"]
+mnemonics = [
+    "Le te avec les deux petits traits : la sourde devient sonore, te donne de.",
+]
 
 [[glyphs]]
 char = "ド"
 answers = ["do"]
+mnemonics = [
+    "Le to avec les deux petits traits : la sourde devient sonore, to donne do.",
+]
 
 [[glyphs]]
 char = "バ"
 answers = ["ba"]
+mnemonics = [
+    "Le ha avec les deux petits traits : la sourde devient sonore, ha donne ba.",
+]
 
 [[glyphs]]
 char = "ビ"
 answers = ["bi"]
+mnemonics = [
+    "Le hi avec les deux petits traits : la sourde devient sonore, hi donne bi.",
+]
 
 [[glyphs]]
 char = "ブ"
 answers = ["bu"]
+mnemonics = [
+    "Le fu avec les deux petits traits : la sourde devient sonore, fu donne bu.",
+]
 
 [[glyphs]]
 char = "ベ"
 answers = ["be"]
+mnemonics = [
+    "Le he avec les deux petits traits : la sourde devient sonore, he donne be.",
+]
 
 [[glyphs]]
 char = "ボ"
 answers = ["bo"]
+mnemonics = [
+    "Le ho avec les deux petits traits : la sourde devient sonore, ho donne bo.",
+]

@@ -21,21 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "ハ"
 answers = ["ha"]
+mnemonics = [
+    "Le kanji signifiant huit, pris tel quel.",
+    "Deux traits qui s'ecartent.",
+]
 
 [[glyphs]]
 char = "ヒ"
 answers = ["hi"]
+mnemonics = [
+    "Morceau du meme kanji que le hi hiragana.",
+    "Un trait vertical avec un pied.",
+]
 
 [[glyphs]]
 char = "フ"
 answers = ["fu", "hu"]
-hint = "a ne pas confondre avec le wa et le ku"
+mnemonics = [
+    "Morceau du kanji signifiant inegal.",
+    "Un seul angle. A ne pas confondre avec le wa et le ku.",
+]
 
 [[glyphs]]
 char = "ヘ"
 answers = ["he"]
-hint = "identique au signe hiragana"
+mnemonics = [
+    "Le meme signe qu'en hiragana : une colline.",
+    "Le seul kana identique dans les deux syllabaires.",
+]
 
 [[glyphs]]
 char = "ホ"
 answers = ["ho"]
+mnemonics = [
+    "Morceau du kanji signifiant garantir.",
+    "Une croix avec deux jambes.",
+]

@@ -21,14 +21,23 @@ three = 0.85
 [[glyphs]]
 char = "日"
 answers = ["soleil", "jour"]
-hint = "le jour du soleil ouvre la semaine"
+mnemonics = [
+    "Un soleil carre avec un trait au milieu.",
+    "Ouvre la semaine : dimanche est le jour du soleil.",
+]
 
 [[glyphs]]
 char = "月"
 answers = ["lune", "mois"]
-hint = "le jour de la lune, le lundi"
+mnemonics = [
+    "Un croissant de lune redresse.",
+    "Lundi est le jour de la lune. Sert aussi a compter les mois.",
+]
 
 [[glyphs]]
 char = "火"
 answers = ["feu"]
-hint = "le jour du feu, le mardi"
+mnemonics = [
+    "Une flamme avec deux etincelles de part et d'autre.",
+    "Mardi est le jour du feu.",
+]

@@ -21,21 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "サ"
 answers = ["sa"]
+mnemonics = [
+    "Morceau du kanji signifiant disperser.",
+    "Deux traits verticaux barres.",
+]
 
 [[glyphs]]
 char = "シ"
 answers = ["shi", "si"]
-hint = "traits qui montent - a ne pas confondre avec le tsu"
+mnemonics = [
+    "Morceau du meme kanji que le shi hiragana.",
+    "Deux points et un trait qui MONTE. Le tsu, lui, descend.",
+]
 
 [[glyphs]]
 char = "ス"
 answers = ["su"]
+mnemonics = [
+    "Morceau du kanji signifiant grand.",
+    "Un chevron d'ou pend une jambe.",
+]
 
 [[glyphs]]
 char = "セ"
 answers = ["se"]
+mnemonics = [
+    "Morceau du meme kanji que le se hiragana.",
+    "Le se hiragana en plus anguleux.",
+]
 
 [[glyphs]]
 char = "ソ"
 answers = ["so"]
-hint = "traits qui descendent - a ne pas confondre avec le n"
+mnemonics = [
+    "Morceau du kanji signifiant ceci.",
+    "Un point et un trait qui DESCEND. Le n, lui, monte.",
+]

@@ -21,24 +21,47 @@ three = 0.85
 [[glyphs]]
 char = "ヤ"
 answers = ["ya"]
+mnemonics = [
+    "Morceau du kanji signifiant aussi.",
+    "Le ya hiragana en plus anguleux.",
+]
 
 [[glyphs]]
 char = "ユ"
 answers = ["yu"]
+mnemonics = [
+    "Morceau du kanji signifiant provenir.",
+    "Un crochet couche, comme un U tourne d'un quart de tour.",
+]
 
 [[glyphs]]
 char = "ヨ"
 answers = ["yo"]
+mnemonics = [
+    "Morceau du kanji signifiant avec.",
+    "Un E a l'envers, trois barres.",
+]
 
 [[glyphs]]
 char = "ワ"
 answers = ["wa"]
+mnemonics = [
+    "Morceau du kanji signifiant harmonie.",
+    "Comme le fu mais ferme en haut. A ne pas confondre avec le ku.",
+]
 
 [[glyphs]]
 char = "ヲ"
 answers = ["wo", "o"]
+mnemonics = [
+    "Morceau du kanji signifiant lointain.",
+    "Particule d'objet, presque jamais ecrite en katakana.",
+]
 
 [[glyphs]]
 char = "ン"
 answers = ["n"]
-hint = "un seul trait qui monte - a ne pas confondre avec le so"
+mnemonics = [
+    "Morceau du kanji signifiant infini.",
+    "Un point et un trait qui MONTE. Le so, lui, descend.",
+]

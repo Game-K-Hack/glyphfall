@@ -21,34 +21,55 @@ three = 0.88
 [[glyphs]]
 char = "日"
 answers = ["soleil", "jour"]
-hint = "le jour du soleil ouvre la semaine"
+mnemonics = [
+    "Un soleil carre avec un trait au milieu.",
+    "Ouvre la semaine : dimanche est le jour du soleil.",
+]
 
 [[glyphs]]
 char = "月"
 answers = ["lune", "mois"]
-hint = "le jour de la lune, le lundi"
+mnemonics = [
+    "Un croissant de lune redresse.",
+    "Lundi est le jour de la lune. Sert aussi a compter les mois.",
+]
 
 [[glyphs]]
 char = "火"
 answers = ["feu"]
-hint = "le jour du feu, le mardi"
+mnemonics = [
+    "Une flamme avec deux etincelles de part et d'autre.",
+    "Mardi est le jour du feu.",
+]
 
 [[glyphs]]
 char = "水"
 answers = ["eau"]
-hint = "le jour de l'eau, le mercredi"
+mnemonics = [
+    "Un cours d'eau avec ses eclaboussures.",
+    "Mercredi est le jour de l'eau.",
+]
 
 [[glyphs]]
 char = "木"
 answers = ["arbre", "bois"]
-hint = "le jour de l'arbre, le jeudi"
+mnemonics = [
+    "Un tronc avec ses branches et ses racines.",
+    "Jeudi est le jour de l'arbre.",
+]
 
 [[glyphs]]
 char = "金"
 answers = ["or", "argent"]
-hint = "le jour de l'or, le vendredi"
+mnemonics = [
+    "Un toit sur des pepites enfouies.",
+    "Vendredi est le jour de l'or. Signifie aussi l'argent que l'on depense.",
+]
 
 [[glyphs]]
 char = "土"
 answers = ["terre", "sol"]
-hint = "le jour de la terre, le samedi"
+mnemonics = [
+    "Une pousse qui sort du sol.",
+    "Samedi est le jour de la terre.",
+]

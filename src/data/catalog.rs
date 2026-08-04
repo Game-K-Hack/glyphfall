@@ -69,6 +69,14 @@ fn validate_level(level: &Level) -> Result<(), DataError> {
     if let Some(glyph) = level.glyphs.iter().find(|glyph| glyph.answers.is_empty()) {
         return invalid(&format!("le glyphe « {} » n'a aucune réponse acceptée", glyph.char));
     }
+    // Chaque signe doit dire comment le retenir : c'est la seule aide dont
+    // dispose le joueur devant une écriture qu'il ne connaît pas.
+    if let Some(glyph) = level.glyphs.iter().find(|glyph| glyph.mnemonics.is_empty()) {
+        return invalid(&format!(
+            "le glyphe « {} » n'a aucun moyen mnémotechnique",
+            glyph.char
+        ));
+    }
     if level.requires.iter().any(|required| *required == level.id) {
         return invalid("le niveau se référence lui-même dans `requires`");
     }
@@ -214,7 +222,7 @@ mod tests {
             glyphs: vec![Glyph {
                 char: "ㄱ".into(),
                 answers: vec!["g".into()],
-                hint: String::new(),
+                mnemonics: vec!["un coin".into()],
             }],
         }
     }

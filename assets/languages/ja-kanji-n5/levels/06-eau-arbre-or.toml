@@ -21,14 +21,23 @@ three = 0.85
 [[glyphs]]
 char = "水"
 answers = ["eau"]
-hint = "le jour de l'eau, le mercredi"
+mnemonics = [
+    "Un cours d'eau avec ses eclaboussures.",
+    "Mercredi est le jour de l'eau.",
+]
 
 [[glyphs]]
 char = "木"
 answers = ["arbre", "bois"]
-hint = "le jour de l'arbre, le jeudi"
+mnemonics = [
+    "Un tronc avec ses branches et ses racines.",
+    "Jeudi est le jour de l'arbre.",
+]
 
 [[glyphs]]
 char = "金"
 answers = ["or", "argent"]
-hint = "le jour de l'or, le vendredi"
+mnemonics = [
+    "Un toit sur des pepites enfouies.",
+    "Vendredi est le jour de l'or. Signifie aussi l'argent que l'on depense.",
+]

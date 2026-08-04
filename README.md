@@ -15,8 +15,10 @@ sur Windows, macOS, Linux et dans un navigateur.
    signes nouveaux par étape, et une révision toutes les deux ou trois.
 3. **Briefing** — tous les signes de l'étape avec leur lecture, les règles et
    les seuils à viser. Survolez un signe pour son aide mnémotechnique.
-4. **La manche** — trois vies et un chronomètre.
-5. **Résultats** — de zéro à trois étoiles, et surtout la liste des signes
+4. **Fiche d'un signe** — en cliquant un signe du briefing : le caractère en
+   grand, ses lectures, comment le retenir, et où vous en êtes avec lui.
+5. **La manche** — trois vies et un chronomètre.
+6. **Résultats** — de zéro à trois étoiles, et surtout la liste des signes
    ratés avec la lecture qu'il fallait taper.
 
 La progression est enregistrée automatiquement, tout comme les volumes réglés
@@ -111,8 +113,16 @@ three = 0.90
 [[glyphs]]
 char = "α"
 answers = ["a"]                    # toutes les lectures acceptées
-hint = "alpha — l'ancêtre du A"    # facultatif, affiché au briefing
+mnemonics = [                      # au moins un, obligatoire
+  "Le premier signe de l'alphabet, l'ancetre de notre A.",
+  "Un a minuscule dont la boucle s'est ouverte.",
+]
 ```
+
+Le premier moyen sert d'aide courte au survol du briefing ; la fiche du signe
+les montre tous. **N'y mettez aucun caractère de l'écriture enseignée** : ils
+sont rendus par la police pixel, qui ne connaît que le latin. Nommez plutôt le
+signe (« le giyeok », « le ha ») — un test le vérifie.
 
 ### Comment découper un chemin
 
@@ -151,7 +161,8 @@ raté une fois sur trois finirait par passer pour acquis.
 
 L'écran de briefing marque en orange les signes dont la note est négative — il
 dit donc quoi travailler, au lieu d'afficher une liste uniforme où les
-faiblesses se noient.
+faiblesses se noient. Cliquer un signe ouvre sa fiche, seul endroit où l'on
+peut s'arrêter sur un caractère sans qu'il tombe.
 
 ### Ce que le jeu vérifie au démarrage
 

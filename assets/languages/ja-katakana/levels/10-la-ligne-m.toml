@@ -21,19 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "マ"
 answers = ["ma"]
+mnemonics = [
+    "Morceau du kanji signifiant fin.",
+    "Un chevron avec une queue.",
+]
 
 [[glyphs]]
 char = "ミ"
 answers = ["mi"]
+mnemonics = [
+    "Morceau du kanji signifiant trois.",
+    "Trois traits : trois se dit mittsu.",
+]
 
 [[glyphs]]
 char = "ム"
 answers = ["mu"]
+mnemonics = [
+    "Morceau du kanji signifiant prive.",
+    "Un angle ferme par un trait.",
+]
 
 [[glyphs]]
 char = "メ"
 answers = ["me"]
+mnemonics = [
+    "Morceau du kanji signifiant femme.",
+    "Une croix penchee, comme un X.",
+]
 
 [[glyphs]]
 char = "モ"
 answers = ["mo"]
+mnemonics = [
+    "Morceau du kanji signifiant peu.",
+    "Le mo hiragana en plus anguleux.",
+]

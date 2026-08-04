@@ -21,23 +21,42 @@ three = 0.90
 [[glyphs]]
 char = "그"
 answers = ["geu", "keu"]
+mnemonics = [
+    "Giyeok plus eu : la barre plate de la terre se glisse sous la consonne.",
+    "Le eu coreen est un son avale, bouche etiree, sans equivalent francais exact.",
+]
 
 [[glyphs]]
 char = "기"
 answers = ["gi", "ki"]
+mnemonics = [
+    "Giyeok plus i : la barre droite de l'humain se place a cote, car elle est verticale.",
+]
 
 [[glyphs]]
 char = "니"
 answers = ["ni"]
+mnemonics = [
+    "Nieun plus i. Deux traits verticaux qui se suivent, faciles a confondre de loin.",
+]
 
 [[glyphs]]
 char = "디"
 answers = ["di", "ti"]
+mnemonics = [
+    "Digeut plus i. Se lit ti en debut de mot, di a l'interieur.",
+]
 
 [[glyphs]]
 char = "리"
 answers = ["ri", "li"]
+mnemonics = [
+    "Rieul plus i : le zigzag suivi de la barre droite.",
+]
 
 [[glyphs]]
 char = "미"
 answers = ["mi"]
+mnemonics = [
+    "Mieum plus i : le carre suivi de la barre droite. Comme dans mium, la haine.",
+]

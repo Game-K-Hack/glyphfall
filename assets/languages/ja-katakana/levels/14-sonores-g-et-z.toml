@@ -21,39 +21,69 @@ three = 0.85
 [[glyphs]]
 char = "ガ"
 answers = ["ga"]
+mnemonics = [
+    "Le ka avec les deux petits traits : la sourde devient sonore, ka donne ga.",
+]
 
 [[glyphs]]
 char = "ギ"
 answers = ["gi"]
+mnemonics = [
+    "Le ki avec les deux petits traits : la sourde devient sonore, ki donne gi.",
+]
 
 [[glyphs]]
 char = "グ"
 answers = ["gu"]
+mnemonics = [
+    "Le ku avec les deux petits traits : la sourde devient sonore, ku donne gu.",
+]
 
 [[glyphs]]
 char = "ゲ"
 answers = ["ge"]
+mnemonics = [
+    "Le ke avec les deux petits traits : la sourde devient sonore, ke donne ge.",
+]
 
 [[glyphs]]
 char = "ゴ"
 answers = ["go"]
+mnemonics = [
+    "Le ko avec les deux petits traits : la sourde devient sonore, ko donne go.",
+]
 
 [[glyphs]]
 char = "ザ"
 answers = ["za"]
+mnemonics = [
+    "Le sa avec les deux petits traits : la sourde devient sonore, sa donne za.",
+]
 
 [[glyphs]]
 char = "ジ"
 answers = ["ji", "zi"]
+mnemonics = [
+    "Le shi avec les deux petits traits. Se lit ji, pas zi.",
+]
 
 [[glyphs]]
 char = "ズ"
 answers = ["zu"]
+mnemonics = [
+    "Le su avec les deux petits traits : la sourde devient sonore, su donne zu.",
+]
 
 [[glyphs]]
 char = "ゼ"
 answers = ["ze"]
+mnemonics = [
+    "Le se avec les deux petits traits : la sourde devient sonore, se donne ze.",
+]
 
 [[glyphs]]
 char = "ゾ"
 answers = ["zo"]
+mnemonics = [
+    "Le so avec les deux petits traits : la sourde devient sonore, so donne zo.",
+]

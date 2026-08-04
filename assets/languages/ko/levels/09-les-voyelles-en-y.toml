@@ -21,19 +21,28 @@ three = 0.85
 [[glyphs]]
 char = "ㅑ"
 answers = ["ya"]
-hint = "le a avec deux traits : on ajoute le y"
+mnemonics = [
+    "Le a avec deux traits au lieu d'un : deux traits veulent toujours dire un Y devant.",
+    "Deux soleils a l'est, donc deux traits : le a devient ya.",
+]
 
 [[glyphs]]
 char = "ㅕ"
 answers = ["yeo"]
-hint = "le eo avec deux traits"
+mnemonics = [
+    "Le eo avec deux traits : un Y vient devant.",
+]
 
 [[glyphs]]
 char = "ㅛ"
 answers = ["yo"]
-hint = "le o avec deux traits"
+mnemonics = [
+    "Le o avec deux traits : un Y vient devant.",
+]
 
 [[glyphs]]
 char = "ㅠ"
 answers = ["yu"]
-hint = "le u avec deux traits"
+mnemonics = [
+    "Le u avec deux traits : un Y vient devant. Se lit you.",
+]

@@ -26,6 +26,7 @@ use crate::session::Session;
 use crate::screens::briefing::briefing_screen;
 use crate::screens::game::game_screen;
 use crate::screens::results::results_screen;
+use crate::screens::sign::sign_screen;
 use crate::screens::language_select::language_select_screen;
 use crate::screens::learning_path::{PathView, learning_path_screen};
 use crate::screens::options::options_screen;
@@ -79,6 +80,11 @@ async fn main() {
             Some(("briefing", target)) => target.split_once('/').map(|(language, level)| {
                 Screen::Briefing { language: language.to_string(), level: level.to_string() }
             }),
+            Some(("sign", target)) => target.split_once('/').map(|(language, level)| Screen::Sign {
+                language: language.to_string(),
+                level: level.to_string(),
+                index: 0,
+            }),
             Some(("play", target)) => target.split_once('/').and_then(|(language, level)| {
                 Session::new(&app.catalog, &app.progress, language, level)
                     .map(|session| Screen::Playing(Box::new(session)))
@@ -115,6 +121,9 @@ async fn main() {
             }
             Screen::Briefing { language, level } => {
                 briefing_screen(&app, language, level, mouse)
+            }
+            Screen::Sign { language, level, index } => {
+                sign_screen(&app, language, level, index, mouse)
             }
             Screen::Playing(session) => game_screen(&app, session),
             Screen::Results { outcome, elapsed } => {

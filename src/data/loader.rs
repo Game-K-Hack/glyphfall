@@ -135,9 +135,9 @@ mod tests {
         let font = fontdue::Font::from_bytes(bytes, fontdue::FontSettings::default())
             .expect("police d'interface lisible");
 
-        // Les aides mnémotechniques sont volontairement absentes : elles citent
-        // les glyphes de la langue et sont donc rendues avec la police de la
-        // langue, qui couvre aussi le latin.
+        // Les moyens mnémotechniques en font partie : ils sont écrits sans
+        // caractère de l'écriture enseignée, précisément pour rester nets sur
+        // la fiche d'un signe.
         let mut texts = Vec::new();
         for language in &catalog.languages {
             texts.push(language.name.clone());
@@ -146,6 +146,9 @@ mod tests {
                 texts.push(level.title.clone());
                 texts.push(level.subtitle.clone());
                 texts.extend(level.glyphs.iter().flat_map(|glyph| glyph.answers.iter().cloned()));
+                texts.extend(
+                    level.glyphs.iter().flat_map(|glyph| glyph.mnemonics.iter().cloned()),
+                );
             }
         }
 
@@ -156,6 +159,32 @@ mod tests {
                     0,
                     "« {character} » (dans « {text} ») est absent de la police d'interface"
                 );
+            }
+        }
+    }
+
+    #[test]
+    fn every_sign_says_how_to_remember_it() {
+        // Sans moyen mnémotechnique, un signe n'est qu'une forme arbitraire à
+        // recopier : c'est la seule aide dont dispose le joueur devant une
+        // écriture qu'il ne connaît pas.
+        let catalog = load_catalog().expect("catalogue valide");
+
+        for language in &catalog.languages {
+            for level in &language.levels {
+                for glyph in &level.glyphs {
+                    assert!(
+                        !glyph.mnemonics.is_empty(),
+                        "« {} » (niveau {}) n'a aucun moyen de le retenir",
+                        glyph.char,
+                        level.id
+                    );
+                    assert!(
+                        glyph.mnemonics.iter().all(|mnemonic| mnemonic.chars().count() > 20),
+                        "« {} » a un moyen trop court pour aider vraiment",
+                        glyph.char
+                    );
+                }
             }
         }
     }

@@ -21,41 +21,79 @@ three = 0.88
 [[glyphs]]
 char = "ナ"
 answers = ["na"]
+mnemonics = [
+    "Morceau du kanji signifiant quoi.",
+    "Une croix penchee, comme le debut du na hiragana.",
+]
 
 [[glyphs]]
 char = "ニ"
 answers = ["ni"]
+mnemonics = [
+    "Le kanji signifiant deux, pris tel quel.",
+    "Deux traits : ni comme deux.",
+]
 
 [[glyphs]]
 char = "ヌ"
 answers = ["nu"]
+mnemonics = [
+    "Morceau du kanji signifiant serviteur.",
+    "Comme le su, mais la jambe part de la barre.",
+]
 
 [[glyphs]]
 char = "ネ"
 answers = ["ne"]
+mnemonics = [
+    "Morceau du kanji signifiant genou.",
+    "Une croix surmontee d'un trait, avec une jambe.",
+]
 
 [[glyphs]]
 char = "ノ"
 answers = ["no"]
+mnemonics = [
+    "Morceau du kanji signifiant sur.",
+    "Un seul trait penche : le plus simple de tous.",
+]
 
 [[glyphs]]
 char = "ハ"
 answers = ["ha"]
+mnemonics = [
+    "Le kanji signifiant huit, pris tel quel.",
+    "Deux traits qui s'ecartent.",
+]
 
 [[glyphs]]
 char = "ヒ"
 answers = ["hi"]
+mnemonics = [
+    "Morceau du meme kanji que le hi hiragana.",
+    "Un trait vertical avec un pied.",
+]
 
 [[glyphs]]
 char = "フ"
 answers = ["fu", "hu"]
-hint = "a ne pas confondre avec le wa et le ku"
+mnemonics = [
+    "Morceau du kanji signifiant inegal.",
+    "Un seul angle. A ne pas confondre avec le wa et le ku.",
+]
 
 [[glyphs]]
 char = "ヘ"
 answers = ["he"]
-hint = "identique au signe hiragana"
+mnemonics = [
+    "Le meme signe qu'en hiragana : une colline.",
+    "Le seul kana identique dans les deux syllabaires.",
+]
 
 [[glyphs]]
 char = "ホ"
 answers = ["ho"]
+mnemonics = [
+    "Morceau du kanji signifiant garantir.",
+    "Une croix avec deux jambes.",
+]

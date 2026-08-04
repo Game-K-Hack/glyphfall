@@ -21,69 +21,111 @@ three = 0.88
 [[glyphs]]
 char = "ㄱ"
 answers = ["g", "k"]
-hint = "giyeok - un coin, comme un G qui a perdu sa boucle"
+mnemonics = [
+    "Le dessin de la langue qui se souleve au fond de la gorge pour bloquer l'air.",
+    "Un coin, ou un G majuscule qui aurait perdu sa boucle. Son nom : giyeok.",
+]
 
 [[glyphs]]
 char = "ㄴ"
 answers = ["n"]
-hint = "nieun - la langue contre les dents, vue de profil"
+mnemonics = [
+    "Le bout de la langue collee derriere les dents du haut, vue de profil.",
+    "Un L a l'envers, ou le bas d'un N. Son nom : nieun.",
+]
 
 [[glyphs]]
 char = "ㄷ"
 answers = ["d", "t"]
-hint = "digeut - le nieun que l'on referme"
+mnemonics = [
+    "Le nieun que l'on referme par le haut : meme langue, contact plus ferme.",
+    "Un D carre, dos a gauche. Son nom : digeut.",
+]
 
 [[glyphs]]
 char = "ㄹ"
 answers = ["r", "l"]
-hint = "rieul - le zigzag de la langue qui roule"
+mnemonics = [
+    "Le zigzag de la langue qui roule puis retombe.",
+    "Un escalier a deux marches. Son nom : rieul.",
+]
 
 [[glyphs]]
 char = "ㅁ"
 answers = ["m"]
-hint = "mieum - la bouche fermee, un carre"
+mnemonics = [
+    "Le dessin de la bouche fermee, vue de face : un carre.",
+    "Le M de mouth, ou de mieum, son nom.",
+]
 
 [[glyphs]]
 char = "ㅂ"
 answers = ["b", "p"]
-hint = "bieup - le mieum ouvert, la bouche qui s'entrouvre"
+mnemonics = [
+    "Le carre de la bouche qui s'entrouvre : deux traits s'echappent vers le haut.",
+    "Une coupe ouverte. Son nom : bieup.",
+]
 
 [[glyphs]]
 char = "ㅅ"
 answers = ["s"]
-hint = "siot - le souffle qui se separe en deux"
+mnemonics = [
+    "Le dessin d'une dent pointue : le souffle passe entre les dents.",
+    "Une tente, ou un A sans barre. Son nom : siot.",
+]
 
 [[glyphs]]
 char = "ㅇ"
 answers = ["ng"]
-hint = "ieung - muet en debut de syllabe, ng en fin"
+mnemonics = [
+    "Le dessin de la gorge ouverte, un cercle.",
+    "Muet au debut d'une syllabe : il ne fait que porter la voyelle. Son nom : ieung.",
+]
 
 [[glyphs]]
 char = "ㅈ"
 answers = ["j"]
-hint = "jieut - un siot coiffe d'un trait"
+mnemonics = [
+    "La dent du siot coiffee d'un chapeau : meme endroit, l'air est bloque avant.",
+    "Un T pose sur un V. Son nom : jieut.",
+]
 
 [[glyphs]]
 char = "ㅊ"
 answers = ["ch"]
-hint = "chieut - le jieut aspire : un trait de plus"
+mnemonics = [
+    "Le jieut avec un trait de plus : en hangeul, un trait ajoute veut dire souffle ajoute.",
+    "Le J aspire devient CH. Son nom : chieut.",
+]
 
 [[glyphs]]
 char = "ㅋ"
 answers = ["k"]
-hint = "kieuk - le giyeok aspire : un trait de plus"
+mnemonics = [
+    "Le giyeok avec un trait de plus : meme geste, souffle en plus.",
+    "Le G aspire devient K. Son nom : kieuk.",
+]
 
 [[glyphs]]
 char = "ㅌ"
 answers = ["t"]
-hint = "tieut - le digeut aspire : un trait de plus"
+mnemonics = [
+    "Le digeut avec un trait de plus a l'interieur.",
+    "Le D aspire devient T. Son nom : tieut.",
+]
 
 [[glyphs]]
 char = "ㅍ"
 answers = ["p"]
-hint = "pieup - le bieup aspire, pose a plat"
+mnemonics = [
+    "Le bieup couche a plat, ouvert en haut et en bas.",
+    "Le B aspire devient P. Son nom : pieup.",
+]
 
 [[glyphs]]
 char = "ㅎ"
 answers = ["h"]
-hint = "hieut - un chapeau sur un cercle, le souffle"
+mnemonics = [
+    "Un chapeau pose sur la gorge ouverte : le souffle sort par le haut.",
+    "Le ieung a deux traits de plus, donc deux crans de souffle. Son nom : hieut.",
+]

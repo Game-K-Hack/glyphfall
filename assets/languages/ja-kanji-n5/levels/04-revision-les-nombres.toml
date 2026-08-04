@@ -21,39 +21,70 @@ three = 0.88
 [[glyphs]]
 char = "一"
 answers = ["1", "un", "ichi"]
+mnemonics = [
+    "Un trait, un. L'ecriture chinoise commence par le plus simple.",
+]
 
 [[glyphs]]
 char = "二"
 answers = ["2", "deux", "ni"]
+mnemonics = [
+    "Deux traits pour deux : le compte continue apres le trait unique.",
+]
 
 [[glyphs]]
 char = "三"
 answers = ["3", "trois", "san"]
+mnemonics = [
+    "Trois traits, trois. Au-dela, on cesse de compter les traits.",
+]
 
 [[glyphs]]
 char = "四"
 answers = ["4", "quatre", "shi", "yon"]
+mnemonics = [
+    "Une bouche avec deux jambes dedans.",
+    "On evite souvent shi, homophone de la mort : on dit yon.",
+]
 
 [[glyphs]]
 char = "五"
 answers = ["5", "cinq", "go"]
+mnemonics = [
+    "Un sablier entre deux barres.",
+]
 
 [[glyphs]]
 char = "六"
 answers = ["6", "six", "roku"]
+mnemonics = [
+    "Un chapeau sur deux jambes.",
+]
 
 [[glyphs]]
 char = "七"
 answers = ["7", "sept", "shichi", "nana"]
+mnemonics = [
+    "Un 7 retourne, barre d'un trait.",
+]
 
 [[glyphs]]
 char = "八"
 answers = ["8", "huit", "hachi"]
+mnemonics = [
+    "Deux traits qui s'ecartent : le chiffre porte-bonheur, car il s'ouvre.",
+]
 
 [[glyphs]]
 char = "九"
 answers = ["9", "neuf", "kyu", "ku"]
+mnemonics = [
+    "Un crochet avec une jambe qui part a droite.",
+]
 
 [[glyphs]]
 char = "十"
 answers = ["10", "dix", "ju"]
+mnemonics = [
+    "Une croix : les deux axes complets, donc la dizaine.",
+]

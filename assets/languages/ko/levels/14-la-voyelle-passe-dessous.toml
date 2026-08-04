@@ -21,24 +21,42 @@ three = 0.85
 [[glyphs]]
 char = "고"
 answers = ["go", "ko"]
-hint = "voyelle horizontale : elle se place dessous"
+mnemonics = [
+    "Giyeok plus o. Une voyelle horizontale se place SOUS la consonne, jamais a cote.",
+    "C'est la seule regle de placement a retenir : verticale a droite, horizontale dessous.",
+]
 
 [[glyphs]]
 char = "노"
 answers = ["no"]
+mnemonics = [
+    "Nieun plus o, la voyelle glissee dessous car elle est horizontale.",
+]
 
 [[glyphs]]
 char = "도"
 answers = ["do", "to"]
+mnemonics = [
+    "Digeut plus o, la voyelle dessous. On le trouve dans doshi, la ville.",
+]
 
 [[glyphs]]
 char = "무"
 answers = ["mu"]
+mnemonics = [
+    "Mieum plus u, la voyelle dessous. Se lit mou et non mu.",
+]
 
 [[glyphs]]
 char = "부"
 answers = ["bu", "pu"]
+mnemonics = [
+    "Bieup plus u, la voyelle dessous. Se lit bou. Comme dans bumo, les parents.",
+]
 
 [[glyphs]]
 char = "수"
 answers = ["su"]
+mnemonics = [
+    "Siot plus u, la voyelle dessous. Se lit sou, comme dans susu, le mais.",
+]

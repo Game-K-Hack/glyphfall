@@ -21,44 +21,71 @@ three = 0.90
 [[glyphs]]
 char = "お"
 answers = ["o"]
-hint = "a ne pas confondre avec le a"
+mnemonics = [
+    "Cursive du kanji signifiant lettre.",
+    "Le a avec un trait de plus en haut a droite. A ne pas confondre avec lui.",
+]
 
 [[glyphs]]
 char = "し"
 answers = ["shi", "si"]
-hint = "se prononce shi, jamais si"
+mnemonics = [
+    "Cursive du kanji signifiant lui.",
+    "Un hamecon. Se prononce chi, jamais si.",
+]
 
 [[glyphs]]
 char = "ち"
 answers = ["chi", "ti"]
-hint = "se prononce tchi"
+mnemonics = [
+    "Cursive du kanji signifiant savoir.",
+    "Le ta retourne. Se prononce tchi.",
+]
 
 [[glyphs]]
 char = "ぬ"
 answers = ["nu"]
-hint = "a ne pas confondre avec me"
+mnemonics = [
+    "Cursive du kanji signifiant serviteur.",
+    "Comme le me, mais avec une boucle au bout. Nouer une boucle : nu.",
+]
 
 [[glyphs]]
 char = "め"
 answers = ["me"]
-hint = "a ne pas confondre avec nu"
+mnemonics = [
+    "Cursive du kanji signifiant femme.",
+    "Comme le nu, mais sans la boucle finale.",
+]
 
 [[glyphs]]
 char = "ほ"
 answers = ["ho"]
-hint = "le ha avec une barre en plus"
+mnemonics = [
+    "Cursive du kanji signifiant garantir.",
+    "Le ha avec une barre de plus en haut.",
+]
 
 [[glyphs]]
 char = "る"
 answers = ["ru"]
-hint = "boucle fermee, contrairement au ro"
+mnemonics = [
+    "Cursive du kanji signifiant rester.",
+    "Comme le ro, mais termine par une boucle fermee.",
+]
 
 [[glyphs]]
 char = "ん"
 answers = ["n"]
-hint = "la seule consonne qui vit seule"
+mnemonics = [
+    "Cursive du kanji signifiant infini.",
+    "La seule consonne qui tient seule, sans voyelle.",
+]
 
 [[glyphs]]
 char = "を"
 answers = ["wo", "o"]
-hint = "ne sert que de particule d'objet direct"
+mnemonics = [
+    "Cursive du kanji signifiant lointain.",
+    "Ne sert que de particule : il marque le complement d'objet. Se prononce o.",
+]

@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "カ"
 answers = ["ka"]
+mnemonics = [
+    "Le kanji signifiant force, pris tel quel.",
+    "A ne pas confondre avec ce kanji, qu'on verra plus tard.",
+]
 
 [[glyphs]]
 char = "キ"
 answers = ["ki"]
+mnemonics = [
+    "Morceau du meme kanji que le ki hiragana.",
+    "Une cle a deux dents, comme le ki hiragana mais anguleuse.",
+]
 
 [[glyphs]]
 char = "ク"
 answers = ["ku"]
-hint = "a ne pas confondre avec le wa et le ta"
+mnemonics = [
+    "Morceau du kanji signifiant longtemps.",
+    "Un bec, plus ferme que celui du ku hiragana. A ne pas confondre avec le wa et le ta.",
+]
 
 [[glyphs]]
 char = "ケ"
 answers = ["ke"]
+mnemonics = [
+    "Morceau du kanji signifiant introduire.",
+    "Un k anguleux, dont la jambe part vers le bas.",
+]
 
 [[glyphs]]
 char = "コ"
 answers = ["ko"]
+mnemonics = [
+    "Morceau du kanji signifiant soi.",
+    "Un crochet ouvert a droite. A ne pas confondre avec le ro, ferme.",
+]

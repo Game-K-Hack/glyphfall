@@ -21,19 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "ア"
 answers = ["a"]
+mnemonics = [
+    "Morceau du meme kanji que le a hiragana, celui qui signifie paisible.",
+    "Un chevron surmonte d'un trait.",
+]
 
 [[glyphs]]
 char = "イ"
 answers = ["i"]
+mnemonics = [
+    "Morceau gauche du kanji signifiant personne.",
+    "Deux traits, comme le i hiragana mais anguleux.",
+]
 
 [[glyphs]]
 char = "ウ"
 answers = ["u"]
+mnemonics = [
+    "Le toit du kanji signifiant maison.",
+    "Un toit avec sa cheminee.",
+]
 
 [[glyphs]]
 char = "エ"
 answers = ["e"]
+mnemonics = [
+    "Le kanji signifiant travail, pris tel quel.",
+    "Un H couche : trois barres, celle du milieu verticale.",
+]
 
 [[glyphs]]
 char = "オ"
 answers = ["o"]
+mnemonics = [
+    "Morceau du kanji signifiant sur.",
+    "Une croix a laquelle pend un trait.",
+]

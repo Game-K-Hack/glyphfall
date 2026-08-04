@@ -21,41 +21,79 @@ three = 0.88
 [[glyphs]]
 char = "な"
 answers = ["na"]
+mnemonics = [
+    "Cursive du kanji signifiant quoi.",
+    "Une croix suivie d'une boucle.",
+]
 
 [[glyphs]]
 char = "に"
 answers = ["ni"]
+mnemonics = [
+    "Cursive du kanji signifiant benevolence.",
+    "Un trait vertical suivi de deux traits couches.",
+]
 
 [[glyphs]]
 char = "ぬ"
 answers = ["nu"]
-hint = "a ne pas confondre avec me"
+mnemonics = [
+    "Cursive du kanji signifiant serviteur.",
+    "Comme le me, mais avec une boucle au bout. Nouer une boucle : nu.",
+]
 
 [[glyphs]]
 char = "ね"
 answers = ["ne"]
+mnemonics = [
+    "Cursive du kanji signifiant genou.",
+    "Comme le nu, mais la boucle est ouverte.",
+]
 
 [[glyphs]]
 char = "の"
 answers = ["no"]
+mnemonics = [
+    "Cursive du kanji signifiant sur.",
+    "Une spirale unique, le kana le plus simple a reconnaitre.",
+]
 
 [[glyphs]]
 char = "は"
 answers = ["ha"]
+mnemonics = [
+    "Cursive du kanji signifiant feuille.",
+    "Un h dont la barre est traversee.",
+]
 
 [[glyphs]]
 char = "ひ"
 answers = ["hi"]
+mnemonics = [
+    "Cursive du kanji signifiant comparer.",
+    "Un nez de profil, ou un sourire.",
+]
 
 [[glyphs]]
 char = "ふ"
 answers = ["fu", "hu"]
+mnemonics = [
+    "Cursive du kanji signifiant inegal.",
+    "Un mont Fuji stylise, avec des flocons de part et d'autre.",
+]
 
 [[glyphs]]
 char = "へ"
 answers = ["he"]
+mnemonics = [
+    "Cursive du kanji signifiant partie.",
+    "Une colline. Le plus simple des kana, identique en katakana.",
+]
 
 [[glyphs]]
 char = "ほ"
 answers = ["ho"]
-hint = "le ha avec une barre en plus"
+mnemonics = [
+    "Cursive du kanji signifiant garantir.",
+    "Le ha avec une barre de plus en haut.",
+]

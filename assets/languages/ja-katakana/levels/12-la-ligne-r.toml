@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "ラ"
 answers = ["ra"]
+mnemonics = [
+    "Morceau du kanji signifiant bon.",
+    "Un trait sur un crochet.",
+]
 
 [[glyphs]]
 char = "リ"
 answers = ["ri"]
+mnemonics = [
+    "Morceau du meme kanji que le ri hiragana.",
+    "Deux traits verticaux, comme le ri hiragana redresse.",
+]
 
 [[glyphs]]
 char = "ル"
 answers = ["ru"]
+mnemonics = [
+    "Morceau du kanji signifiant rester.",
+    "Deux jambes qui s'ecartent.",
+]
 
 [[glyphs]]
 char = "レ"
 answers = ["re"]
+mnemonics = [
+    "Morceau du kanji signifiant rite.",
+    "Un seul angle qui remonte.",
+]
 
 [[glyphs]]
 char = "ロ"
 answers = ["ro"]
-hint = "un carre parfait, contrairement au ko ouvert"
+mnemonics = [
+    "Morceau du kanji signifiant lui.",
+    "Un carre ferme. Le ko, lui, est ouvert a droite.",
+]

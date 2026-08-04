@@ -21,29 +21,47 @@ three = 0.88
 [[glyphs]]
 char = "ㄱ"
 answers = ["g", "k"]
-hint = "giyeok - un coin, comme un G qui a perdu sa boucle"
+mnemonics = [
+    "Le dessin de la langue qui se souleve au fond de la gorge pour bloquer l'air.",
+    "Un coin, ou un G majuscule qui aurait perdu sa boucle. Son nom : giyeok.",
+]
 
 [[glyphs]]
 char = "ㄴ"
 answers = ["n"]
-hint = "nieun - la langue contre les dents, vue de profil"
+mnemonics = [
+    "Le bout de la langue collee derriere les dents du haut, vue de profil.",
+    "Un L a l'envers, ou le bas d'un N. Son nom : nieun.",
+]
 
 [[glyphs]]
 char = "ㄷ"
 answers = ["d", "t"]
-hint = "digeut - le nieun que l'on referme"
+mnemonics = [
+    "Le nieun que l'on referme par le haut : meme langue, contact plus ferme.",
+    "Un D carre, dos a gauche. Son nom : digeut.",
+]
 
 [[glyphs]]
 char = "ㄹ"
 answers = ["r", "l"]
-hint = "rieul - le zigzag de la langue qui roule"
+mnemonics = [
+    "Le zigzag de la langue qui roule puis retombe.",
+    "Un escalier a deux marches. Son nom : rieul.",
+]
 
 [[glyphs]]
 char = "ㅁ"
 answers = ["m"]
-hint = "mieum - la bouche fermee, un carre"
+mnemonics = [
+    "Le dessin de la bouche fermee, vue de face : un carre.",
+    "Le M de mouth, ou de mieum, son nom.",
+]
 
 [[glyphs]]
 char = "ㅂ"
 answers = ["b", "p"]
-hint = "bieup - le mieum ouvert, la bouche qui s'entrouvre"
+mnemonics = [
+    "Le carre de la bouche qui s'entrouvre : deux traits s'echappent vers le haut.",
+    "Une coupe ouverte. Son nom : bieup.",
+]

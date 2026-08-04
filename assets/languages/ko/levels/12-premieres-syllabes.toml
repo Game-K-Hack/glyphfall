@@ -21,20 +21,37 @@ three = 0.85
 [[glyphs]]
 char = "가"
 answers = ["ga", "ka"]
-hint = "consonne + voyelle verticale : elle se place a droite"
+mnemonics = [
+    "Giyeok plus a : la consonne a gauche, la voyelle verticale a sa droite.",
+    "Se lit ka en debut de mot, ga entre deux voyelles. Le jeu accepte les deux.",
+]
 
 [[glyphs]]
 char = "나"
 answers = ["na"]
+mnemonics = [
+    "Nieun plus a : la langue derriere les dents, puis la bouche s'ouvre.",
+    "On le trouve dans nara, qui veut dire pays.",
+]
 
 [[glyphs]]
 char = "다"
 answers = ["da", "ta"]
+mnemonics = [
+    "Digeut plus a. Meme regle de position que les autres voyelles verticales.",
+    "Se lit ta en debut de mot, da a l'interieur.",
+]
 
 [[glyphs]]
 char = "라"
 answers = ["ra", "la"]
+mnemonics = [
+    "Rieul plus a. Le son est entre le R et le L francais, la langue effleure.",
+]
 
 [[glyphs]]
 char = "마"
 answers = ["ma"]
+mnemonics = [
+    "Mieum plus a : le carre de la bouche fermee, puis elle s'ouvre grand.",
+]

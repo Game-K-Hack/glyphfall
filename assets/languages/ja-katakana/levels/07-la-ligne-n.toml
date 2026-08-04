@@ -21,19 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "ナ"
 answers = ["na"]
+mnemonics = [
+    "Morceau du kanji signifiant quoi.",
+    "Une croix penchee, comme le debut du na hiragana.",
+]
 
 [[glyphs]]
 char = "ニ"
 answers = ["ni"]
+mnemonics = [
+    "Le kanji signifiant deux, pris tel quel.",
+    "Deux traits : ni comme deux.",
+]
 
 [[glyphs]]
 char = "ヌ"
 answers = ["nu"]
+mnemonics = [
+    "Morceau du kanji signifiant serviteur.",
+    "Comme le su, mais la jambe part de la barre.",
+]
 
 [[glyphs]]
 char = "ネ"
 answers = ["ne"]
+mnemonics = [
+    "Morceau du kanji signifiant genou.",
+    "Une croix surmontee d'un trait, avec une jambe.",
+]
 
 [[glyphs]]
 char = "ノ"
 answers = ["no"]
+mnemonics = [
+    "Morceau du kanji signifiant sur.",
+    "Un seul trait penche : le plus simple de tous.",
+]

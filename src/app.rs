@@ -47,6 +47,12 @@ pub enum Screen {
         language: String,
         level: String,
     },
+    /// La fiche d'un signe, ouverte depuis le briefing.
+    Sign {
+        language: String,
+        level: String,
+        index: usize,
+    },
     /// Les manches et leurs bilans sont volumineux : les mettre en boite
     /// garde l'enumeration compacte, elle qui est copiee a chaque transition.
     Playing(Box<Session>),

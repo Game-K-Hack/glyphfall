@@ -21,14 +21,23 @@ three = 0.85
 [[glyphs]]
 char = "ㄷ"
 answers = ["d", "t"]
-hint = "digeut - le nieun que l'on referme"
+mnemonics = [
+    "Le nieun que l'on referme par le haut : meme langue, contact plus ferme.",
+    "Un D carre, dos a gauche. Son nom : digeut.",
+]
 
 [[glyphs]]
 char = "ㄹ"
 answers = ["r", "l"]
-hint = "rieul - le zigzag de la langue qui roule"
+mnemonics = [
+    "Le zigzag de la langue qui roule puis retombe.",
+    "Un escalier a deux marches. Son nom : rieul.",
+]
 
 [[glyphs]]
 char = "ㅂ"
 answers = ["b", "p"]
-hint = "bieup - le mieum ouvert, la bouche qui s'entrouvre"
+mnemonics = [
+    "Le carre de la bouche qui s'entrouvre : deux traits s'echappent vers le haut.",
+    "Une coupe ouverte. Son nom : bieup.",
+]

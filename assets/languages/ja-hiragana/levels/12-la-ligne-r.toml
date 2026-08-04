@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "ら"
 answers = ["ra"]
+mnemonics = [
+    "Cursive du kanji signifiant bon.",
+    "Un trait pose sur une boucle.",
+]
 
 [[glyphs]]
 char = "り"
 answers = ["ri"]
+mnemonics = [
+    "Cursive du kanji signifiant profit.",
+    "Deux traits verticaux, le second recourbe.",
+]
 
 [[glyphs]]
 char = "る"
 answers = ["ru"]
-hint = "boucle fermee, contrairement au ro"
+mnemonics = [
+    "Cursive du kanji signifiant rester.",
+    "Comme le ro, mais termine par une boucle fermee.",
+]
 
 [[glyphs]]
 char = "れ"
 answers = ["re"]
+mnemonics = [
+    "Cursive du kanji signifiant rite.",
+    "Comme le ne, mais la fin part vers la droite.",
+]
 
 [[glyphs]]
 char = "ろ"
 answers = ["ro"]
+mnemonics = [
+    "Cursive du kanji signifiant lui.",
+    "Comme le ru, mais sans la boucle : une route ouverte.",
+]

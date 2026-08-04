@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "た"
 answers = ["ta"]
+mnemonics = [
+    "Cursive du kanji signifiant grand.",
+    "Un t suivi d'un petit trait, comme un ta ecrit vite.",
+]
 
 [[glyphs]]
 char = "ち"
 answers = ["chi", "ti"]
-hint = "se prononce tchi"
+mnemonics = [
+    "Cursive du kanji signifiant savoir.",
+    "Le ta retourne. Se prononce tchi.",
+]
 
 [[glyphs]]
 char = "つ"
 answers = ["tsu", "tu"]
+mnemonics = [
+    "Cursive du kanji signifiant fleuve.",
+    "Une vague. Se prononce tsou.",
+]
 
 [[glyphs]]
 char = "て"
 answers = ["te"]
+mnemonics = [
+    "Cursive du kanji signifiant main.",
+    "Une main tendue vue de profil.",
+]
 
 [[glyphs]]
 char = "と"
 answers = ["to"]
+mnemonics = [
+    "Cursive du kanji signifiant s'arreter.",
+    "Un clou plante, avec sa pointe.",
+]

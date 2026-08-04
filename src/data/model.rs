@@ -167,9 +167,12 @@ pub struct Glyph {
     /// Toutes les romanisations correctes. La première est celle qu'on montre
     /// au joueur ; les suivantes sont des variantes tolérées (« si » / « shi »).
     pub answers: Vec<String>,
-    /// Aide mnémotechnique, affichée sur l'écran de briefing.
-    #[serde(default)]
-    pub hint: String,
+    /// Comment retenir ce signe. Au moins un, souvent deux : le premier sert
+    /// d'aide courte au survol, la page de détail les montre tous.
+    ///
+    /// Volontairement écrits sans caractère de l'écriture enseignée, pour
+    /// qu'ils restent rendus par la police pixel — voir le test de couverture.
+    pub mnemonics: Vec<String>,
 }
 
 impl Glyph {
@@ -183,6 +186,11 @@ impl Glyph {
     /// La romanisation de référence, montrée en briefing et en correction.
     pub fn primary_answer(&self) -> &str {
         self.answers.first().map(String::as_str).unwrap_or("")
+    }
+
+    /// L'aide courte, affichée au survol.
+    pub fn hint(&self) -> &str {
+        self.mnemonics.first().map(String::as_str).unwrap_or("")
     }
 }
 
@@ -221,7 +229,7 @@ mod tests {
         let glyph = Glyph {
             char: "し".into(),
             answers: vec!["shi".into(), "si".into()],
-            hint: String::new(),
+            mnemonics: vec!["se prononce chi".into()],
         };
 
         assert!(glyph.accepts("shi"));
@@ -253,6 +261,7 @@ mod tests {
             [[glyphs]]
             char = "ㄱ"
             answers = ["g"]
+            mnemonics = ["un coin"]
             "#,
         )
         .expect("le TOML minimal doit être accepté");
@@ -278,6 +287,7 @@ mod tests {
             [[glyphs]]
             char = "ㄱ"
             answers = ["g"]
+            mnemonics = ["un coin"]
             "#,
         );
 

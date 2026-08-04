@@ -21,42 +21,79 @@ three = 0.88
 [[glyphs]]
 char = "サ"
 answers = ["sa"]
+mnemonics = [
+    "Morceau du kanji signifiant disperser.",
+    "Deux traits verticaux barres.",
+]
 
 [[glyphs]]
 char = "シ"
 answers = ["shi", "si"]
-hint = "traits qui montent - a ne pas confondre avec le tsu"
+mnemonics = [
+    "Morceau du meme kanji que le shi hiragana.",
+    "Deux points et un trait qui MONTE. Le tsu, lui, descend.",
+]
 
 [[glyphs]]
 char = "ス"
 answers = ["su"]
+mnemonics = [
+    "Morceau du kanji signifiant grand.",
+    "Un chevron d'ou pend une jambe.",
+]
 
 [[glyphs]]
 char = "セ"
 answers = ["se"]
+mnemonics = [
+    "Morceau du meme kanji que le se hiragana.",
+    "Le se hiragana en plus anguleux.",
+]
 
 [[glyphs]]
 char = "ソ"
 answers = ["so"]
-hint = "traits qui descendent - a ne pas confondre avec le n"
+mnemonics = [
+    "Morceau du kanji signifiant ceci.",
+    "Un point et un trait qui DESCEND. Le n, lui, monte.",
+]
 
 [[glyphs]]
 char = "タ"
 answers = ["ta"]
+mnemonics = [
+    "Morceau du kanji signifiant beaucoup.",
+    "Un ku barre d'un trait.",
+]
 
 [[glyphs]]
 char = "チ"
 answers = ["chi", "ti"]
+mnemonics = [
+    "Morceau du kanji signifiant mille.",
+    "Un 7 barre. Se prononce tchi.",
+]
 
 [[glyphs]]
 char = "ツ"
 answers = ["tsu", "tu"]
-hint = "traits penches - a ne pas confondre avec le shi"
+mnemonics = [
+    "Morceau du meme kanji que le tsu hiragana.",
+    "Trois traits qui MONTENT. Le shi a deux points, le tsu en a trois.",
+]
 
 [[glyphs]]
 char = "テ"
 answers = ["te"]
+mnemonics = [
+    "Morceau du kanji signifiant ciel.",
+    "Deux barres et une jambe.",
+]
 
 [[glyphs]]
 char = "ト"
 answers = ["to"]
+mnemonics = [
+    "Morceau du kanji signifiant s'arreter.",
+    "Un trait vertical avec un ergot.",
+]

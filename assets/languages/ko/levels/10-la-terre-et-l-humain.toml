@@ -21,9 +21,14 @@ three = 0.85
 [[glyphs]]
 char = "ㅡ"
 answers = ["eu"]
-hint = "la barre horizontale, la terre"
+mnemonics = [
+    "La terre, toute plate. Le troisieme symbole de base avec le ciel et l'humain.",
+    "Un son avale, bouche etiree, comme le e de je.",
+]
 
 [[glyphs]]
 char = "ㅣ"
 answers = ["i"]
-hint = "la barre verticale, l'humain debout"
+mnemonics = [
+    "L'humain debout, tout droit. Le deuxieme symbole de base.",
+]

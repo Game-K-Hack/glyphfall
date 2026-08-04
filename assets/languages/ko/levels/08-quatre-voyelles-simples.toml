@@ -21,19 +21,31 @@ three = 0.85
 [[glyphs]]
 char = "ㅏ"
 answers = ["a"]
-hint = "trait vers la droite : le son sort devant"
+mnemonics = [
+    "Le trait vertical est l'humain debout ; le point du soleil s'est pose a sa droite.",
+    "Le soleil a l'est : le son sort devant, bouche grande ouverte.",
+]
 
 [[glyphs]]
 char = "ㅓ"
 answers = ["eo"]
-hint = "trait vers la gauche : le miroir du a"
+mnemonics = [
+    "Le miroir du a : le soleil est passe a gauche, le son recule dans la bouche.",
+    "Entre le o et le e francais, comme le eu de peur.",
+]
 
 [[glyphs]]
 char = "ㅗ"
 answers = ["o"]
-hint = "trait vers le haut"
+mnemonics = [
+    "La barre est la terre, le trait au-dessus est le soleil qui se leve.",
+    "Le soleil au-dessus de l'horizon : les levres s'arrondissent.",
+]
 
 [[glyphs]]
 char = "ㅜ"
 answers = ["u"]
-hint = "trait vers le bas : le miroir du o"
+mnemonics = [
+    "Le miroir du o : le soleil est passe sous la terre.",
+    "Se prononce ou et jamais u : le u francais n'existe pas en coreen.",
+]

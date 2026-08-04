@@ -21,34 +21,55 @@ three = 0.90
 [[glyphs]]
 char = "が"
 answers = ["ga"]
-hint = "le ka sonorise par les deux petits traits"
+mnemonics = [
+    "Le ka avec les deux petits traits : la sourde devient sonore, ka donne ga.",
+]
 
 [[glyphs]]
 char = "じ"
 answers = ["ji", "zi"]
-hint = "le shi sonorise se lit ji, pas zi"
+mnemonics = [
+    "Le shi avec les deux petits traits. Se lit ji, pas zi.",
+]
 
 [[glyphs]]
 char = "づ"
 answers = ["zu", "du"]
+mnemonics = [
+    "Le tsu avec les deux petits traits. Meme son que le zu precedent, mais rare.",
+]
 
 [[glyphs]]
 char = "ぱ"
 answers = ["pa"]
-hint = "le ha avec un petit rond : le son devient P"
+mnemonics = [
+    "Le ha avec le petit rond : le rond donne toujours un P, ha donne pa.",
+]
 
 [[glyphs]]
 char = "ぴ"
 answers = ["pi"]
+mnemonics = [
+    "Le hi avec le petit rond : le rond donne toujours un P, hi donne pi.",
+]
 
 [[glyphs]]
 char = "ぶ"
 answers = ["bu"]
+mnemonics = [
+    "Le fu avec les deux petits traits : la sourde devient sonore, fu donne bu.",
+]
 
 [[glyphs]]
 char = "べ"
 answers = ["be"]
+mnemonics = [
+    "Le he avec les deux petits traits : la sourde devient sonore, he donne be.",
+]
 
 [[glyphs]]
 char = "ぞ"
 answers = ["zo"]
+mnemonics = [
+    "Le so avec les deux petits traits : la sourde devient sonore, so donne zo.",
+]

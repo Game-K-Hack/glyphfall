@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "あ"
 answers = ["a"]
+mnemonics = [
+    "Cursive du kanji signifiant paisible.",
+    "Un A majuscule auquel on aurait ajoute une boucle.",
+]
 
 [[glyphs]]
 char = "い"
 answers = ["i"]
+mnemonics = [
+    "Cursive du kanji signifiant comme.",
+    "Deux traits paralleles, comme les deux jambages du i.",
+]
 
 [[glyphs]]
 char = "う"
 answers = ["u"]
+mnemonics = [
+    "Cursive du kanji signifiant maison.",
+    "Un u penche coiffe d'un accent.",
+]
 
 [[glyphs]]
 char = "え"
 answers = ["e"]
+mnemonics = [
+    "Cursive du kanji signifiant riviere.",
+    "Un z surmonte d'un trait.",
+]
 
 [[glyphs]]
 char = "お"
 answers = ["o"]
-hint = "a ne pas confondre avec le a"
+mnemonics = [
+    "Cursive du kanji signifiant lettre.",
+    "Le a avec un trait de plus en haut a droite. A ne pas confondre avec lui.",
+]

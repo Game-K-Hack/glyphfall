@@ -29,7 +29,7 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
     let Some(level) = language.level(level_id) else { return Transition::Pop };
 
     draw_header(&app.fonts, level);
-    let hovered = draw_glyphs(app, language, level, mouse);
+    let (hovered, clicked) = draw_glyphs(app, language, level, mouse);
     draw_rules(&app.fonts, level);
 
     // Survoler un glyphe remplace le rappel des touches par son aide
@@ -38,12 +38,23 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
         Some(hint) if !hint.is_empty() => draw_hint(&app.fonts, language, hint),
         _ => ui::text_centered(
             &app.fonts,
-            "ECHAP RETOUR",
+            "CLIQUE UN SIGNE POUR SA FICHE",
             canvas::WIDTH / 2.0,
             200.0,
             fonts::TEXT,
             role::TEXT_DISABLED,
         ),
+    }
+
+    // Cliquer un signe ouvre sa fiche : le briefing ne peut montrer qu'une
+    // ligne d'aide, la fiche a la place de tout dire.
+    if let Some(index) = clicked {
+        app.sfx.confirm();
+        return Transition::Push(Screen::Sign {
+            language: language_id.to_string(),
+            level: level_id.to_string(),
+            index,
+        });
     }
 
     let start = Rect::new(((canvas::WIDTH - 120.0) / 2.0).floor(), 172.0, 120.0, 20.0);
@@ -89,17 +100,19 @@ fn draw_header(fonts_set: &Fonts, level: &Level) {
     ui::text(fonts_set, &count, canvas::WIDTH - 8.0 - width, 6.0, fonts::TEXT, role::TEXT_MUTED);
 }
 
-/// Dessine la grille des glyphes et renvoie l'aide de celui survolé.
+/// Dessine la grille des signes, et renvoie l'aide de celui survolé ainsi que
+/// l'indice de celui que l'on vient de cliquer.
 fn draw_glyphs<'a>(
     app: &App,
     language: &'a Language,
     level: &'a Level,
     mouse: Vec2,
-) -> Option<&'a str> {
+) -> (Option<&'a str>, Option<usize>) {
     let fonts_set = &app.fonts;
     let script = fonts_set.script(&language.id);
     let capacity = COLUMNS * ROWS;
     let mut hovered = None;
+    let mut clicked = None;
 
     for (index, glyph) in level.glyphs.iter().take(capacity).enumerate() {
         let cell = Rect::new(
@@ -111,8 +124,11 @@ fn draw_glyphs<'a>(
 
         let is_hovered = ui::hit(cell, mouse);
         if is_hovered {
-            hovered = Some(glyph.hint.as_str());
+            hovered = Some(glyph.hint());
             ui::fill(cell, role::PANEL);
+            if is_mouse_button_pressed(MouseButton::Left) {
+                clicked = Some(index);
+            }
         }
 
         let glyph_box = Rect::new(cell.x, cell.y, cell.w, GLYPH_SIZE as f32 + 2.0);
@@ -149,7 +165,7 @@ fn draw_glyphs<'a>(
         );
     }
 
-    hovered
+    (hovered, clicked)
 }
 
 fn draw_rules(fonts_set: &Fonts, level: &Level) {

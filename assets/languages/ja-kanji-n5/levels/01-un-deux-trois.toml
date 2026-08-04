@@ -21,11 +21,20 @@ three = 0.85
 [[glyphs]]
 char = "一"
 answers = ["1", "un", "ichi"]
+mnemonics = [
+    "Un trait, un. L'ecriture chinoise commence par le plus simple.",
+]
 
 [[glyphs]]
 char = "二"
 answers = ["2", "deux", "ni"]
+mnemonics = [
+    "Deux traits pour deux : le compte continue apres le trait unique.",
+]
 
 [[glyphs]]
 char = "三"
 answers = ["3", "trois", "san"]
+mnemonics = [
+    "Trois traits, trois. Au-dela, on cesse de compter les traits.",
+]

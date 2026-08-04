@@ -21,43 +21,71 @@ three = 0.90
 [[glyphs]]
 char = "シ"
 answers = ["shi", "si"]
-hint = "traits qui montent - a ne pas confondre avec le tsu"
+mnemonics = [
+    "Morceau du meme kanji que le shi hiragana.",
+    "Deux points et un trait qui MONTE. Le tsu, lui, descend.",
+]
 
 [[glyphs]]
 char = "ツ"
 answers = ["tsu", "tu"]
-hint = "traits penches - a ne pas confondre avec le shi"
+mnemonics = [
+    "Morceau du meme kanji que le tsu hiragana.",
+    "Trois traits qui MONTENT. Le shi a deux points, le tsu en a trois.",
+]
 
 [[glyphs]]
 char = "ソ"
 answers = ["so"]
-hint = "traits qui descendent - a ne pas confondre avec le n"
+mnemonics = [
+    "Morceau du kanji signifiant ceci.",
+    "Un point et un trait qui DESCEND. Le n, lui, monte.",
+]
 
 [[glyphs]]
 char = "ン"
 answers = ["n"]
-hint = "un seul trait qui monte - a ne pas confondre avec le so"
+mnemonics = [
+    "Morceau du kanji signifiant infini.",
+    "Un point et un trait qui MONTE. Le so, lui, descend.",
+]
 
 [[glyphs]]
 char = "ク"
 answers = ["ku"]
-hint = "a ne pas confondre avec le wa et le ta"
+mnemonics = [
+    "Morceau du kanji signifiant longtemps.",
+    "Un bec, plus ferme que celui du ku hiragana. A ne pas confondre avec le wa et le ta.",
+]
 
 [[glyphs]]
 char = "フ"
 answers = ["fu", "hu"]
-hint = "a ne pas confondre avec le wa et le ku"
+mnemonics = [
+    "Morceau du kanji signifiant inegal.",
+    "Un seul angle. A ne pas confondre avec le wa et le ku.",
+]
 
 [[glyphs]]
 char = "ロ"
 answers = ["ro"]
-hint = "un carre parfait, contrairement au ko ouvert"
+mnemonics = [
+    "Morceau du kanji signifiant lui.",
+    "Un carre ferme. Le ko, lui, est ouvert a droite.",
+]
 
 [[glyphs]]
 char = "ヲ"
 answers = ["wo", "o"]
+mnemonics = [
+    "Morceau du kanji signifiant lointain.",
+    "Particule d'objet, presque jamais ecrite en katakana.",
+]
 
 [[glyphs]]
 char = "ヘ"
 answers = ["he"]
-hint = "identique au signe hiragana"
+mnemonics = [
+    "Le meme signe qu'en hiragana : une colline.",
+    "Le seul kana identique dans les deux syllabaires.",
+]

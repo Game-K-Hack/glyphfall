@@ -1,15 +1,15 @@
 ---
 id: "ajouter-une-mthode-dapprentissage-mnmotechnique-2026-08-04"
-status: "todo"
+status: "in-progress"
 priority: "medium"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-04T15:53:38.061Z"
-modified: "2026-08-04T15:53:38.061Z"
+modified: "2026-08-04T16:24:58.420Z"
 completedAt: null
 labels: []
-order: "a7"
+order: "a0"
 ---
 # Ajouter une méthode d'apprentissage mnémotechnique
 

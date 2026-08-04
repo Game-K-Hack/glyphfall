@@ -21,25 +21,47 @@ three = 0.85
 [[glyphs]]
 char = "や"
 answers = ["ya"]
+mnemonics = [
+    "Cursive du kanji signifiant aussi.",
+    "Un yacht avec sa voile.",
+]
 
 [[glyphs]]
 char = "ゆ"
 answers = ["yu"]
+mnemonics = [
+    "Cursive du kanji signifiant provenir.",
+    "Un poisson stylise, avec sa nageoire et sa queue.",
+]
 
 [[glyphs]]
 char = "よ"
 answers = ["yo"]
+mnemonics = [
+    "Cursive du kanji signifiant avec.",
+    "Un yoyo qui pend au bout de son fil.",
+]
 
 [[glyphs]]
 char = "わ"
 answers = ["wa"]
+mnemonics = [
+    "Cursive du kanji signifiant harmonie.",
+    "Comme le ne et le re, mais la fin se referme en boucle courte.",
+]
 
 [[glyphs]]
 char = "を"
 answers = ["wo", "o"]
-hint = "ne sert que de particule d'objet direct"
+mnemonics = [
+    "Cursive du kanji signifiant lointain.",
+    "Ne sert que de particule : il marque le complement d'objet. Se prononce o.",
+]
 
 [[glyphs]]
 char = "ん"
 answers = ["n"]
-hint = "la seule consonne qui vit seule"
+mnemonics = [
+    "Cursive du kanji signifiant infini.",
+    "La seule consonne qui tient seule, sans voyelle.",
+]

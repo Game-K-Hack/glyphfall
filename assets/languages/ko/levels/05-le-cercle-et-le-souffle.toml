@@ -21,9 +21,15 @@ three = 0.85
 [[glyphs]]
 char = "ㅇ"
 answers = ["ng"]
-hint = "ieung - muet en debut de syllabe, ng en fin"
+mnemonics = [
+    "Le dessin de la gorge ouverte, un cercle.",
+    "Muet au debut d'une syllabe : il ne fait que porter la voyelle. Son nom : ieung.",
+]
 
 [[glyphs]]
 char = "ㅎ"
 answers = ["h"]
-hint = "hieut - un chapeau sur un cercle, le souffle"
+mnemonics = [
+    "Un chapeau pose sur la gorge ouverte : le souffle sort par le haut.",
+    "Le ieung a deux traits de plus, donc deux crans de souffle. Son nom : hieut.",
+]

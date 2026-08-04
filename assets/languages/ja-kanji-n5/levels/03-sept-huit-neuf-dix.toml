@@ -21,15 +21,27 @@ three = 0.85
 [[glyphs]]
 char = "七"
 answers = ["7", "sept", "shichi", "nana"]
+mnemonics = [
+    "Un 7 retourne, barre d'un trait.",
+]
 
 [[glyphs]]
 char = "八"
 answers = ["8", "huit", "hachi"]
+mnemonics = [
+    "Deux traits qui s'ecartent : le chiffre porte-bonheur, car il s'ouvre.",
+]
 
 [[glyphs]]
 char = "九"
 answers = ["9", "neuf", "kyu", "ku"]
+mnemonics = [
+    "Un crochet avec une jambe qui part a droite.",
+]
 
 [[glyphs]]
 char = "十"
 answers = ["10", "dix", "ju"]
+mnemonics = [
+    "Une croix : les deux axes complets, donc la dizaine.",
+]

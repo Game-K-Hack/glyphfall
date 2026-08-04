@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "さ"
 answers = ["sa"]
+mnemonics = [
+    "Cursive du kanji signifiant gauche.",
+    "Un s dont on a barre le haut.",
+]
 
 [[glyphs]]
 char = "し"
 answers = ["shi", "si"]
-hint = "se prononce shi, jamais si"
+mnemonics = [
+    "Cursive du kanji signifiant lui.",
+    "Un hamecon. Se prononce chi, jamais si.",
+]
 
 [[glyphs]]
 char = "す"
 answers = ["su"]
+mnemonics = [
+    "Cursive du kanji signifiant tenir.",
+    "Une boucle nouee sous une barre.",
+]
 
 [[glyphs]]
 char = "せ"
 answers = ["se"]
+mnemonics = [
+    "Cursive du kanji signifiant monde.",
+    "Une fourche a deux dents barree.",
+]
 
 [[glyphs]]
 char = "そ"
 answers = ["so"]
+mnemonics = [
+    "Cursive du kanji signifiant ceci.",
+    "Un zigzag qui descend d'un trait.",
+]

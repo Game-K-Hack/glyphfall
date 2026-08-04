@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "な"
 answers = ["na"]
+mnemonics = [
+    "Cursive du kanji signifiant quoi.",
+    "Une croix suivie d'une boucle.",
+]
 
 [[glyphs]]
 char = "に"
 answers = ["ni"]
+mnemonics = [
+    "Cursive du kanji signifiant benevolence.",
+    "Un trait vertical suivi de deux traits couches.",
+]
 
 [[glyphs]]
 char = "ぬ"
 answers = ["nu"]
-hint = "a ne pas confondre avec me"
+mnemonics = [
+    "Cursive du kanji signifiant serviteur.",
+    "Comme le me, mais avec une boucle au bout. Nouer une boucle : nu.",
+]
 
 [[glyphs]]
 char = "ね"
 answers = ["ne"]
+mnemonics = [
+    "Cursive du kanji signifiant genou.",
+    "Comme le nu, mais la boucle est ouverte.",
+]
 
 [[glyphs]]
 char = "の"
 answers = ["no"]
+mnemonics = [
+    "Cursive du kanji signifiant sur.",
+    "Une spirale unique, le kana le plus simple a reconnaitre.",
+]

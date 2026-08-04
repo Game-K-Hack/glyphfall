@@ -21,20 +21,39 @@ three = 0.85
 [[glyphs]]
 char = "ま"
 answers = ["ma"]
+mnemonics = [
+    "Cursive du kanji signifiant fin.",
+    "Deux barres traversees par une boucle.",
+]
 
 [[glyphs]]
 char = "み"
 answers = ["mi"]
+mnemonics = [
+    "Cursive du kanji signifiant beaute.",
+    "Un 3 auquel on a ajoute une queue.",
+]
 
 [[glyphs]]
 char = "む"
 answers = ["mu"]
+mnemonics = [
+    "Cursive du kanji signifiant militaire.",
+    "Une vache vue de profil : meuh, mu.",
+]
 
 [[glyphs]]
 char = "め"
 answers = ["me"]
-hint = "a ne pas confondre avec nu"
+mnemonics = [
+    "Cursive du kanji signifiant femme.",
+    "Comme le nu, mais sans la boucle finale.",
+]
 
 [[glyphs]]
 char = "も"
 answers = ["mo"]
+mnemonics = [
+    "Cursive du kanji signifiant aussi.",
+    "Un hamecon a deux barres.",
+]

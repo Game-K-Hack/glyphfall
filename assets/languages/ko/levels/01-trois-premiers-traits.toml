@@ -21,14 +21,23 @@ three = 0.85
 [[glyphs]]
 char = "ㄱ"
 answers = ["g", "k"]
-hint = "giyeok - un coin, comme un G qui a perdu sa boucle"
+mnemonics = [
+    "Le dessin de la langue qui se souleve au fond de la gorge pour bloquer l'air.",
+    "Un coin, ou un G majuscule qui aurait perdu sa boucle. Son nom : giyeok.",
+]
 
 [[glyphs]]
 char = "ㄴ"
 answers = ["n"]
-hint = "nieun - la langue contre les dents, vue de profil"
+mnemonics = [
+    "Le bout de la langue collee derriere les dents du haut, vue de profil.",
+    "Un L a l'envers, ou le bas d'un N. Son nom : nieun.",
+]
 
 [[glyphs]]
 char = "ㅁ"
 answers = ["m"]
-hint = "mieum - la bouche fermee, un carre"
+mnemonics = [
+    "Le dessin de la bouche fermee, vue de face : un carre.",
+    "Le M de mouth, ou de mieum, son nom.",
+]
