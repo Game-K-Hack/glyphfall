@@ -132,6 +132,27 @@ autour de 50 s, `speed.start` vers 42 — et se durcissent au fil du chemin. Un
 signe qu'on découvre demande le temps de le reconnaître ; un signe qu'on révise
 doit venir tout seul.
 
+### Ce que le moteur fait de son côté
+
+Le découpage des fichiers ne fait que la moitié du travail. Pendant la manche,
+le tirage des tuiles n'est pas uniforme :
+
+- **Les signes neufs passent d'abord**, un par un, dans l'ordre du fichier. Un
+  tirage purement aléatoire pourrait montrer le même trois fois de suite et en
+  oublier un autre jusqu'à la fin.
+- **Un signe raté revient** trois tuiles plus tard. C'est le seul moment où la
+  correction porte encore ; le laisser filer, c'est le laisser mal appris.
+- **Le tirage favorise ce qui est mal su.** Chaque signe porte une note de
+  maîtrise, gardée d'une partie à l'autre : une réussite la monte d'un point,
+  une erreur la descend de deux. Plus elle est basse, plus le signe revient.
+
+Cette asymétrie entre réussite et erreur est volontaire : sans elle, un signe
+raté une fois sur trois finirait par passer pour acquis.
+
+L'écran de briefing marque en orange les signes dont la note est négative — il
+dit donc quoi travailler, au lieu d'afficher une liste uniforme où les
+faiblesses se noient.
+
 ### Ce que le jeu vérifie au démarrage
 
 Un contenu incohérent affiche un écran d'erreur explicite plutôt que de casser

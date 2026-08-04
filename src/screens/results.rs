@@ -38,7 +38,7 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
     if ui::button(&app.fonts, mouse, Button::new(retry, "REJOUER").focused(true))
         || is_key_pressed(KeyCode::Enter)
     {
-        return match Session::new(&app.catalog, &outcome.language_id, &outcome.level_id) {
+        return match Session::new(&app.catalog, &app.progress, &outcome.language_id, &outcome.level_id) {
             Some(session) => Transition::Replace(Screen::Playing(Box::new(session))),
             // Le niveau a disparu du catalogue : on ne peut que remonter.
             None => Transition::Pop,

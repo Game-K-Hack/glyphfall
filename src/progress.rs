@@ -17,6 +17,18 @@ pub const MAX_STARS: u8 = 3;
 /// Nom du fichier de sauvegarde, ou clé de stockage en navigateur.
 const SAVE_NAME: &str = "progress.toml";
 
+/// Un signe jamais rencontré part de zéro ; les bornes encadrent ce que la
+/// maîtrise peut valoir.
+const WEAKEST: i8 = -4;
+const STRONGEST: i8 = 4;
+
+/// Une erreur pèse plus lourd qu'une réussite.
+///
+/// Sans cette asymétrie, un signe raté une fois sur trois finirait par passer
+/// pour acquis alors qu'il ne l'est pas.
+const HIT_GAIN: i8 = 1;
+const MISS_COST: i8 = 2;
+
 /// Version du format de sauvegarde. Une sauvegarde d'une version inconnue est
 /// ignorée plutôt que mal interprétée : mieux vaut repartir de zéro qu'ouvrir
 /// des niveaux au hasard.
@@ -32,6 +44,13 @@ pub struct Progress {
     /// écriture à l'autre et lisible à l'oeil.
     #[serde(default)]
     best: BTreeMap<String, u8>,
+    /// Maîtrise de chaque signe, entre `WEAKEST` et `STRONGEST`.
+    ///
+    /// Indexée par le signe lui-même et non par niveau : un signe appris à
+    /// l'étape 2 et revu à l'étape 9 est le même signe, et c'est bien sa
+    /// solidité que l'on veut suivre.
+    #[serde(default)]
+    mastery: BTreeMap<String, i8>,
 }
 
 impl Progress {
@@ -83,6 +102,36 @@ impl Progress {
         } else {
             false
         }
+    }
+
+    /// La solidité d'un signe. Zéro pour un signe jamais rencontré.
+    pub fn mastery(&self, character: &str) -> i8 {
+        self.mastery.get(character).copied().unwrap_or(0)
+    }
+
+    /// Ce signe est-il encore fragile ?
+    pub fn is_shaky(&self, character: &str) -> bool {
+        self.mastery(character) < 0
+    }
+
+    /// Poids de tirage d'un signe : plus il est mal su, plus il revient.
+    ///
+    /// C'est le coeur de la révision. Tirer uniformément ferait revenir aussi
+    /// souvent un signe acquis depuis dix étapes qu'un signe raté hier.
+    pub fn draw_weight(&self, character: &str) -> u32 {
+        (STRONGEST - self.mastery(character) + 1) as u32
+    }
+
+    /// Enregistre le bilan d'un signe sur une manche.
+    pub fn note(&mut self, character: &str, hits: u32, misses: u32) {
+        let delta = hits as i32 * HIT_GAIN as i32 - misses as i32 * MISS_COST as i32;
+        if delta == 0 {
+            return;
+        }
+
+        let updated =
+            (self.mastery(character) as i32 + delta).clamp(WEAKEST as i32, STRONGEST as i32) as i8;
+        self.mastery.insert(character.to_string(), updated);
     }
 
     /// Le niveau est-il jouable ? Il l'est quand tous ses prérequis sont faits.
@@ -182,6 +231,67 @@ mod tests {
 
         assert_ne!(parsed.version, FORMAT_VERSION);
         assert_eq!(Progress::new().stars("ko-01"), 0, "on repart de zéro");
+    }
+
+    #[test]
+    fn a_missed_sign_comes_back_more_often_than_a_known_one() {
+        let mut progress = Progress::new();
+
+        // Trois reussites d'affilee sur le premier, un rate sur le second.
+        progress.note("\u{3131}", 3, 0);
+        progress.note("\u{3134}", 0, 1);
+
+        assert!(
+            progress.draw_weight("\u{3134}") > progress.draw_weight("\u{3131}"),
+            "le signe rate doit peser plus lourd dans le tirage"
+        );
+        assert!(progress.is_shaky("\u{3134}"));
+        assert!(!progress.is_shaky("\u{3131}"));
+    }
+
+    #[test]
+    fn a_mistake_costs_more_than_a_success_earns() {
+        // Une manche a deux tiers de reussite ne doit pas consolider un signe.
+        let mut progress = Progress::new();
+
+        progress.note("\u{3131}", 2, 1);
+
+        assert_eq!(progress.mastery("\u{3131}"), 0, "deux bonnes et une ratee s'annulent");
+    }
+
+    #[test]
+    fn mastery_stays_within_its_bounds() {
+        // Sans bornes, un signe travaille cent fois deviendrait impossible a
+        // faire ressortir en revision.
+        let mut progress = Progress::new();
+
+        progress.note("\u{3131}", 100, 0);
+        assert_eq!(progress.mastery("\u{3131}"), STRONGEST);
+        assert_eq!(progress.draw_weight("\u{3131}"), 1, "un signe acquis garde une chance");
+
+        progress.note("\u{3134}", 0, 100);
+        assert_eq!(progress.mastery("\u{3134}"), WEAKEST);
+    }
+
+    #[test]
+    fn an_unseen_sign_sits_in_the_middle() {
+        let progress = Progress::new();
+
+        assert_eq!(progress.mastery("\u{3131}"), 0);
+        assert!(!progress.is_shaky("\u{3131}"), "jamais vu n'est pas fragile, juste inconnu");
+    }
+
+    #[test]
+    fn mastery_survives_a_round_trip() {
+        let mut progress = Progress::new();
+        progress.note("\u{3131}", 4, 0);
+        progress.note("\u{3134}", 0, 2);
+
+        let written = toml::to_string(&progress).expect("progression serialisable");
+        let read: Progress = toml::from_str(&written).expect("progression relisible");
+
+        assert_eq!(read.mastery("\u{3131}"), 4);
+        assert_eq!(read.mastery("\u{3134}"), -4);
     }
 
     #[test]

@@ -7,9 +7,10 @@
 
 use macroquad::prelude::*;
 
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashSet, VecDeque};
 
 use crate::data::{Catalog, GameMode, Glyph, Language, Level, Rules, Stars};
+use crate::progress::Progress;
 
 /// Hauteur d'une tuile, en pixels virtuels.
 pub const TILE_HEIGHT: f32 = 40.0;
@@ -26,6 +27,19 @@ const CLEAR_FLASH: f32 = 0.15;
 const SHAKE_DURATION: f32 = 0.2;
 /// Amplitude maximale du tremblement, en pixels virtuels.
 const SHAKE_PIXELS: f32 = 3.0;
+
+/// Une tuile ratée revient au bout de ce nombre d'apparitions.
+///
+/// Assez tôt pour que la correction serve encore, assez tard pour laisser le
+/// temps de la lire sur l'écran. La renvoyer aussitôt ne laisserait pas
+/// réfléchir ; ne jamais la renvoyer laisse partir avec l'erreur.
+const RETRY_AFTER: u32 = 3;
+
+/// Au-delà, la file d'attente des ratés est purgée par la tête.
+///
+/// Une manche catastrophique accumulerait sinon une file plus longue que la
+/// manche elle-même, et ne présenterait plus jamais de signe neuf.
+const MAX_RETRIES: usize = 6;
 
 pub struct Tile {
     pub column: i32,
@@ -54,6 +68,14 @@ pub struct Session {
     glyphs: Vec<Glyph>,
     /// Ceux des niveaux prérequis, piochés selon `review_ratio`.
     review: Vec<Glyph>,
+    /// Les signes neufs, présentés un par un au démarrage.
+    warmup: VecDeque<Glyph>,
+    /// Les signes ratés, à représenter rapidement.
+    retry: VecDeque<Glyph>,
+    /// Poids de tirage venus de la progression, par signe.
+    weights: BTreeMap<String, u32>,
+    /// Bilan par signe : réussites et ratés, pour nourrir la maîtrise.
+    tally: BTreeMap<String, (u32, u32)>,
 
     pub tiles: Vec<Tile>,
     pub score: u32,
@@ -64,6 +86,8 @@ pub struct Session {
 
     spawn_timer: f32,
     spawned: u32,
+    /// Apparitions depuis le dernier rappel d'un signe raté.
+    since_retry: u32,
 
     hits: u32,
     /// Tuiles tombées sans avoir été reconnues.
@@ -110,11 +134,26 @@ pub struct Outcome {
     pub is_record: bool,
     /// Les glyphes ratés, sans doublon, pour la correction de fin.
     pub missed_glyphs: Vec<String>,
+    /// Ce que chaque signe a donné, pour mettre la maîtrise à jour.
+    pub signs: Vec<SignResult>,
+}
+
+/// Le bilan d'un signe sur une manche.
+#[derive(Debug, Clone)]
+pub struct SignResult {
+    pub character: String,
+    pub hits: u32,
+    pub misses: u32,
 }
 
 impl Session {
     /// Prépare une manche. `None` si le niveau n'existe pas dans le catalogue.
-    pub fn new(catalog: &Catalog, language_id: &str, level_id: &str) -> Option<Self> {
+    pub fn new(
+        catalog: &Catalog,
+        progress: &Progress,
+        language_id: &str,
+        level_id: &str,
+    ) -> Option<Self> {
         let language = catalog.language(language_id)?;
         let level = language.level(level_id)?;
 
@@ -126,6 +165,20 @@ impl Session {
 
         let review = review_pool(language, level);
 
+        // Les poids sont copiés une fois pour toutes : la manche ne doit pas
+        // garder d'emprunt sur la progression, qui est modifiée à la fin.
+        let weights = level
+            .glyphs
+            .iter()
+            .chain(review.iter())
+            .map(|glyph| (glyph.char.clone(), progress.draw_weight(&glyph.char)))
+            .collect();
+
+        // Chaque signe neuf passe une première fois, dans l'ordre du fichier.
+        // Un tirage purement aléatoire pourrait montrer le même trois fois de
+        // suite et en oublier un autre jusqu'à la fin de la manche.
+        let warmup = level.glyphs.iter().cloned().collect();
+
         Some(Self {
             language_id: language_id.to_string(),
             level_id: level_id.to_string(),
@@ -134,6 +187,10 @@ impl Session {
             stars: level.stars,
             glyphs: level.glyphs.clone(),
             review,
+            warmup,
+            retry: VecDeque::new(),
+            weights,
+            tally: BTreeMap::new(),
             tiles: Vec::new(),
             score: 0,
             lives: level.rules.lives,
@@ -141,6 +198,7 @@ impl Session {
             time_left: level.rules.duration,
             spawn_timer: 0.0,
             spawned: 0,
+            since_retry: 0,
             hits: 0,
             missed: 0,
             wrong: 0,
@@ -244,9 +302,11 @@ impl Session {
         match target {
             Some(tile) => {
                 tile.cleared = Some(CLEAR_FLASH);
+                let character = tile.glyph.char.clone();
                 self.hits += 1;
                 self.score += POINTS_PER_HIT;
                 self.events.push(Event::Hit);
+                self.tally.entry(character).or_default().0 += 1;
             }
             None => {
                 self.wrong += 1;
@@ -262,22 +322,36 @@ impl Session {
         }
         self.spawn_timer = 0.0;
 
-        let glyph = self.pick_glyph().clone();
+        let glyph = self.pick_glyph();
         let column = rand::gen_range(0, self.rules.columns);
 
         self.tiles.push(Tile { column, y: -TILE_HEIGHT, glyph, cleared: None });
         self.spawned += 1;
+        self.since_retry += 1;
     }
 
-    /// Tire un glyphe : soit du niveau, soit — selon `review_ratio` — de ses
-    /// prérequis, pour ne pas oublier ce qui vient d'être appris.
-    fn pick_glyph(&self) -> &Glyph {
+    /// Choisit le prochain signe à faire tomber.
+    ///
+    /// Trois priorités, dans cet ordre : présenter les signes neufs, revenir sur
+    /// ce qui vient d'être raté, puis tirer au sort en favorisant le mal su.
+    fn pick_glyph(&mut self) -> Glyph {
+        if let Some(glyph) = self.warmup.pop_front() {
+            return glyph;
+        }
+
+        if self.since_retry >= RETRY_AFTER {
+            if let Some(glyph) = self.retry.pop_front() {
+                self.since_retry = 0;
+                return glyph;
+            }
+        }
+
         let reviewing = !self.review.is_empty()
             && self.rules.review_ratio > 0.0
             && rand::gen_range(0.0, 1.0) < self.rules.review_ratio;
 
         let pool = if reviewing { &self.review } else { &self.glyphs };
-        &pool[rand::gen_range(0, pool.len())]
+        weighted_pick(pool, &self.weights).clone()
     }
 
     fn advance_tiles(&mut self, dt: f32) {
@@ -294,8 +368,17 @@ impl Session {
                     if tile.y + TILE_HEIGHT >= limit {
                         lost += 1;
                         self.missed += 1;
+                        self.tally.entry(tile.glyph.char.clone()).or_default().1 += 1;
+
                         if !self.missed_glyphs.contains(&tile.glyph.char) {
                             self.missed_glyphs.push(tile.glyph.char.clone());
+                        }
+
+                        // Un signe raté doit revenir : c'est le seul moment où
+                        // la correction porte encore.
+                        self.retry.push_back(tile.glyph.clone());
+                        if self.retry.len() > MAX_RETRIES {
+                            self.retry.pop_front();
                         }
                     }
                 }
@@ -329,6 +412,15 @@ impl Session {
             reason,
             is_record: false,
             missed_glyphs: self.missed_glyphs.clone(),
+            signs: self
+                .tally
+                .iter()
+                .map(|(character, (hits, misses))| SignResult {
+                    character: character.clone(),
+                    hits: *hits,
+                    misses: *misses,
+                })
+                .collect(),
         }
     }
 
@@ -343,6 +435,28 @@ impl Session {
 
         self.hits as f32 / attempts as f32
     }
+}
+
+/// Tire un signe au hasard, en favorisant ceux que le joueur maîtrise mal.
+///
+/// Un tirage uniforme ferait revenir aussi souvent un signe acquis depuis dix
+/// étapes qu'un signe raté la veille : la révision passerait le plus clair de
+/// son temps sur ce qui est déjà su.
+fn weighted_pick<'a>(pool: &'a [Glyph], weights: &BTreeMap<String, u32>) -> &'a Glyph {
+    let weight = |glyph: &Glyph| weights.get(&glyph.char).copied().unwrap_or(1).max(1);
+    let total: u32 = pool.iter().map(weight).sum();
+
+    let mut ticket = rand::gen_range(0, total);
+    for glyph in pool {
+        let share = weight(glyph);
+        if ticket < share {
+            return glyph;
+        }
+        ticket -= share;
+    }
+
+    // Inatteignable : les parts couvrent tout le total.
+    &pool[0]
 }
 
 /// Tous les signes déjà rencontrés avant ce niveau.
@@ -381,6 +495,7 @@ mod tests {
     use super::*;
     use crate::data::model::{Glyph, Level, Speed, Stars};
     use crate::data::{Catalog, Language};
+    use crate::progress::Progress;
 
     fn glyph(character: &str, answer: &str) -> Glyph {
         Glyph {
@@ -419,7 +534,7 @@ mod tests {
 
     fn session(levels: Vec<Level>, level_id: &str) -> Session {
         let catalog = catalog(levels);
-        Session::new(&catalog, "ko", level_id).expect("niveau présent")
+        Session::new(&catalog, &Progress::new(), "ko", level_id).expect("niveau présent")
     }
 
     fn falling_tile(session: &mut Session, character: &str, answer: &str, y: f32) {
@@ -573,10 +688,110 @@ mod tests {
 
     #[test]
     fn an_entry_level_has_nothing_to_review() {
-        let session = session(vec![level("ko-01", &[], vec![glyph("ㄱ", "g")])], "ko-01");
+        let mut session = session(vec![level("ko-01", &[], vec![glyph("ㄱ", "g")])], "ko-01");
 
         assert!(session.review.is_empty());
         assert_eq!(session.pick_glyph().char, "ㄱ");
+    }
+
+    #[test]
+    fn every_new_sign_is_shown_once_before_any_repeat() {
+        // Un tirage purement aleatoire peut montrer trois fois le meme signe et
+        // en oublier un autre jusqu'a la fin de la manche. Les signes neufs
+        // passent donc d'abord, chacun son tour.
+        let glyphs = vec![glyph("ㄱ", "g"), glyph("ㄴ", "n"), glyph("ㅁ", "m")];
+        let mut session = session(vec![level("ko-01", &[], glyphs)], "ko-01");
+
+        let opening: Vec<String> =
+            (0..3).map(|_| session.pick_glyph().char.clone()).collect();
+
+        assert_eq!(opening, vec!["ㄱ", "ㄴ", "ㅁ"]);
+    }
+
+    #[test]
+    fn a_missed_sign_comes_back_within_the_round() {
+        // C'est le seul moment ou la correction porte encore : laisser filer un
+        // signe rate sans jamais le representer, c'est le laisser mal appris.
+        let glyphs = vec![glyph("ㄱ", "g"), glyph("ㄴ", "n")];
+        let mut session = session(vec![level("ko-01", &[], glyphs)], "ko-01");
+        session.lives = 9;
+        session.warmup.clear();
+
+        falling_tile(&mut session, "ㅁ", "m", TARGET_Y - TILE_HEIGHT - 1.0);
+        session.advance_tiles(0.5);
+        assert_eq!(session.retry.len(), 1, "le signe rate entre en file");
+
+        // Les premieres apparitions laissent le temps de lire la correction,
+        // puis le signe revient.
+        let drawn: Vec<String> = (0..RETRY_AFTER + 1)
+            .map(|_| {
+                session.since_retry += 1;
+                session.pick_glyph().char.clone()
+            })
+            .collect();
+
+        assert!(drawn.contains(&"ㅁ".to_string()), "le signe rate doit revenir : {drawn:?}");
+    }
+
+    #[test]
+    fn the_retry_queue_cannot_swallow_the_round() {
+        // Une manche catastrophique accumulerait une file plus longue que la
+        // manche, et ne presenterait plus jamais de signe neuf.
+        let mut session = session(vec![level("ko-01", &[], vec![glyph("ㄱ", "g")])], "ko-01");
+        session.lives = 99;
+
+        for _ in 0..MAX_RETRIES * 3 {
+            falling_tile(&mut session, "ㄱ", "g", TARGET_Y - TILE_HEIGHT - 1.0);
+            session.advance_tiles(0.5);
+        }
+
+        assert!(session.retry.len() <= MAX_RETRIES);
+    }
+
+    #[test]
+    fn the_round_reports_what_each_sign_gave() {
+        // C'est ce bilan qui nourrit la maitrise d'une manche a l'autre.
+        let mut session = session(vec![level("ko-01", &[], vec![glyph("ㄱ", "g")])], "ko-01");
+        session.lives = 9;
+
+        falling_tile(&mut session, "ㄱ", "g", 10.0);
+        session.input = "g".into();
+        session.validate();
+
+        falling_tile(&mut session, "ㄴ", "n", TARGET_Y - TILE_HEIGHT - 1.0);
+        session.advance_tiles(0.5);
+
+        let outcome = session.outcome(EndReason::TimeUp);
+        let find = |c: &str| outcome.signs.iter().find(|s| s.character == c).cloned();
+
+        assert_eq!(find("ㄱ").map(|s| (s.hits, s.misses)), Some((1, 0)));
+        assert_eq!(find("ㄴ").map(|s| (s.hits, s.misses)), Some((0, 1)));
+    }
+
+    #[test]
+    fn a_shaky_sign_is_drawn_more_often_than_a_solid_one() {
+        // La ponderation vient de la progression : sans elle, une revision
+        // passerait le plus clair de son temps sur ce qui est deja su.
+        let mut progress = Progress::new();
+        progress.note("ㄱ", 0, 4); // fragile
+        progress.note("ㄴ", 4, 0); // solide
+
+        let catalog = catalog(vec![level(
+            "ko-01",
+            &[],
+            vec![glyph("ㄱ", "g"), glyph("ㄴ", "n")],
+        )]);
+        let mut session = Session::new(&catalog, &progress, "ko", "ko-01").expect("niveau");
+        session.warmup.clear();
+
+        let mut shaky = 0;
+        for _ in 0..400 {
+            if session.pick_glyph().char == "ㄱ" {
+                shaky += 1;
+            }
+        }
+
+        assert!(shaky > 240, "le signe fragile devrait dominer, obtenu {shaky}/400");
     }
 
     #[test]

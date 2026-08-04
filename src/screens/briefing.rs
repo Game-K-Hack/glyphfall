@@ -29,7 +29,7 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
     let Some(level) = language.level(level_id) else { return Transition::Pop };
 
     draw_header(&app.fonts, level);
-    let hovered = draw_glyphs(&app.fonts, language, level, mouse);
+    let hovered = draw_glyphs(app, language, level, mouse);
     draw_rules(&app.fonts, level);
 
     // Survoler un glyphe remplace le rappel des touches par son aide
@@ -55,7 +55,7 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
     );
 
     if pressed || is_key_pressed(KeyCode::Enter) {
-        if let Some(session) = Session::new(&app.catalog, language_id, level_id) {
+        if let Some(session) = Session::new(&app.catalog, &app.progress, language_id, level_id) {
             app.sfx.confirm();
             return Transition::Push(Screen::Playing(Box::new(session)));
         }
@@ -91,11 +91,12 @@ fn draw_header(fonts_set: &Fonts, level: &Level) {
 
 /// Dessine la grille des glyphes et renvoie l'aide de celui survolé.
 fn draw_glyphs<'a>(
-    fonts_set: &Fonts,
+    app: &App,
     language: &'a Language,
     level: &'a Level,
     mouse: Vec2,
 ) -> Option<&'a str> {
+    let fonts_set = &app.fonts;
     let script = fonts_set.script(&language.id);
     let capacity = COLUMNS * ROWS;
     let mut hovered = None;
@@ -116,13 +117,21 @@ fn draw_glyphs<'a>(
 
         let glyph_box = Rect::new(cell.x, cell.y, cell.w, GLYPH_SIZE as f32 + 2.0);
         ui::glyph_fitted(script, &glyph.char, glyph_box, GLYPH_SIZE, role::TEXT);
+        // Les signes déjà ratés par le passé ressortent : le briefing dit ainsi
+        // quoi travailler, au lieu de présenter une liste uniforme où les
+        // faiblesses se noient.
+        let color = match (is_hovered, app.progress.is_shaky(&glyph.char)) {
+            (true, _) => role::ACCENT,
+            (false, true) => role::SHAKY,
+            (false, false) => role::TEXT_MUTED,
+        };
         ui::text_centered(
             fonts_set,
             glyph.primary_answer(),
             cell.x + cell.w / 2.0,
             cell.y + CELL_HEIGHT - 10.0,
             fonts::TEXT,
-            if is_hovered { role::ACCENT } else { role::TEXT_MUTED },
+            color,
         );
     }
 

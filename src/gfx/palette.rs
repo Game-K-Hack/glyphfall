@@ -57,6 +57,8 @@ pub mod role {
     pub const TITLE: Color = GOLD;
     /// Aide mnémotechnique.
     pub const HINT: Color = GOLD;
+    /// Signe encore mal su, à retravailler.
+    pub const SHAKY: Color = EMBER;
     /// Texte secondaire : sous-titres, aides, unités.
     pub const TEXT_MUTED: Color = SILVER;
     /// Texte sur un élément désactivé.

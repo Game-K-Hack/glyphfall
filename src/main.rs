@@ -80,7 +80,7 @@ async fn main() {
                 Screen::Briefing { language: language.to_string(), level: level.to_string() }
             }),
             Some(("play", target)) => target.split_once('/').and_then(|(language, level)| {
-                Session::new(&app.catalog, language, level)
+                Session::new(&app.catalog, &app.progress, language, level)
                     .map(|session| Screen::Playing(Box::new(session)))
             }),
             _ => match start.as_str() {
@@ -126,9 +126,13 @@ async fn main() {
         // chaque frame de l'ecran de resultats qui reste affiche longtemps.
         if let Transition::Replace(Screen::Results { outcome, .. }) = &mut transition {
             outcome.is_record = app.progress.record(&outcome.level_id, outcome.stars);
-            if outcome.is_record {
-                app.progress.save();
+
+            // La maîtrise de chaque signe est mise à jour même sans record :
+            // c'est elle qui pilotera le tirage des prochaines révisions.
+            for sign in &outcome.signs {
+                app.progress.note(&sign.character, sign.hits, sign.misses);
             }
+            app.progress.save();
         }
 
         // Échap revient en arrière partout, sauf sur l'écran-titre où il n'y a
