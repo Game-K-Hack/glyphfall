@@ -1,15 +1,18 @@
 use macroquad::prelude::*;
 
+mod app;
 mod core;
 mod data;
 mod gfx;
 mod screens;
 mod window;
 
-use crate::core::{GameState, Screen};
+use crate::app::{App, Navigator, Screen, Transition};
+use crate::core::GameState;
 use crate::gfx::{Canvas, Fonts};
 use crate::screens::game::game_screen;
-use crate::screens::main_menu::main_menu_screen;
+use crate::screens::game_over::game_over_screen;
+use crate::screens::title::title_screen;
 use crate::window::window_conf;
 
 #[macroquad::main(window_conf)]
@@ -25,13 +28,15 @@ async fn main() {
     };
 
     let fonts = Fonts::load(&catalog);
+    let app = App { catalog, fonts };
+
     let mut canvas = Canvas::new();
-    let mut state = GameState::new();
+    let mut navigator = Navigator::new(Screen::Title);
     let mut capture = Capture::from_environment();
 
     // Raccourci de développement : démarrer directement sur un écran donné.
     if std::env::var("ALPHATILES_START").as_deref() == Ok("playing") {
-        state.current_screen = Screen::Playing;
+        navigator.apply(Transition::Push(Screen::Playing(GameState::new())));
     }
 
     loop {
@@ -40,16 +45,40 @@ async fn main() {
         canvas.begin();
         let mouse = canvas.mouse();
 
-        match state.current_screen {
-            Screen::MainMenu => main_menu_screen(&mut state, &fonts, mouse),
-            Screen::Playing => game_screen(&mut state, &fonts, mouse),
-        }
+        let transition = match navigator.top_mut() {
+            Screen::Title => title_screen(&app.fonts, mouse),
+            Screen::Playing(state) => game_screen(state, &app.fonts),
+            Screen::GameOver { score } => game_over_screen(*score, &app.fonts, mouse),
+        };
+
+        // Échap revient en arrière partout, sauf sur l'écran-titre où il n'y a
+        // rien en dessous. Les écrans n'ont donc pas à s'en préoccuper.
+        let transition = match transition {
+            Transition::Stay if is_key_pressed(KeyCode::Escape) && navigator.can_go_back() => {
+                Transition::Pop
+            }
+            other => other,
+        };
 
         canvas.end();
-        // Avant le `next_frame` : c'est là que le tampon contient encore ce qui
-        // vient d'être dessiné.
         capture.tick();
+
+        if !navigator.apply(transition) {
+            return;
+        }
         next_frame().await;
+    }
+}
+
+/// Affiche une erreur de contenu jusqu'à ce que la fenêtre soit fermée.
+/// Un `panic!` ne serait vu par personne : le jeu se lance sans terminal.
+async fn fatal_error_screen(message: &str) {
+    loop {
+        clear_background(BLACK);
+        draw_text("CONTENU INVALIDE", 40.0, 80.0, 34.0, RED);
+        draw_text(message, 40.0, 130.0, 18.0, WHITE);
+        draw_text("Corrigez le fichier TOML puis relancez.", 40.0, 170.0, 18.0, GRAY);
+        next_frame().await
     }
 }
 
@@ -86,17 +115,5 @@ impl Capture {
             get_screen_data().export_png(path);
             std::process::exit(0);
         }
-    }
-}
-
-/// Affiche une erreur de contenu jusqu'à ce que la fenêtre soit fermée.
-/// Un `panic!` ne serait vu par personne : le jeu se lance sans terminal.
-async fn fatal_error_screen(message: &str) {
-    loop {
-        clear_background(BLACK);
-        draw_text("CONTENU INVALIDE", 40.0, 80.0, 34.0, RED);
-        draw_text(message, 40.0, 130.0, 18.0, WHITE);
-        draw_text("Corrigez le fichier TOML puis relancez.", 40.0, 170.0, 18.0, GRAY);
-        next_frame().await
     }
 }

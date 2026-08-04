@@ -1,11 +1,12 @@
 use macroquad::prelude::*;
 
-use crate::core::{GameState, Screen};
+use crate::app::{Screen, Transition};
+use crate::core::GameState;
 use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 
-pub fn main_menu_screen(state: &mut GameState, fonts_set: &Fonts, mouse: Vec2) {
+pub fn title_screen(fonts_set: &Fonts, mouse: Vec2) -> Transition {
     clear_background(role::BACKGROUND);
 
     ui::text_centered(
@@ -30,13 +31,14 @@ pub fn main_menu_screen(state: &mut GameState, fonts_set: &Fonts, mouse: Vec2) {
     let x = ((canvas::WIDTH - BUTTON_WIDTH) / 2.0).floor();
 
     let play = Rect::new(x, 116.0, BUTTON_WIDTH, BUTTON_HEIGHT);
-    if ui::button(fonts_set, mouse, Button::new(play, "JOUER")) {
-        *state = GameState::new();
-        state.current_screen = Screen::Playing;
+    if ui::button(fonts_set, mouse, Button::new(play, "JOUER")) || is_key_pressed(KeyCode::Enter) {
+        return Transition::Push(Screen::Playing(GameState::new()));
     }
 
     let quit = Rect::new(x, 144.0, BUTTON_WIDTH, BUTTON_HEIGHT);
     if ui::button(fonts_set, mouse, Button::new(quit, "QUITTER").accent(role::DANGER)) {
-        std::process::exit(0);
+        return Transition::Quit;
     }
+
+    Transition::Stay
 }

@@ -1,6 +1,7 @@
 use macroquad::prelude::*;
 
-use crate::core::{COLS, GameState, Screen, TARGET_Y, TILE_HEIGHT, TILE_WIDTH};
+use crate::app::{Screen, Transition};
+use crate::core::{COLS, GameState, TARGET_Y, TILE_HEIGHT, TILE_WIDTH};
 use crate::gfx::palette::role;
 use crate::gfx::ui;
 use crate::gfx::{Fonts, canvas, fonts};
@@ -11,17 +12,13 @@ const LANGUAGE: &str = "ko";
 /// Bord gauche de la grille, centrée sur la toile.
 const PLAYFIELD_X: f32 = (canvas::WIDTH - COLS as f32 * TILE_WIDTH) / 2.0;
 
-pub fn game_screen(state: &mut GameState, fonts_set: &Fonts, mouse: Vec2) {
-    if state.game_over {
-        game_over_screen(state, fonts_set, mouse);
-        return;
-    }
-
-    update(state);
+pub fn game_screen(state: &mut GameState, fonts_set: &Fonts) -> Transition {
+    let transition = update(state);
     draw(state, fonts_set);
+    transition
 }
 
-fn update(state: &mut GameState) {
+fn update(state: &mut GameState) -> Transition {
     let dt = get_frame_time();
 
     state.spawn_timer += dt;
@@ -61,18 +58,21 @@ fn update(state: &mut GameState) {
     }
 
     state.lives = state.lives.saturating_sub(missed);
+    state.tiles.retain(|tile| tile.y < canvas::HEIGHT && !tile.is_pressed);
+
     if state.lives == 0 {
-        state.game_over = true;
+        // `Replace` et non `Push` : l'écran de fin prend la place de la partie,
+        // pour que « retour » ramène là d'où la partie a été lancée.
+        return Transition::Replace(Screen::GameOver { score: state.score });
     }
 
-    state.tiles.retain(|tile| tile.y < canvas::HEIGHT && !tile.is_pressed);
+    Transition::Stay
 }
 
 fn draw(state: &GameState, fonts_set: &Fonts) {
     clear_background(role::BACKGROUND);
 
-    let playfield =
-        Rect::new(PLAYFIELD_X, 0.0, COLS as f32 * TILE_WIDTH, canvas::HEIGHT);
+    let playfield = Rect::new(PLAYFIELD_X, 0.0, COLS as f32 * TILE_WIDTH, canvas::HEIGHT);
     ui::fill(playfield, role::PANEL);
 
     for column in 0..=COLS {
@@ -110,41 +110,10 @@ fn draw_input_bar(state: &GameState, fonts_set: &Fonts) {
     let bar = Rect::new(((canvas::WIDTH - WIDTH) / 2.0).floor(), 192.0, WIDTH, 16.0);
     ui::panel(bar, role::BORDER);
 
-    if state.input_buffer.is_empty() {
-        ui::text(fonts_set, "tapez la lecture", bar.x + 5.0, bar.y + 4.0, fonts::TEXT, role::TEXT_DISABLED);
+    let (content, color) = if state.input_buffer.is_empty() {
+        ("tapez la lecture", role::TEXT_DISABLED)
     } else {
-        ui::text(fonts_set, &state.input_buffer, bar.x + 5.0, bar.y + 4.0, fonts::TEXT, role::STAR);
-    }
-}
-
-fn game_over_screen(state: &mut GameState, fonts_set: &Fonts, mouse: Vec2) {
-    clear_background(role::BACKGROUND);
-
-    ui::text_centered(fonts_set, "GAME OVER", canvas::WIDTH / 2.0, 56.0, fonts::TITLE, role::DANGER);
-    ui::text_centered(
-        fonts_set,
-        &format!("SCORE {:05}", state.score),
-        canvas::WIDTH / 2.0,
-        84.0,
-        fonts::TEXT,
-        role::TEXT,
-    );
-
-    const BUTTON_WIDTH: f32 = 168.0;
-    let x = ((canvas::WIDTH - BUTTON_WIDTH) / 2.0).floor();
-
-    let retry = Rect::new(x, 120.0, BUTTON_WIDTH, 20.0);
-    if ui::button(fonts_set, mouse, ui::Button::new(retry, "REJOUER"))
-        || is_key_pressed(KeyCode::Space)
-    {
-        *state = GameState::new();
-        state.current_screen = Screen::Playing;
-    }
-
-    let menu = Rect::new(x, 148.0, BUTTON_WIDTH, 20.0);
-    if ui::button(fonts_set, mouse, ui::Button::new(menu, "MENU").accent(role::TEXT_MUTED))
-        || is_key_pressed(KeyCode::Escape)
-    {
-        state.current_screen = Screen::MainMenu;
-    }
+        (state.input_buffer.as_str(), role::STAR)
+    };
+    ui::text(fonts_set, content, bar.x + 5.0, bar.y + 4.0, fonts::TEXT, color);
 }

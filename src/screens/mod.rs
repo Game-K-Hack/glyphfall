@@ -1,2 +1,3 @@
-pub mod main_menu;
 pub mod game;
+pub mod game_over;
+pub mod title;

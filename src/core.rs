@@ -1,4 +1,4 @@
-//! L'état de la partie en cours.
+//! L'état d'une partie en cours.
 //!
 //! Les valeurs codées en dur ici sont provisoires : elles seront remplacées par
 //! les règles du niveau chargé depuis `assets/languages/`.
@@ -26,8 +26,6 @@ pub struct GameState {
     pub lives: u32,
     pub speed: f32,
     pub spawn_timer: f32,
-    pub game_over: bool,
-    pub current_screen: Screen,
     pub input_buffer: String,
 }
 
@@ -39,8 +37,6 @@ impl GameState {
             lives: 3,
             speed: 55.0,
             spawn_timer: 0.0,
-            game_over: false,
-            current_screen: Screen::MainMenu,
             input_buffer: String::new(),
         }
     }
@@ -70,10 +66,4 @@ impl GameState {
             is_pressed: false,
         });
     }
-}
-
-#[derive(PartialEq)]
-pub enum Screen {
-    MainMenu,
-    Playing,
 }
