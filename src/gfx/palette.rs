@@ -5,6 +5,11 @@
 //! donne à l'interface son unité : aucune couleur ne doit être écrite en dur
 //! ailleurs dans le projet.
 
+// La palette est livree entiere : ses seize couleurs forment un ensemble
+// coherent, et n'en declarer que celles utilisees aujourd'hui obligerait a
+// retrouver les valeurs exactes a chaque nouvel ecran.
+#![allow(dead_code)]
+
 use macroquad::prelude::Color;
 
 const fn hex(value: u32) -> Color {

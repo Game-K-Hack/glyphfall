@@ -59,8 +59,9 @@ pub enum Transition {
     /// Remplacer cet écran : la partie relancée ne doit pas s'empiler sur la
     /// précédente, sinon « retour » traverserait toutes les tentatives.
     Replace(Screen),
-    /// Revenir à la racine, quel que soit le nombre d'écrans empilés.
-    ToRoot,
+    /// Remonter de plusieurs crans d'un coup, quand l'écran visé n'est pas
+    /// juste en dessous. Ne dépile jamais la racine.
+    PopMany(usize),
     Quit,
 }
 
@@ -98,9 +99,87 @@ impl Navigator {
                 self.stack.pop();
                 self.stack.push(screen);
             }
-            Transition::ToRoot => self.stack.truncate(1),
+            Transition::PopMany(count) => {
+                let keep = self.stack.len().saturating_sub(count).max(1);
+                self.stack.truncate(keep);
+            }
             Transition::Quit => return false,
         }
         true
+    }
+
+    #[cfg(test)]
+    fn depth(&self) -> usize {
+        self.stack.len()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn navigator() -> Navigator {
+        let mut navigator = Navigator::new(Screen::Title);
+        navigator.apply(Transition::Push(Screen::LanguageSelect { selected: 0 }));
+        navigator.apply(Transition::Push(Screen::LearningPath {
+            language: "ko".into(),
+            selected: 0,
+        }));
+        navigator
+    }
+
+    #[test]
+    fn the_root_is_never_popped() {
+        // Depiler la racine ne laisserait plus rien a afficher.
+        let mut navigator = Navigator::new(Screen::Title);
+
+        assert!(!navigator.can_go_back());
+        navigator.apply(Transition::Pop);
+
+        assert_eq!(navigator.depth(), 1);
+    }
+
+    #[test]
+    fn popping_many_stops_at_the_root() {
+        let mut navigator = navigator();
+
+        navigator.apply(Transition::PopMany(99));
+
+        assert_eq!(navigator.depth(), 1);
+    }
+
+    #[test]
+    fn popping_many_goes_back_several_screens_at_once() {
+        // Le bouton « chemin » de l'ecran de resultats saute par-dessus le
+        // briefing : sans cela il ne tiendrait pas ce que son nom promet.
+        let mut navigator = navigator();
+        navigator.apply(Transition::Push(Screen::Briefing {
+            language: "ko".into(),
+            level: "ko-01".into(),
+        }));
+        let before = navigator.depth();
+
+        navigator.apply(Transition::PopMany(2));
+
+        assert_eq!(navigator.depth(), before - 2);
+        assert!(matches!(navigator.top_mut(), Screen::LanguageSelect { .. }));
+    }
+
+    #[test]
+    fn replacing_keeps_the_stack_depth() {
+        // Rejouer ne doit pas empiler les tentatives les unes sur les autres.
+        let mut navigator = navigator();
+        let before = navigator.depth();
+
+        navigator.apply(Transition::Replace(Screen::Title));
+
+        assert_eq!(navigator.depth(), before);
+    }
+
+    #[test]
+    fn quitting_stops_the_loop() {
+        let mut navigator = navigator();
+
+        assert!(!navigator.apply(Transition::Quit));
     }
 }

@@ -47,8 +47,10 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
 
     let path = Rect::new(x + BUTTON_WIDTH + GAP, 184.0, BUTTON_WIDTH, 20.0);
     if ui::button(&app.fonts, mouse, Button::new(path, "CHEMIN").accent(role::TEXT_MUTED)) {
-        // Le briefing est juste en dessous : deux crans ramènent au chemin.
-        return Transition::Pop;
+        // Le briefing est juste en dessous : il faut deux crans pour revenir
+        // au chemin, sinon le bouton ne tient pas ce que son nom promet.
+        app.sfx.navigate();
+        return Transition::PopMany(2);
     }
 
     Transition::Stay

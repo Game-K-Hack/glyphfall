@@ -188,21 +188,15 @@ pub fn panel(rect: Rect, background: Color) {
 pub struct Button<'a> {
     pub rect: Rect,
     pub label: &'a str,
-    /// Un bouton désactivé s'affiche en grisé et ne peut pas être cliqué.
-    pub enabled: bool,
-    /// Mis en avant par la navigation au clavier.
+    /// Mis en avant par la navigation au clavier, ou parce que c'est l'action
+    /// attendue de l'écran.
     pub focused: bool,
     pub accent: Color,
 }
 
 impl<'a> Button<'a> {
     pub fn new(rect: Rect, label: &'a str) -> Self {
-        Self { rect, label, enabled: true, focused: false, accent: role::ACCENT }
-    }
-
-    pub fn enabled(mut self, enabled: bool) -> Self {
-        self.enabled = enabled;
-        self
+        Self { rect, label, focused: false, accent: role::ACCENT }
     }
 
     pub fn focused(mut self, focused: bool) -> Self {
@@ -221,13 +215,12 @@ impl<'a> Button<'a> {
 /// L'activation au clavier reste à la charge de l'écran, qui seul sait quel
 /// élément a le focus.
 pub fn button(fonts: &Fonts, mouse: Vec2, button: Button) -> bool {
-    let hovered = button.enabled && hit(button.rect, mouse);
-    let highlighted = hovered || (button.enabled && button.focused);
+    let hovered = hit(button.rect, mouse);
 
-    let (background, label_color) = match (button.enabled, highlighted) {
-        (false, _) => (role::PANEL, role::TEXT_DISABLED),
-        (true, true) => (button.accent, role::BORDER),
-        (true, false) => (role::PANEL, role::TEXT),
+    let (background, label_color) = if hovered || button.focused {
+        (button.accent, role::BORDER)
+    } else {
+        (role::PANEL, role::TEXT)
     };
 
     panel(button.rect, background);
@@ -286,7 +279,6 @@ const LOCK: [&str; 7] = [
 ];
 
 pub const STAR_WIDTH: f32 = 7.0;
-pub const STAR_HEIGHT: f32 = 7.0;
 pub const HEART_WIDTH: f32 = 7.0;
 
 pub fn star(x: f32, y: f32, earned: bool) {

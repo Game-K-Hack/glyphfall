@@ -1,0 +1,177 @@
+# AlphaTiles
+
+Un jeu pour apprendre les alphabets qui ne s'écrivent pas en lettres latines :
+hangeul, hiragana, katakana, kanji. Les signes tombent, vous tapez leur lecture
+avant qu'ils ne franchissent la ligne rouge. Interface entièrement en 8-bit.
+
+Écrit en Rust avec [macroquad](https://macroquad.rs), donc le même code tourne
+sur Windows, macOS, Linux et dans un navigateur.
+
+## Le parcours
+
+1. **Choix de l'alphabet** — chaque écriture s'annonce dans ses propres signes.
+2. **Chemin d'apprentissage** — les étapes s'enchaînent, une étoile suffit à
+   ouvrir la suivante.
+3. **Briefing** — tous les signes de l'étape avec leur lecture, les règles et
+   les seuils à viser. Survolez un signe pour son aide mnémotechnique.
+4. **La manche** — trois vies et un chronomètre.
+5. **Résultats** — de zéro à trois étoiles, et surtout la liste des signes
+   ratés avec la lecture qu'il fallait taper.
+
+La progression est enregistrée automatiquement.
+
+## Commandes
+
+| Touche | Effet |
+|---|---|
+| Lettres et chiffres | Composer la lecture |
+| `Entrée` / `Espace` | Valider la saisie |
+| `Retour arrière` | Corriger |
+| `↑` `↓` | Naviguer dans les menus |
+| `Échap` | Revenir en arrière |
+
+La souris fonctionne partout où le clavier fonctionne.
+
+## Lancer et construire
+
+```sh
+cargo run --release
+```
+
+Pour le navigateur :
+
+```sh
+rustup target add wasm32-unknown-unknown
+cargo build --release --target wasm32-unknown-unknown
+cp target/wasm32-unknown-unknown/release/alphatiles.wasm web/
+```
+
+Puis servez le dossier `web/` par HTTP — ouvrir `index.html` depuis le disque
+ne marche pas, le navigateur refuse de charger un `.wasm` en `file://` :
+
+```sh
+python -m http.server --directory web 8080
+```
+
+Tout le contenu (langues, polices) est embarqué dans le binaire à la
+compilation : il n'y a rien à distribuer à côté de l'exécutable. En
+contrepartie le `.wasm` pèse environ 17 Mo, dont l'essentiel est constitué des
+deux polices CJK. Servez-le avec la compression `gzip` activée, cela le ramène
+à quelques mégaoctets.
+
+## Ajouter une langue
+
+Créez un dossier dans `assets/languages/`, puis recompilez. **Rien à déclarer
+dans le code** : le dossier est découvert tout seul.
+
+```
+assets/languages/el-grec/
+├── language.toml
+└── levels/
+    ├── 01-voyelles.toml
+    └── 02-consonnes.toml
+```
+
+`language.toml` :
+
+```toml
+id = "el-grec"                     # identifiant stable, utilisé par la sauvegarde
+name = "Grec"                      # nom affiché, en français
+native_name = "Ελληνικά"           # nom dans l'écriture elle-même
+description = "L'alphabet grec, 24 lettres."
+font = "NotoSansGreek-Regular.ttf" # fichier de assets/fonts/, facultatif
+```
+
+Un fichier par étape dans `levels/` :
+
+```toml
+id = "el-01"                       # unique dans TOUT le catalogue
+title = "Les voyelles"
+subtitle = "Sept lettres pour commencer"
+order = 1                          # position sur le chemin
+requires = []                      # étapes à finir avant celle-ci
+mode = "tile_fall"
+
+[rules]
+lives = 3
+duration = 90                      # secondes ; 0 = sans limite
+columns = 4
+spawn_interval = 1.4               # secondes entre deux signes
+speed = { start = 55.0, ramp = 1.5, max = 170.0 }
+review_ratio = 0.25                # part des signes puisée dans `requires`
+
+[stars]                            # précision minimale pour chaque étoile
+one = 0.50
+two = 0.75
+three = 0.90
+
+[[glyphs]]
+char = "α"
+answers = ["a"]                    # toutes les lectures acceptées
+hint = "alpha — l'ancêtre du A"    # facultatif, affiché au briefing
+```
+
+### Ce que le jeu vérifie au démarrage
+
+Un contenu incohérent affiche un écran d'erreur explicite plutôt que de casser
+silencieusement le chemin d'apprentissage. Sont refusés : deux identifiants
+identiques, un `requires` qui ne résout pas, un cycle de prérequis, des seuils
+d'étoiles décroissants, un `review_ratio` sans prérequis à réviser, un niveau
+sans signe, une clé mal orthographiée.
+
+`cargo test` va plus loin et vérifie que chaque signe du catalogue est bien
+dessinable par la police de sa langue, et que la police pixel couvre tous les
+textes français — un accent manquant afficherait « Cor en » sans rien casser.
+
+### Deux pièges
+
+- **Les titres, sous-titres, noms et descriptions sont écrits avec la police
+  pixel**, qui ne connaît que le latin. N'y mettez pas de caractères de
+  l'écriture enseignée : ils s'afficheraient en tofu. Les `hint`, eux, sont
+  écrits avec la police de la langue et peuvent citer les signes.
+- **`speed` s'exprime en pixels virtuels par seconde**, sur une toile de
+  384 × 216. Un signe parcourt 200 pixels avant d'atteindre la ligne : à 55, il
+  laisse un peu moins de quatre secondes pour répondre.
+
+### Ajouter une police
+
+Déposez le `.ttf` dans `assets/fonts/` et nommez-le dans `language.toml`. Une
+police CJK complète pèse plusieurs mégaoctets et alourdit d'autant le binaire :
+n'ajoutez que celles qui servent, et une seule graisse.
+
+## Organisation du code
+
+| Dossier | Rôle |
+|---|---|
+| `src/data/` | Lecture et validation des fichiers de langue |
+| `src/gfx/` | Toile virtuelle, palette, polices, briques d'interface |
+| `src/screens/` | Un fichier par écran |
+| `src/session.rs` | Une manche : règles, tuiles, score, bilan |
+| `src/progress.rs` | Étoiles gagnées, déverrouillage |
+| `src/storage.rs` | Sauvegarde, fichier ou stockage navigateur |
+| `src/audio.rs` | Bruitages synthétisés au démarrage |
+| `src/app.rs` | État global et pile de navigation |
+
+Tout est dessiné sur une toile de 384 × 216 agrandie d'un facteur **entier** en
+filtrage au plus proche. C'est ce qui donne de vrais pixels carrés ; les écrans
+raisonnent donc en pixels virtuels et n'appellent jamais `screen_width()`.
+
+### Raccourcis de développement
+
+```sh
+ALPHATILES_START=languages           cargo run
+ALPHATILES_START=path:ja-hiragana    cargo run
+ALPHATILES_START=briefing:ko/ko-01   cargo run
+ALPHATILES_START=play:ko/ko-03       cargo run
+
+# Capture une image après N frames puis quitte, pour vérifier un écran.
+ALPHATILES_SCREENSHOT=ecran.png ALPHATILES_SCREENSHOT_AFTER=120 cargo run
+```
+
+## Crédits
+
+- Polices : [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P),
+  [Noto Sans KR](https://fonts.google.com/noto/specimen/Noto+Sans+KR) et
+  [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP), toutes
+  sous SIL Open Font License.
+- Palette : « Sweetie 16 » de GrafxKid, domaine public.

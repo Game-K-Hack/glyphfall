@@ -56,11 +56,6 @@ impl Catalog {
 
         Ok(())
     }
-
-    /// Les niveaux ouverts d'emblée : ceux sans prérequis.
-    pub fn entry_levels<'a>(&self, language: &'a Language) -> Vec<&'a Level> {
-        language.levels.iter().filter(|level| level.requires.is_empty()).collect()
-    }
 }
 
 fn validate_level(level: &Level) -> Result<(), DataError> {
@@ -313,15 +308,4 @@ mod tests {
         assert!(matches!(catalog.validate(), Err(DataError::InvalidLevel { .. })));
     }
 
-    #[test]
-    fn entry_levels_are_those_without_prerequisites() {
-        let language = language("ko", vec![level("ko-01", &[]), level("ko-02", &["ko-01"])]);
-        let catalog = catalog(vec![language]);
-        let language = catalog.language("ko").unwrap();
-
-        let entries = catalog.entry_levels(language);
-
-        assert_eq!(entries.len(), 1);
-        assert_eq!(entries[0].id, "ko-01");
-    }
 }

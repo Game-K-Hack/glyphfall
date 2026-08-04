@@ -66,7 +66,9 @@ impl Fonts {
     }
 }
 
-/// Le nom de fichier de la police d'interface, pour les tests de couverture.
+/// Le nom de fichier de la police d'interface, pour le test qui verifie
+/// qu'elle sait dessiner tous les textes du catalogue.
+#[cfg_attr(not(test), allow(dead_code))]
 pub const UI_FONT_FILE: &str = UI_FONT;
 
 fn load(file_name: &str) -> Option<Font> {
