@@ -21,9 +21,21 @@ const STAR_POP: f32 = 0.15;
 /// nombre plutôt que passé sous silence.
 const MAX_MISSED_SHOWN: usize = 8;
 
+/// Délai avant que l'écran n'accepte quoi que ce soit.
+///
+/// La manche se termine souvent au milieu d'une frappe : la même touche qui
+/// valide un signe relance une partie ici. Sans ce délai, finir en tapant
+/// enchaîne aussitôt sur une nouvelle manche, sans même laisser voir le bilan.
+///
+/// Il couvre aussi l'apparition des étoiles : agir avant qu'elles ne soient
+/// posées reviendrait à sauter sa propre récompense.
+const GRACE: f32 = 0.9;
+
 pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Vec2) -> Transition {
     clear_background(role::BACKGROUND);
     *elapsed += get_frame_time();
+
+    let ready = accepts_input(*elapsed);
 
     draw_verdict(&app.fonts, outcome);
     draw_stars(outcome.stars, *elapsed);
@@ -34,10 +46,13 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
     const GAP: f32 = 12.0;
     let x = ((canvas::WIDTH - (BUTTON_WIDTH * 2.0 + GAP)) / 2.0).floor();
 
+    // Pendant le délai, le bouton reste dessiné mais éteint : le montrer déjà
+    // en avant alors qu'il ne répond pas serait pire que de le griser.
     let retry = Rect::new(x, 184.0, BUTTON_WIDTH, 20.0);
-    if ui::button(&app.fonts, mouse, Button::new(retry, "REJOUER").focused(true))
-        || is_key_pressed(KeyCode::Enter)
-    {
+    let restart = ui::button(&app.fonts, mouse, Button::new(retry, "REJOUER").focused(ready))
+        || is_key_pressed(KeyCode::Enter);
+
+    if ready && restart {
         return match Session::new(&app.catalog, &app.progress, &outcome.language_id, &outcome.level_id) {
             Some(session) => Transition::Replace(Screen::Playing(Box::new(session))),
             // Le niveau a disparu du catalogue : on ne peut que remonter.
@@ -46,7 +61,7 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
     }
 
     let path = Rect::new(x + BUTTON_WIDTH + GAP, 184.0, BUTTON_WIDTH, 20.0);
-    if ui::button(&app.fonts, mouse, Button::new(path, "CHEMIN").accent(role::TEXT_MUTED)) {
+    if ui::button(&app.fonts, mouse, Button::new(path, "CHEMIN").accent(role::TEXT_MUTED)) && ready {
         // Le briefing est juste en dessous : il faut deux crans pour revenir
         // au chemin, sinon le bouton ne tient pas ce que son nom promet.
         app.sfx.navigate();
@@ -208,4 +223,33 @@ fn answer_for<'a>(app: &'a App, outcome: &Outcome, character: &str) -> Option<&'
         .flat_map(|level| level.glyphs.iter())
         .find(|glyph| glyph.char == character)
         .map(|glyph| glyph.primary_answer())
+}
+
+/// L'écran répond-il déjà aux touches et aux clics ?
+fn accepts_input(elapsed: f32) -> bool {
+    elapsed >= GRACE
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_screen_ignores_the_keystroke_that_ended_the_round() {
+        // La touche qui valide un signe est celle qui relance une partie : une
+        // frappe a cheval sur la fin de manche enchainerait sans laisser voir
+        // le bilan.
+        assert!(!accepts_input(0.0));
+        assert!(!accepts_input(GRACE - 0.01));
+        assert!(accepts_input(GRACE));
+    }
+
+    #[test]
+    fn the_delay_outlasts_the_star_animation() {
+        // Pouvoir relancer avant que les etoiles ne soient posees reviendrait a
+        // sauter sa propre recompense.
+        let animation_end = STAR_DELAY * (MAX_STARS - 1) as f32 + STAR_POP;
+
+        assert!(GRACE >= animation_end, "delai {GRACE}, animation {animation_end}");
+    }
 }
