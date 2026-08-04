@@ -6,6 +6,7 @@ mod gfx;
 mod progress;
 mod screens;
 mod session;
+mod storage;
 mod window;
 
 use crate::app::{App, Navigator, Screen, Transition};
@@ -33,7 +34,7 @@ async fn main() {
     };
 
     let fonts = Fonts::load(&catalog);
-    let mut app = App { catalog, fonts, progress: Progress::new() };
+    let mut app = App { catalog, fonts, progress: Progress::load() };
 
     let mut canvas = Canvas::new();
     let mut navigator = Navigator::new(Screen::Title);
@@ -89,6 +90,9 @@ async fn main() {
         // chaque frame de l'ecran de resultats qui reste affiche longtemps.
         if let Transition::Replace(Screen::Results { outcome, .. }) = &mut transition {
             outcome.is_record = app.progress.record(&outcome.level_id, outcome.stars);
+            if outcome.is_record {
+                app.progress.save();
+            }
         }
 
         // Échap revient en arrière partout, sauf sur l'écran-titre où il n'y a

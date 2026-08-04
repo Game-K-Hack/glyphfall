@@ -1,25 +1,58 @@
 //! La progression du joueur : combien d'étoiles pour chaque niveau, et donc
 //! quels niveaux sont ouverts.
 //!
-//! Volontairement en mémoire pour l'instant ; la persistance sur disque et en
-//! navigateur viendra se brancher derrière cette même interface.
+//! La sauvegarde passe par `storage`, qui masque la difference entre un
+//! fichier sur le bureau et le stockage local du navigateur.
 
-use std::collections::HashMap;
+use std::collections::BTreeMap;
+
+use serde::{Deserialize, Serialize};
 
 use crate::data::{Language, Level};
+use crate::storage;
 
 /// Étoiles maximales pour un niveau.
 pub const MAX_STARS: u8 = 3;
 
-#[derive(Debug, Default)]
+/// Version du format de sauvegarde. Une sauvegarde d'une version inconnue est
+/// ignorée plutôt que mal interprétée : mieux vaut repartir de zéro qu'ouvrir
+/// des niveaux au hasard.
+const FORMAT_VERSION: u32 = 1;
+
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Progress {
+    #[serde(default)]
+    version: u32,
     /// Identifiant de niveau vers le meilleur score en étoiles.
-    best: HashMap<String, u8>,
+    ///
+    /// Une carte ordonnée, pour que le fichier de sauvegarde reste stable d'une
+    /// écriture à l'autre et lisible à l'oeil.
+    #[serde(default)]
+    best: BTreeMap<String, u8>,
 }
 
 impl Progress {
     pub fn new() -> Self {
-        Self::default()
+        Self { version: FORMAT_VERSION, ..Self::default() }
+    }
+
+    /// Relit la sauvegarde. Une sauvegarde absente, illisible ou d'un format
+    /// inconnu donne une progression vide.
+    pub fn load() -> Self {
+        let Some(content) = storage::read() else { return Self::new() };
+
+        match toml::from_str::<Self>(&content) {
+            Ok(progress) if progress.version == FORMAT_VERSION => progress,
+            _ => Self::new(),
+        }
+    }
+
+    /// Écrit la sauvegarde. Un échec est silencieux : ne plus pouvoir écrire ne
+    /// doit pas interrompre une partie en cours.
+    pub fn save(&self) {
+        if let Ok(content) = toml::to_string(self) {
+            storage::write(&content);
+        }
     }
 
     /// Le meilleur résultat obtenu sur ce niveau, 0 s'il n'a jamais été réussi.
@@ -120,6 +153,32 @@ mod tests {
         assert!(progress.record("ko-01", 3));
         assert!(!progress.record("ko-01", 1), "ce n'est pas un nouveau record");
         assert_eq!(progress.stars("ko-01"), 3);
+    }
+
+    #[test]
+    fn a_save_survives_a_round_trip() {
+        let mut progress = Progress::new();
+        progress.record("ko-01", 3);
+        progress.record("hira-01", 1);
+
+        let written = toml::to_string(&progress).expect("progression sérialisable");
+        let read: Progress = toml::from_str(&written).expect("progression relisible");
+
+        assert_eq!(read.stars("ko-01"), 3);
+        assert_eq!(read.stars("hira-01"), 1);
+        assert_eq!(read.version, FORMAT_VERSION);
+    }
+
+    #[test]
+    fn a_save_from_an_unknown_format_is_ignored() {
+        // Sans ce garde-fou, un futur format relu de travers pourrait ouvrir des
+        // niveaux au hasard ou en refermer.
+        let future = "version = 999\n\n[best]\n\"ko-01\" = 3\n";
+
+        let parsed: Progress = toml::from_str(future).expect("TOML valide");
+
+        assert_ne!(parsed.version, FORMAT_VERSION);
+        assert_eq!(Progress::new().stars("ko-01"), 0, "on repart de zéro");
     }
 
     #[test]
