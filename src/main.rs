@@ -1,6 +1,7 @@
 use macroquad::prelude::*;
 
 mod app;
+mod audio;
 mod data;
 mod gfx;
 mod progress;
@@ -10,6 +11,7 @@ mod storage;
 mod window;
 
 use crate::app::{App, Navigator, Screen, Transition};
+use crate::audio::Sfx;
 use crate::gfx::{Canvas, Fonts};
 use crate::progress::Progress;
 use crate::session::Session;
@@ -34,7 +36,8 @@ async fn main() {
     };
 
     let fonts = Fonts::load(&catalog);
-    let mut app = App { catalog, fonts, progress: Progress::load() };
+    let sfx = Sfx::load().await;
+    let mut app = App { catalog, fonts, sfx, progress: Progress::load() };
 
     let mut canvas = Canvas::new();
     let mut navigator = Navigator::new(Screen::Title);
@@ -72,7 +75,7 @@ async fn main() {
         let mouse = canvas.mouse();
 
         let mut transition = match navigator.top_mut() {
-            Screen::Title => title_screen(&app.fonts, mouse),
+            Screen::Title => title_screen(&app, mouse),
             Screen::LanguageSelect { selected } => language_select_screen(&app, selected, mouse),
             Screen::LearningPath { language, selected } => {
                 learning_path_screen(&app, language, selected, mouse)

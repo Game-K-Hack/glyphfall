@@ -20,6 +20,10 @@ pub const TARGET_Y: f32 = 160.0;
 const POINTS_PER_HIT: u32 = 10;
 /// Durée du flash vert d'une tuile validée, en secondes.
 const CLEAR_FLASH: f32 = 0.15;
+/// Duree du tremblement quand une vie est perdue.
+const SHAKE_DURATION: f32 = 0.2;
+/// Amplitude maximale du tremblement, en pixels virtuels.
+const SHAKE_PIXELS: f32 = 3.0;
 
 pub struct Tile {
     pub column: i32,
@@ -66,6 +70,20 @@ pub struct Session {
     wrong: u32,
     /// Les glyphes ratés, pour les rappeler à la fin.
     missed_glyphs: Vec<String>,
+
+    /// Ce qui vient de se produire, a lire une fois par frame par l'ecran.
+    /// La manche ne joue pas de son elle-meme : elle ne connait que ses regles.
+    events: Vec<Event>,
+    /// Secondes de tremblement restantes.
+    shake: f32,
+}
+
+/// Un fait de jeu, remonte a l'ecran le temps d'une frame.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Event {
+    Hit,
+    Wrong,
+    Missed,
 }
 
 /// Pourquoi la manche s'est arrêtée.
@@ -132,6 +150,8 @@ impl Session {
             missed: 0,
             wrong: 0,
             missed_glyphs: Vec::new(),
+            events: Vec::new(),
+            shake: 0.0,
         })
     }
 
@@ -155,8 +175,27 @@ impl Session {
         }
     }
 
+    /// Ce qui s'est produit depuis la derniere lecture, puis remet a zero.
+    pub fn take_events(&mut self) -> Vec<Event> {
+        std::mem::take(&mut self.events)
+    }
+
+    /// De combien decaler le rendu de la zone de jeu.
+    ///
+    /// Perdre une vie secoue l'ecran : le coeur qui s'eteint est trop discret
+    /// quand on a les yeux sur les tuiles.
+    pub fn shake_offset(&self) -> Vec2 {
+        if self.shake <= 0.0 {
+            return Vec2::ZERO;
+        }
+
+        let strength = (self.shake / SHAKE_DURATION * SHAKE_PIXELS).ceil();
+        vec2(rand::gen_range(-strength, strength).round(), 0.0)
+    }
+
     /// Avance la manche d'une frame. Renvoie le bilan quand elle se termine.
     pub fn update(&mut self, dt: f32) -> Option<Outcome> {
+        self.shake = (self.shake - dt).max(0.0);
         self.read_input();
         self.spawn(dt);
         self.advance_tiles(dt);
@@ -212,8 +251,12 @@ impl Session {
                 tile.cleared = Some(CLEAR_FLASH);
                 self.hits += 1;
                 self.score += POINTS_PER_HIT;
+                self.events.push(Event::Hit);
             }
-            None => self.wrong += 1,
+            None => {
+                self.wrong += 1;
+                self.events.push(Event::Wrong);
+            }
         }
     }
 
@@ -266,6 +309,10 @@ impl Session {
 
         // Plusieurs tuiles perdues sur la même frame coûtent bien plusieurs vies.
         self.lives = self.lives.saturating_sub(lost);
+        if lost > 0 {
+            self.events.push(Event::Missed);
+            self.shake = SHAKE_DURATION;
+        }
 
         self.tiles.retain(|tile| match tile.cleared {
             Some(remaining) => remaining > 0.0,

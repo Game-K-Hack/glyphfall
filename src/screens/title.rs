@@ -1,11 +1,12 @@
 use macroquad::prelude::*;
 
-use crate::app::{Screen, Transition};
+use crate::app::{App, Screen, Transition};
 use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
-use crate::gfx::{Fonts, canvas, fonts};
+use crate::gfx::{canvas, fonts};
 
-pub fn title_screen(fonts_set: &Fonts, mouse: Vec2) -> Transition {
+pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
+    let fonts_set = &app.fonts;
     clear_background(role::BACKGROUND);
 
     ui::text_centered(
@@ -31,6 +32,7 @@ pub fn title_screen(fonts_set: &Fonts, mouse: Vec2) -> Transition {
 
     let play = Rect::new(x, 116.0, BUTTON_WIDTH, BUTTON_HEIGHT);
     if ui::button(fonts_set, mouse, Button::new(play, "JOUER")) || is_key_pressed(KeyCode::Enter) {
+        app.sfx.confirm();
         return Transition::Push(Screen::LanguageSelect { selected: 0 });
     }
 

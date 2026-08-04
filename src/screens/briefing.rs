@@ -56,6 +56,7 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
 
     if pressed || is_key_pressed(KeyCode::Enter) {
         if let Some(session) = Session::new(&app.catalog, language_id, level_id) {
+            app.sfx.confirm();
             return Transition::Push(Screen::Playing(Box::new(session)));
         }
     }

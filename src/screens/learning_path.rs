@@ -81,9 +81,11 @@ pub fn learning_path_screen(
 
     if is_key_pressed(KeyCode::Down) {
         *selected = (*selected + 1) % language.levels.len();
+        app.sfx.navigate();
     }
     if is_key_pressed(KeyCode::Up) {
         *selected = (*selected + language.levels.len() - 1) % language.levels.len();
+        app.sfx.navigate();
     }
     if is_key_pressed(KeyCode::Enter) {
         let level = &language.levels[*selected];
@@ -93,10 +95,13 @@ pub fn learning_path_screen(
     }
 
     match chosen {
-        Some(level) => Transition::Push(Screen::Briefing {
-            language: language.id.clone(),
-            level: level.id.clone(),
-        }),
+        Some(level) => {
+            app.sfx.confirm();
+            Transition::Push(Screen::Briefing {
+                language: language.id.clone(),
+                level: level.id.clone(),
+            })
+        }
         None => Transition::Stay,
     }
 }

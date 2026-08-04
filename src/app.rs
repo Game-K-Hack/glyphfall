@@ -9,6 +9,7 @@
 //! que la boucle principale applique. Cela évite qu'un écran se retire du
 //! dessous de ses propres pieds au milieu de son rendu.
 
+use crate::audio::Sfx;
 use crate::data::Catalog;
 use crate::gfx::Fonts;
 use crate::progress::Progress;
@@ -18,6 +19,7 @@ use crate::session::{Outcome, Session};
 pub struct App {
     pub catalog: Catalog,
     pub fonts: Fonts,
+    pub sfx: Sfx,
     pub progress: Progress,
 }
 

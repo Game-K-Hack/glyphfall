@@ -81,19 +81,24 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
 
     if is_key_pressed(KeyCode::Down) {
         *selected = (*selected + 1) % languages.len();
+        app.sfx.navigate();
     }
     if is_key_pressed(KeyCode::Up) {
         *selected = (*selected + languages.len() - 1) % languages.len();
+        app.sfx.navigate();
     }
     if is_key_pressed(KeyCode::Enter) {
         chosen = Some(&languages[*selected]);
     }
 
     match chosen {
-        Some(language) => Transition::Push(Screen::LearningPath {
-            language: language.id.clone(),
-            selected: 0,
-        }),
+        Some(language) => {
+            app.sfx.confirm();
+            Transition::Push(Screen::LearningPath {
+                language: language.id.clone(),
+                selected: 0,
+            })
+        }
         None => Transition::Stay,
     }
 }

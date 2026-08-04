@@ -1,14 +1,14 @@
 ---
 id: "sauvegarde-de-progression-natif-wasm-2026-08-04"
-status: "in-progress"
+status: "done"
 priority: "medium"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-04T00:16:08.702Z"
-modified: "2026-08-04T00:31:32.890Z"
-completedAt: null
+modified: "2026-08-04T00:32:43.543Z"
+completedAt: "2026-08-04T00:32:43.543Z"
 labels: []
-order: "a0"
+order: "aA"
 ---
 # Sauvegarde de progression (natif + wasm)

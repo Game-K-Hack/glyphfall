@@ -6,13 +6,24 @@ use crate::app::{App, Screen, Transition};
 use crate::gfx::palette::role;
 use crate::gfx::ui;
 use crate::gfx::{Fonts, canvas, fonts};
-use crate::session::{PLAYFIELD_WIDTH, Session, TARGET_Y, TILE_HEIGHT};
+use crate::session::{Event, PLAYFIELD_WIDTH, Session, TARGET_Y, TILE_HEIGHT};
 
 /// Taille des glyphes sur les tuiles.
 const GLYPH_SIZE: u16 = 24;
 
 pub fn game_screen(app: &App, session: &mut Session) -> Transition {
     let outcome = session.update(get_frame_time());
+
+    // La manche remonte ce qui vient de se produire ; c'est l'ecran qui decide
+    // de le sonoriser.
+    for event in session.take_events() {
+        match event {
+            Event::Hit => app.sfx.hit(),
+            Event::Wrong => app.sfx.wrong(),
+            Event::Missed => app.sfx.missed(),
+        }
+    }
+
     draw(app, session);
 
     match outcome {
@@ -30,7 +41,8 @@ fn draw(app: &App, session: &Session) {
     clear_background(role::BACKGROUND);
 
     let tile_width = session.tile_width();
-    let playfield_x = session.playfield_x();
+    // Seule la zone de jeu tremble : un HUD qui bouge se lit mal.
+    let playfield_x = session.playfield_x() + session.shake_offset().x;
     let playfield_width = tile_width * session.rules.columns as f32;
 
     ui::fill(Rect::new(playfield_x, 0.0, playfield_width, canvas::HEIGHT), role::PANEL);
