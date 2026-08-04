@@ -188,10 +188,19 @@ textes français — un accent manquant afficherait « Cor en » sans rien casse
 
 ## Ajouter une musique
 
-Déposez un `.mp3`, `.ogg` ou `.wav` dans `assets/music/menu/` et recompilez.
+Déposez un `.mp3`, `.ogg` ou `.wav` dans l'un des deux dossiers et recompilez.
 Rien à déclarer : les fichiers sont repérés tout seuls et enchaînés dans un
-ordre aléatoire sur tous les écrans **sauf la manche**, qui reste silencieuse
-pour ne pas couvrir les bruitages.
+ordre aléatoire.
+
+| Dossier | Quand |
+|---|---|
+| `assets/music/menu/` | Partout sauf en partie |
+| `assets/music/game/` | Pendant les manches, à 60 % du volume |
+
+La manche joue plus bas parce que l'information y passe par les bruitages : un
+signe reconnu, une vie perdue. Le passage d'une ambiance à l'autre coupe net —
+laisser finir un morceau de menu par-dessus une partie déjà lancée serait pire
+qu'une coupure.
 
 Le moteur audio ne sait pas lire le MP3 : le jeu décode lui-même les morceaux
 puis les lui confie en WAV brut. C'est ce décodage qui donne aussi leur durée

@@ -19,7 +19,7 @@ mod window;
 use crate::app::{App, Navigator, Screen, Transition};
 use crate::audio::Sfx;
 use crate::gfx::{Canvas, Fonts};
-use crate::music::Music;
+use crate::music::{Ambience, Music};
 use crate::progress::Progress;
 use crate::settings::Settings;
 use crate::session::Session;
@@ -107,10 +107,13 @@ async fn main() {
         canvas.begin();
         let mouse = canvas.mouse();
 
-        // La manche reste silencieuse : les bruitages y portent l'information,
-        // une musique par-dessus les couvrirait.
-        let in_menus = !matches!(navigator.top_mut(), Screen::Playing(_));
-        app.music.update(get_frame_time(), in_menus).await;
+        // La manche a sa propre ambiance, plus energique et jouee plus bas pour
+        // laisser passer les bruitages.
+        let ambience = match navigator.top_mut() {
+            Screen::Playing(_) => Ambience::Game,
+            _ => Ambience::Menus,
+        };
+        app.music.update(get_frame_time(), ambience).await;
 
         let mut transition = match navigator.top_mut() {
             Screen::Title => title_screen(&app, mouse),
