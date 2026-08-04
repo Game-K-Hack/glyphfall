@@ -1,150 +1,150 @@
 use macroquad::prelude::*;
-use crate::core::{
-    Assets,
-    GameState,
-    Screen,
-    TILE_WIDTH,
-    TILE_HEIGHT,
-    COLS,
-    TARGET_Y,
-};
 
-pub fn game_screen(state: &mut GameState, assets: &Assets) {
+use crate::core::{COLS, GameState, Screen, TARGET_Y, TILE_HEIGHT, TILE_WIDTH};
+use crate::gfx::palette::role;
+use crate::gfx::ui;
+use crate::gfx::{Fonts, canvas, fonts};
+
+/// Provisoire : la langue jouée viendra du niveau choisi.
+const LANGUAGE: &str = "ko";
+
+/// Bord gauche de la grille, centrée sur la toile.
+const PLAYFIELD_X: f32 = (canvas::WIDTH - COLS as f32 * TILE_WIDTH) / 2.0;
+
+pub fn game_screen(state: &mut GameState, fonts_set: &Fonts, mouse: Vec2) {
     if state.game_over {
-        // --- ÉCRAN DE GAME OVER ---
-        clear_background(BLACK);
-        draw_text("GAME OVER", screen_width() / 2.0 - 100.0, screen_height() / 2.0 - 20.0, 40.0, RED);
-        draw_text(&format!("Score final : {}", state.score), screen_width() / 2.0 - 80.0, screen_height() / 2.0 + 20.0, 25.0, WHITE);
-        draw_text("Appuyez sur ESPACE pour rejouer", screen_width() / 2.0 - 150.0, screen_height() / 2.0 + 60.0, 20.0, GRAY);
-        draw_text("Appuyez sur ÉCHAP pour quitter et revenir au menu", screen_width() / 2.0 - 230.0, screen_height() / 2.0 + 80.0, 20.0, GRAY);
-
-        if is_key_pressed(KeyCode::Space) {
-            *state = GameState::new();
-            state.current_screen = Screen::Playing;
-        }
-        if is_key_pressed(KeyCode::Escape) {
-            state.current_screen = Screen::MainMenu;
-        }
-        // La boucle de frames vit dans `main`, cet écran se contente de rendre une frame.
+        game_over_screen(state, fonts_set, mouse);
         return;
     }
 
-    // --- 1. LOGIQUE & MISES À JOUR (UPDATE) ---
+    update(state);
+    draw(state, fonts_set);
+}
+
+fn update(state: &mut GameState) {
     let dt = get_frame_time();
 
-    // Gestion de l'apparition des tuiles
     state.spawn_timer += dt;
-    if state.spawn_timer > 1.0 { // Fait apparaître une tuile toutes les secondes
+    if state.spawn_timer > 1.4 {
         state.spawn_tile();
         state.spawn_timer = 0.0;
-        // Augmente légèrement la vitesse pour corser le jeu
-        state.speed += 5.0; 
+        state.speed += 1.5;
     }
 
     if is_key_pressed(KeyCode::Backspace) {
         state.input_buffer.pop();
     }
-
-    if let Some(c) = get_char_pressed() {
-        if c.is_alphanumeric() {
-            // Cette fois on enregistre en MINUSCULE car nos traductions sont en minuscules
-            state.input_buffer.push(c.to_ascii_lowercase()); 
+    if let Some(character) = get_char_pressed() {
+        if character.is_alphanumeric() {
+            state.input_buffer.push(character.to_ascii_lowercase());
         }
     }
 
-    
-    // --- 2. LOGIQUE DE VALIDATION ---
-    let mut missed_tile = false;
-    let input_validated = is_key_pressed(KeyCode::Space) || is_key_pressed(KeyCode::Enter);
+    let validated = is_key_pressed(KeyCode::Space) || is_key_pressed(KeyCode::Enter);
+    let mut missed = 0;
 
     for tile in state.tiles.iter_mut() {
         tile.y += state.speed * dt;
 
-        // Le joueur doit avoir tapé EXACTEMENT la bonne romanisation
-        if input_validated && !tile.is_pressed && state.input_buffer == tile.romanization {
+        if validated && !tile.is_pressed && state.input_buffer == tile.romanization {
             tile.is_pressed = true;
             state.score += 10;
         }
 
-        if tile.y > screen_height() && !tile.is_pressed {
-            missed_tile = true;
+        if tile.y > canvas::HEIGHT && !tile.is_pressed {
+            missed += 1;
         }
     }
 
-    if input_validated {
+    if validated {
         state.input_buffer.clear();
     }
 
-    // Sanction si une tuile est manquée
-    if missed_tile {
-        if state.lives > 0 {
-            state.lives -= 1;
-        }
-        if state.lives == 0 {
-            state.game_over = true;
-        }
+    state.lives = state.lives.saturating_sub(missed);
+    if state.lives == 0 {
+        state.game_over = true;
     }
 
-    // Nettoyage : on enlève les tuiles sorties de l'écran ou déjà validées
-    state.tiles.retain(|tile| tile.y < screen_height() && !tile.is_pressed);
+    state.tiles.retain(|tile| tile.y < canvas::HEIGHT && !tile.is_pressed);
+}
 
-    // --- 2. RENDU GRAPHIQUE (DRAW) ---
-    clear_background(DARKGRAY);
+fn draw(state: &GameState, fonts_set: &Fonts) {
+    clear_background(role::BACKGROUND);
 
-    // Dessin des 4 colonnes
-    let start_x = (screen_width() - (COLS as f32 * TILE_WIDTH)) / 2.0;
-    for i in 0..COLS {
-        let x = start_x + i as f32 * TILE_WIDTH;
-        draw_line(x, 0.0, x, screen_height(), 1.0, GRAY);
+    let playfield =
+        Rect::new(PLAYFIELD_X, 0.0, COLS as f32 * TILE_WIDTH, canvas::HEIGHT);
+    ui::fill(playfield, role::PANEL);
+
+    for column in 0..=COLS {
+        let x = PLAYFIELD_X + column as f32 * TILE_WIDTH;
+        draw_rectangle(x, 0.0, 1.0, canvas::HEIGHT, role::BORDER);
     }
-    // Ligne de fin de la dernière colonne
-    draw_line(start_x + COLS as f32 * TILE_WIDTH, 0.0, start_x + COLS as f32 * TILE_WIDTH, screen_height(), 1.0, GRAY);
 
-    // Dessin de la ligne cible (Zone de validation)
-    draw_line(start_x, TARGET_Y, start_x + (COLS as f32 * TILE_WIDTH), TARGET_Y, 3.0, RED);
+    // La ligne de validation : passé ce trait, la tuile est perdue.
+    draw_rectangle(playfield.x, TARGET_Y, playfield.w, 1.0, role::DANGER);
 
-    // Dessin des tuiles
+    let script = fonts_set.script(LANGUAGE);
     for tile in &state.tiles {
-        let x = start_x + tile.col as f32 * TILE_WIDTH;
-        
-        // Dessin de la tuile (dans la boucle de rendu des tuiles)
-        let color = if tile.is_pressed { GREEN } else { BLACK };
-        draw_rectangle(x + 2.0, tile.y, TILE_WIDTH - 4.0, TILE_HEIGHT, color);
-
-        // On affiche le caractère coréen !
-        draw_text_ex(
-            &tile.glyph,
-            x + (TILE_WIDTH / 2.0) - 15.0,
-            tile.y + (TILE_HEIGHT / 2.0) + 10.0,
-            TextParams {
-                font: Some(&assets.korean),
-                font_size: 44,
-                color: WHITE,
-                ..Default::default()
-            },
+        let rect = Rect::new(
+            PLAYFIELD_X + tile.col as f32 * TILE_WIDTH + 1.0,
+            tile.y.floor(),
+            TILE_WIDTH - 2.0,
+            TILE_HEIGHT,
         );
+
+        ui::panel(rect, if tile.is_pressed { role::SUCCESS } else { role::BORDER });
+        ui::glyph_centered(script, &tile.glyph, rect, 24, role::TEXT);
     }
 
-    // Interface utilisateur (Score & Vies)
-    draw_text(&format!("SCORE: {}", state.score), 20.0, 40.0, 30.0, WHITE);
-    // La police par défaut de macroquad n'a pas d'emoji : on reste en ASCII.
-    draw_text(&format!("VIES: {}", "<3 ".repeat(state.lives as usize)), 20.0, 80.0, 30.0, RED);
+    draw_hud(state, fonts_set);
+    draw_input_bar(state, fonts_set);
+}
 
-    let bar_width = 400.0;
-    let bar_height = 50.0;
-    let bar_x = (screen_width() - bar_width) / 2.0;
-    let bar_y = screen_height() - 80.0;
+fn draw_hud(state: &GameState, fonts_set: &Fonts) {
+    ui::text(fonts_set, &format!("{:05}", state.score), 6.0, 6.0, fonts::TEXT, role::TEXT);
+    ui::hearts_row(6.0, 18.0, state.lives, 3);
+}
 
-    // Dessin du fond de la barre (Gris foncé avec une bordure blanche)
-    draw_rectangle(bar_x, bar_y, bar_width, bar_height, BLACK);
-    draw_rectangle_lines(bar_x, bar_y, bar_width, bar_height, 2.0, WHITE);
+fn draw_input_bar(state: &GameState, fonts_set: &Fonts) {
+    const WIDTH: f32 = 160.0;
+    let bar = Rect::new(((canvas::WIDTH - WIDTH) / 2.0).floor(), 192.0, WIDTH, 16.0);
+    ui::panel(bar, role::BORDER);
 
-    // Affichage du texte saisi à l'intérieur de la barre
     if state.input_buffer.is_empty() {
-        // Petit texte d'aide si la barre est vide
-        draw_text("Tapez les lettres ici...", bar_x + 15.0, bar_y + 32.0, 20.0, GRAY);
+        ui::text(fonts_set, "tapez la lecture", bar.x + 5.0, bar.y + 4.0, fonts::TEXT, role::TEXT_DISABLED);
     } else {
-        // Affiche la saisie actuelle du joueur
-        draw_text(&state.input_buffer, bar_x + 15.0, bar_y + 35.0, 26.0, YELLOW);
+        ui::text(fonts_set, &state.input_buffer, bar.x + 5.0, bar.y + 4.0, fonts::TEXT, role::STAR);
+    }
+}
+
+fn game_over_screen(state: &mut GameState, fonts_set: &Fonts, mouse: Vec2) {
+    clear_background(role::BACKGROUND);
+
+    ui::text_centered(fonts_set, "GAME OVER", canvas::WIDTH / 2.0, 56.0, fonts::TITLE, role::DANGER);
+    ui::text_centered(
+        fonts_set,
+        &format!("SCORE {:05}", state.score),
+        canvas::WIDTH / 2.0,
+        84.0,
+        fonts::TEXT,
+        role::TEXT,
+    );
+
+    const BUTTON_WIDTH: f32 = 168.0;
+    let x = ((canvas::WIDTH - BUTTON_WIDTH) / 2.0).floor();
+
+    let retry = Rect::new(x, 120.0, BUTTON_WIDTH, 20.0);
+    if ui::button(fonts_set, mouse, ui::Button::new(retry, "REJOUER"))
+        || is_key_pressed(KeyCode::Space)
+    {
+        *state = GameState::new();
+        state.current_screen = Screen::Playing;
+    }
+
+    let menu = Rect::new(x, 148.0, BUTTON_WIDTH, 20.0);
+    if ui::button(fonts_set, mouse, ui::Button::new(menu, "MENU").accent(role::TEXT_MUTED))
+        || is_key_pressed(KeyCode::Escape)
+    {
+        state.current_screen = Screen::MainMenu;
     }
 }

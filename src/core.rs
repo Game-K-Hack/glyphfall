@@ -1,30 +1,16 @@
+//! L'état de la partie en cours.
+//!
+//! Les valeurs codées en dur ici sont provisoires : elles seront remplacées par
+//! les règles du niveau chargé depuis `assets/languages/`.
+
 use macroquad::prelude::*;
 
-pub const TILE_WIDTH: f32 = 100.0;
-pub const TILE_HEIGHT: f32 = 140.0;
-pub const COLS: i32 = 4; // 4 colonnes comme dans Piano Tiles
-pub const TARGET_Y: f32 = 500.0; // La ligne de validation en bas de l'écran
-
-const KOREAN_FONT: &str = "NotoSansKR-Regular.ttf";
-
-/// Ressources chargées une seule fois au démarrage puis partagées par tous les écrans.
-/// Les polices sont embarquées dans le binaire pour rester multiplateforme (WASM inclus).
-pub struct Assets {
-    pub korean: Font,
-}
-
-impl Assets {
-    pub fn load() -> Self {
-        // Les polices viennent du même répertoire embarqué que les langues :
-        // un manifeste peut ainsi désigner la sienne par son nom de fichier.
-        let bytes = crate::data::font_bytes(KOREAN_FONT)
-            .unwrap_or_else(|| panic!("{KOREAN_FONT} est absent de assets/fonts/"));
-        let korean =
-            load_ttf_font_from_bytes(bytes).expect("Fichier de police invalide ou corrompu");
-
-        Self { korean }
-    }
-}
+/// Toutes les dimensions sont en pixels virtuels (voir `gfx::canvas`).
+pub const TILE_WIDTH: f32 = 48.0;
+pub const TILE_HEIGHT: f32 = 40.0;
+pub const COLS: i32 = 4;
+/// La ligne de validation, au-dessus de la barre de saisie.
+pub const TARGET_Y: f32 = 160.0;
 
 pub struct Tile {
     pub col: i32,
@@ -51,7 +37,7 @@ impl GameState {
             tiles: Vec::new(),
             score: 0,
             lives: 3,
-            speed: 200.0,
+            speed: 55.0,
             spawn_timer: 0.0,
             game_over: false,
             current_screen: Screen::MainMenu,
@@ -62,7 +48,7 @@ impl GameState {
     pub fn spawn_tile(&mut self) {
         let col = rand::gen_range(0, COLS);
 
-        // Notre dictionnaire d'apprentissage (Consonnes et Voyelles de base)
+        // Provisoire : le tirage viendra des glyphes du niveau choisi.
         let alphabet_coreen = [
             ("ㄱ", "g"),  ("ㄴ", "n"),  ("ㄷ", "d"),  ("ㄹ", "r"),
             ("ㅁ", "m"),  ("ㅂ", "b"),  ("ㅅ", "s"),  ("ㅇ", "ng"),
@@ -73,7 +59,6 @@ impl GameState {
             ("ㅡ", "eu"), ("ㅣ", "i"),
         ];
 
-        // Choisit un index au hasard dans le dictionnaire
         let idx = rand::gen_range(0, alphabet_coreen.len());
         let (glyph, romanization) = alphabet_coreen[idx];
 

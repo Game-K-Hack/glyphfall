@@ -30,7 +30,14 @@ pub fn window_conf() -> Conf {
 
     Conf {
         window_title: "AlphaTiles".to_string(),
+        // Trois fois la toile virtuelle : la fenêtre s'ouvre pile sur un
+        // facteur d'agrandissement entier, sans bandes de letterbox.
+        window_width: crate::gfx::canvas::WIDTH as i32 * 3,
+        window_height: crate::gfx::canvas::HEIGHT as i32 * 3,
         fullscreen: false,
+        // Le high-DPI ferait rendre macroquad à une résolution non entière et
+        // reviendrait à flouter ce que l'agrandissement au pixel garantit.
+        high_dpi: false,
         icon: Some(icon),
         ..Default::default()
     }

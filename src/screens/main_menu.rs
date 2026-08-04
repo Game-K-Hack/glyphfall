@@ -1,43 +1,42 @@
 use macroquad::prelude::*;
+
 use crate::core::{GameState, Screen};
+use crate::gfx::palette::role;
+use crate::gfx::ui::{self, Button};
+use crate::gfx::{Fonts, canvas, fonts};
 
-pub fn main_menu_screen(state: &mut GameState) {
-    clear_background(BLACK);
+pub fn main_menu_screen(state: &mut GameState, fonts_set: &Fonts, mouse: Vec2) {
+    clear_background(role::BACKGROUND);
 
-    // Titre du jeu
-    draw_text("ALPHA TILES", screen_width() / 2.0 - 120.0, 150.0, 45.0, WHITE);
+    ui::text_centered(
+        fonts_set,
+        "ALPHA TILES",
+        canvas::WIDTH / 2.0,
+        48.0,
+        fonts::TITLE,
+        role::TITLE,
+    );
+    ui::text_centered(
+        fonts_set,
+        "apprends un alphabet",
+        canvas::WIDTH / 2.0,
+        72.0,
+        fonts::TEXT,
+        role::TEXT_MUTED,
+    );
 
-    // Coordonnées et tailles des boutons
-    let btn_width = 250.0;
-    let btn_height = 50.0;
-    let btn_x = (screen_width() - btn_width) / 2.0;
-    
-    let play_y = 280.0;
-    let quit_y = 360.0;
+    const BUTTON_WIDTH: f32 = 168.0;
+    const BUTTON_HEIGHT: f32 = 20.0;
+    let x = ((canvas::WIDTH - BUTTON_WIDTH) / 2.0).floor();
 
-    // --- BOUTON 1 : LANCER ALPHABET ---
-    // Dessin du bouton
-    draw_rectangle(btn_x, play_y, btn_width, btn_height, BLUE);
-    draw_text("LANCER ALPHABET", btn_x + 25.0, play_y + 32.0, 22.0, WHITE);
-
-    // Clic sur Lancer
-    if is_mouse_button_pressed(MouseButton::Left) {
-        let (mx, my) = mouse_position();
-        if mx >= btn_x && mx <= btn_x + btn_width && my >= play_y && my <= play_y + btn_height {
-            *state = GameState::new(); // Réinitialise les variables
-            state.current_screen = Screen::Playing; // Lance la partie !
-        }
+    let play = Rect::new(x, 116.0, BUTTON_WIDTH, BUTTON_HEIGHT);
+    if ui::button(fonts_set, mouse, Button::new(play, "JOUER")) {
+        *state = GameState::new();
+        state.current_screen = Screen::Playing;
     }
 
-    // --- BOUTON 2 : QUITTER ---
-    draw_rectangle(btn_x, quit_y, btn_width, btn_height, RED);
-    draw_text("QUITTER", btn_x + 75.0, quit_y + 32.0, 22.0, WHITE);
-
-    // Clic sur Quitter
-    if is_mouse_button_pressed(MouseButton::Left) {
-        let (mx, my) = mouse_position();
-        if mx >= btn_x && mx <= btn_x + btn_width && my >= quit_y && my <= quit_y + btn_height {
-            std::process::exit(0); // Ferme proprement le programme en Rust
-        }
+    let quit = Rect::new(x, 144.0, BUTTON_WIDTH, BUTTON_HEIGHT);
+    if ui::button(fonts_set, mouse, Button::new(quit, "QUITTER").accent(role::DANGER)) {
+        std::process::exit(0);
     }
 }
