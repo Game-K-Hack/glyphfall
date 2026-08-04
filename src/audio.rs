@@ -91,42 +91,66 @@ async fn tone(notes: &[(f32, f32)], volume: f32) -> Option<Sound> {
         }
     }
 
-    load_sound_from_bytes(&encode_wav(&samples)).await.ok()
+    load_sound_from_bytes(&encode_wav(&samples, SAMPLE_RATE, 1)).await.ok()
 }
 
-/// Emballe des échantillons dans un WAV PCM 16 bits mono, le format que
+/// Taille de l'en-tête WAV canonique, en octets.
+pub const WAV_HEADER_SIZE: usize = 44;
+
+const BITS_PER_SAMPLE: u16 = 16;
+
+/// Emballe des échantillons entrelacés dans un WAV PCM 16 bits, le format que
 /// macroquad sait lire sur toutes les plateformes.
-fn encode_wav(samples: &[f32]) -> Vec<u8> {
-    const HEADER_SIZE: u32 = 36;
-    const BITS_PER_SAMPLE: u16 = 16;
-    const CHANNELS: u16 = 1;
+pub fn encode_wav(samples: &[f32], sample_rate: u32, channels: u16) -> Vec<u8> {
+    let mut wav = vec![0; WAV_HEADER_SIZE];
+    wav.reserve(samples.len() * 2);
 
-    let data_size = (samples.len() * 2) as u32;
-    let byte_rate = SAMPLE_RATE * CHANNELS as u32 * (BITS_PER_SAMPLE / 8) as u32;
-
-    let mut wav = Vec::with_capacity(HEADER_SIZE as usize + 8 + data_size as usize);
-
-    wav.extend_from_slice(b"RIFF");
-    wav.extend_from_slice(&(HEADER_SIZE + data_size).to_le_bytes());
-    wav.extend_from_slice(b"WAVE");
-
-    wav.extend_from_slice(b"fmt ");
-    wav.extend_from_slice(&16u32.to_le_bytes()); // taille du bloc fmt
-    wav.extend_from_slice(&1u16.to_le_bytes()); // 1 = PCM non compressé
-    wav.extend_from_slice(&CHANNELS.to_le_bytes());
-    wav.extend_from_slice(&SAMPLE_RATE.to_le_bytes());
-    wav.extend_from_slice(&byte_rate.to_le_bytes());
-    wav.extend_from_slice(&(CHANNELS * BITS_PER_SAMPLE / 8).to_le_bytes()); // alignement
-    wav.extend_from_slice(&BITS_PER_SAMPLE.to_le_bytes());
-
-    wav.extend_from_slice(b"data");
-    wav.extend_from_slice(&data_size.to_le_bytes());
     for sample in samples {
-        let value = (sample.clamp(-1.0, 1.0) * i16::MAX as f32) as i16;
-        wav.extend_from_slice(&value.to_le_bytes());
+        wav.extend_from_slice(&to_pcm16(*sample).to_le_bytes());
     }
 
+    write_wav_header(&mut wav, sample_rate, channels);
     wav
+}
+
+/// Convertit un échantillon flottant en entier 16 bits.
+///
+/// Le bornage évite qu'une valeur au-delà de 1.0 ne repasse en négatif à la
+/// conversion, ce qui s'entendrait comme un craquement.
+pub fn to_pcm16(sample: f32) -> i16 {
+    (sample.clamp(-1.0, 1.0) * i16::MAX as f32) as i16
+}
+
+/// Écrit l'en-tête au début d'un tampon dont les 44 premiers octets ont été
+/// réservés, le reste contenant déjà les données PCM.
+///
+/// Procéder ainsi permet d'encoder au fil du décodage d'un MP3, sans garder en
+/// mémoire une copie flottante de tout le morceau en plus du résultat.
+pub fn write_wav_header(wav: &mut [u8], sample_rate: u32, channels: u16) {
+    debug_assert!(wav.len() >= WAV_HEADER_SIZE);
+
+    let data_size = (wav.len() - WAV_HEADER_SIZE) as u32;
+    let byte_rate = sample_rate * channels as u32 * (BITS_PER_SAMPLE / 8) as u32;
+
+    let mut header = Vec::with_capacity(WAV_HEADER_SIZE);
+    header.extend_from_slice(b"RIFF");
+    // Tout ce qui suit ce champ, soit l'en-tête moins ses huit premiers octets.
+    header.extend_from_slice(&((WAV_HEADER_SIZE - 8) as u32 + data_size).to_le_bytes());
+    header.extend_from_slice(b"WAVE");
+
+    header.extend_from_slice(b"fmt ");
+    header.extend_from_slice(&16u32.to_le_bytes()); // taille du bloc fmt
+    header.extend_from_slice(&1u16.to_le_bytes()); // 1 = PCM non compressé
+    header.extend_from_slice(&channels.to_le_bytes());
+    header.extend_from_slice(&sample_rate.to_le_bytes());
+    header.extend_from_slice(&byte_rate.to_le_bytes());
+    header.extend_from_slice(&(channels * BITS_PER_SAMPLE / 8).to_le_bytes()); // alignement
+    header.extend_from_slice(&BITS_PER_SAMPLE.to_le_bytes());
+
+    header.extend_from_slice(b"data");
+    header.extend_from_slice(&data_size.to_le_bytes());
+
+    wav[..WAV_HEADER_SIZE].copy_from_slice(&header);
 }
 
 #[cfg(test)]
@@ -137,7 +161,7 @@ mod tests {
     fn the_wav_header_describes_the_data_that_follows() {
         let samples = vec![0.0; 100];
 
-        let wav = encode_wav(&samples);
+        let wav = encode_wav(&samples, SAMPLE_RATE, 1);
 
         assert_eq!(&wav[0..4], b"RIFF");
         assert_eq!(&wav[8..12], b"WAVE");
@@ -155,7 +179,7 @@ mod tests {
     fn samples_are_clamped_rather_than_wrapped() {
         // Sans bornage, un échantillon au-delà de 1.0 repasserait en négatif à
         // la conversion et produirait un craquement.
-        let wav = encode_wav(&[2.0, -2.0]);
+        let wav = encode_wav(&[2.0, -2.0], SAMPLE_RATE, 1);
 
         let first = i16::from_le_bytes(wav[44..46].try_into().unwrap());
         let second = i16::from_le_bytes(wav[46..48].try_into().unwrap());

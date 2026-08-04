@@ -133,6 +133,25 @@ textes français — un accent manquant afficherait « Cor en » sans rien casse
   384 × 216. Un signe parcourt 200 pixels avant d'atteindre la ligne : à 55, il
   laisse un peu moins de quatre secondes pour répondre.
 
+## Ajouter une musique
+
+Déposez un `.mp3`, `.ogg` ou `.wav` dans `assets/music/menu/` et recompilez.
+Rien à déclarer : les fichiers sont repérés tout seuls et enchaînés dans un
+ordre aléatoire sur tous les écrans **sauf la manche**, qui reste silencieuse
+pour ne pas couvrir les bruitages.
+
+Le moteur audio ne sait pas lire le MP3 : le jeu décode lui-même les morceaux
+puis les lui confie en WAV brut. C'est ce décodage qui donne aussi leur durée
+exacte, dont la playlist a besoin pour savoir quand enchaîner.
+
+Une seule piste est décodée à la fois, au moment où elle démarre : un morceau
+de cinq minutes prend environ trois dixièmes de seconde à décoder et occupe
+une cinquantaine de mégaoctets pendant qu'il joue. Des morceaux courts sont
+plus économes. Leur poids s'ajoute par ailleurs directement à celui de
+l'exécutable, puisque tout est embarqué.
+
+Le dossier peut rester vide : le jeu se lance alors sans musique.
+
 ### Ajouter une police
 
 Déposez le `.ttf` dans `assets/fonts/` et nommez-le dans `language.toml`. Une
@@ -150,6 +169,8 @@ n'ajoutez que celles qui servent, et une seule graisse.
 | `src/progress.rs` | Étoiles gagnées, déverrouillage |
 | `src/storage.rs` | Sauvegarde, fichier ou stockage navigateur |
 | `src/audio.rs` | Bruitages synthétisés au démarrage |
+| `src/music.rs` | Playlist des menus, décodage des morceaux |
+| `src/compose.rs` | Le générateur de la musique « Claude » |
 | `src/app.rs` | État global et pile de navigation |
 
 Tout est dessiné sur une toile de 384 × 216 agrandie d'un facteur **entier** en
@@ -166,6 +187,9 @@ ALPHATILES_START=play:ko/ko-03       cargo run
 
 # Capture une image après N frames puis quitte, pour vérifier un écran.
 ALPHATILES_SCREENSHOT=ecran.png ALPHATILES_SCREENSHOT_AFTER=120 cargo run
+
+# Régénère la musique d'ambiance après avoir retouché src/compose.rs.
+ALPHATILES_COMPOSE=assets/music/menu/Claude.wav cargo run --release
 ```
 
 ## Crédits
@@ -175,3 +199,5 @@ ALPHATILES_SCREENSHOT=ecran.png ALPHATILES_SCREENSHOT_AFTER=120 cargo run
   [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP), toutes
   sous SIL Open Font License.
 - Palette : « Sweetie 16 » de GrafxKid, domaine public.
+- Bruitages et musique « Claude » : synthétisés par le jeu lui-même, voir
+  `src/audio.rs` et `src/compose.rs`.

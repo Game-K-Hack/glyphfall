@@ -2,8 +2,10 @@ use macroquad::prelude::*;
 
 mod app;
 mod audio;
+mod compose;
 mod data;
 mod gfx;
+mod music;
 mod progress;
 mod screens;
 mod session;
@@ -13,6 +15,7 @@ mod window;
 use crate::app::{App, Navigator, Screen, Transition};
 use crate::audio::Sfx;
 use crate::gfx::{Canvas, Fonts};
+use crate::music::Music;
 use crate::progress::Progress;
 use crate::session::Session;
 use crate::screens::briefing::briefing_screen;
@@ -37,7 +40,15 @@ async fn main() {
 
     let fonts = Fonts::load(&catalog);
     let sfx = Sfx::load().await;
-    let mut app = App { catalog, fonts, sfx, progress: Progress::load() };
+    let music = Music::load();
+    let mut app = App { catalog, fonts, sfx, music, progress: Progress::load() };
+
+    // Génère la musique d'ambiance puis quitte, sans ouvrir de fenêtre de jeu.
+    #[cfg(not(target_arch = "wasm32"))]
+    if let Ok(path) = std::env::var("ALPHATILES_COMPOSE") {
+        compose::write(&path);
+        return;
+    }
 
     let mut canvas = Canvas::new();
     let mut navigator = Navigator::new(Screen::Title);
@@ -73,6 +84,11 @@ async fn main() {
         // résolution de la fenêtre.
         canvas.begin();
         let mouse = canvas.mouse();
+
+        // La manche reste silencieuse : les bruitages y portent l'information,
+        // une musique par-dessus les couvrirait.
+        let in_menus = !matches!(navigator.top_mut(), Screen::Playing(_));
+        app.music.update(get_frame_time(), in_menus).await;
 
         let mut transition = match navigator.top_mut() {
             Screen::Title => title_screen(&app, mouse),

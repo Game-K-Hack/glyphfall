@@ -11,6 +11,7 @@
 
 use crate::audio::Sfx;
 use crate::data::Catalog;
+use crate::music::Music;
 use crate::gfx::Fonts;
 use crate::progress::Progress;
 use crate::session::{Outcome, Session};
@@ -20,6 +21,7 @@ pub struct App {
     pub catalog: Catalog,
     pub fonts: Fonts,
     pub sfx: Sfx,
+    pub music: Music,
     pub progress: Progress,
 }
 
