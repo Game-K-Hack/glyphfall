@@ -19,6 +19,22 @@ const FORMAT_VERSION: u32 = 1;
 /// à viser.
 pub const MAX_LEVEL: u8 = 10;
 
+/// Les durées proposées pour l'objectif quotidien, en minutes.
+///
+/// Zéro désactive l'alerte. Des paliers plutôt qu'un réglage continu : personne
+/// ne veut viser 37 minutes, et neuf crans se parcourent d'un geste.
+pub const DAILY_GOALS: [u32; 9] = [0, 5, 10, 15, 20, 30, 60, 90, 120];
+
+/// Le libellé d'une durée d'objectif.
+pub fn goal_label(minutes: u32) -> String {
+    match minutes {
+        0 => "AUCUN".to_string(),
+        minutes if minutes < 60 => format!("{minutes} MIN"),
+        minutes if minutes % 60 == 0 => format!("{}H", minutes / 60),
+        minutes => format!("{}H{:02}", minutes / 60, minutes % 60),
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Settings {
     #[serde(default)]
@@ -36,6 +52,13 @@ pub struct Settings {
     /// Volume des bruitages, de 0 à `MAX_LEVEL`.
     #[serde(default = "default_sfx")]
     pub sfx: u8,
+    /// Minutes d'apprentissage visées par jour, `0` pour ne pas être alerté.
+    ///
+    /// `None` signifie que la question n'a jamais été posée — ce n'est pas la
+    /// même chose que d'avoir répondu « désactivé », et c'est ce qui déclenche
+    /// l'écran de réglage au premier lancement.
+    #[serde(default)]
+    pub daily_goal: Option<u32>,
 }
 
 impl Default for Settings {
@@ -45,6 +68,7 @@ impl Default for Settings {
             music: default_music(),
             music_game: default_music_game(),
             sfx: default_sfx(),
+            daily_goal: None,
         }
     }
 }
@@ -81,12 +105,29 @@ impl Settings {
         gain(self.sfx)
     }
 
+    /// L'objectif du jour en minutes, `0` si l'alerte est coupée ou si la
+    /// question n'a pas encore été posée.
+    pub fn daily_goal_minutes(&self) -> u32 {
+        self.daily_goal.unwrap_or(0)
+    }
+
+    /// Le cran correspondant dans `DAILY_GOALS`.
+    pub fn daily_goal_step(&self) -> usize {
+        let minutes = self.daily_goal_minutes();
+        DAILY_GOALS.iter().position(|goal| *goal == minutes).unwrap_or(0)
+    }
+
     /// Un fichier retouché à la main pourrait annoncer un volume de 200 ; on ne
     /// laisse pas cette valeur atteindre le moteur audio.
     fn clamped(mut self) -> Self {
         self.music = self.music.min(MAX_LEVEL);
         self.music_game = self.music_game.min(MAX_LEVEL);
         self.sfx = self.sfx.min(MAX_LEVEL);
+        // Une durée inconnue vaut mieux ignorée que prise au mot : elle
+        // n'aurait aucun cran sur le curseur.
+        if self.daily_goal.is_some_and(|goal| !DAILY_GOALS.contains(&goal)) {
+            self.daily_goal = None;
+        }
         self
     }
 }
@@ -135,7 +176,13 @@ mod tests {
 
     #[test]
     fn settings_survive_a_round_trip() {
-        let settings = Settings { version: FORMAT_VERSION, music: 3, music_game: 2, sfx: 9 };
+        let settings = Settings {
+            version: FORMAT_VERSION,
+            music: 3,
+            music_game: 2,
+            sfx: 9,
+            daily_goal: Some(30),
+        };
 
         let written = toml::to_string(&settings).expect("réglages sérialisables");
         let read: Settings = toml::from_str(&written).expect("réglages relisibles");
@@ -143,6 +190,7 @@ mod tests {
         assert_eq!(read.music, 3);
         assert_eq!(read.music_game, 2);
         assert_eq!(read.sfx, 9);
+        assert_eq!(read.daily_goal, Some(30));
     }
 
     #[test]
@@ -166,5 +214,49 @@ mod tests {
 
         assert_eq!(settings.music, 2);
         assert_eq!(settings.sfx, default_sfx());
+    }
+}
+
+#[cfg(test)]
+mod goal_tests {
+    use super::*;
+
+    #[test]
+    fn durations_read_the_way_one_says_them() {
+        assert_eq!(goal_label(0), "AUCUN");
+        assert_eq!(goal_label(5), "5 MIN");
+        assert_eq!(goal_label(30), "30 MIN");
+        assert_eq!(goal_label(60), "1H");
+        assert_eq!(goal_label(90), "1H30");
+        assert_eq!(goal_label(120), "2H");
+    }
+
+    #[test]
+    fn never_answered_is_not_the_same_as_disabled() {
+        // C'est cette distinction qui declenche la question au premier
+        // lancement, sans la reposer a quelqu'un qui a repondu « desactive ».
+        let untouched = Settings::default();
+        assert!(untouched.daily_goal.is_none());
+        assert_eq!(untouched.daily_goal_minutes(), 0);
+
+        let disabled = Settings { daily_goal: Some(0), ..Settings::default() };
+        assert!(disabled.daily_goal.is_some());
+        assert_eq!(disabled.daily_goal_minutes(), 0);
+    }
+
+    #[test]
+    fn every_step_maps_back_to_itself() {
+        for (index, minutes) in DAILY_GOALS.iter().enumerate() {
+            let settings = Settings { daily_goal: Some(*minutes), ..Settings::default() };
+            assert_eq!(settings.daily_goal_step(), index);
+        }
+    }
+
+    #[test]
+    fn a_hand_edited_duration_outside_the_steps_is_dropped() {
+        // Sans cela le curseur n'aurait aucune position a montrer.
+        let parsed = Settings { daily_goal: Some(37), ..Settings::default() }.clamped();
+
+        assert_eq!(parsed.daily_goal, None);
     }
 }

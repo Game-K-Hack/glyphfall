@@ -5,6 +5,9 @@ use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{canvas, fonts};
 
+/// Trente minutes : le cran proposé d'emblée, ni décourageant ni symbolique.
+const DEFAULT_GOAL_STEP: usize = 5;
+
 pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
     let fonts_set = &app.fonts;
     clear_background(role::BACKGROUND);
@@ -33,13 +36,19 @@ pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
     let play = Rect::new(x, 116.0, BUTTON_WIDTH, BUTTON_HEIGHT);
     if ui::button(fonts_set, mouse, Button::new(play, "JOUER")) || is_key_pressed(KeyCode::Enter) {
         app.sfx.confirm();
-        return Transition::Push(Screen::LanguageSelect { selected: 0 });
+
+        // La question du temps quotidien n'est posée qu'une fois. Avoir répondu
+        // « désactivé » est une réponse : on ne la repose pas.
+        return match app.settings.daily_goal {
+            None => Transition::Push(Screen::DailyGoal { step: DEFAULT_GOAL_STEP, dragging: false }),
+            Some(_) => Transition::Push(Screen::LanguageSelect { selected: 0 }),
+        };
     }
 
     let options = Rect::new(x, 144.0, BUTTON_WIDTH, BUTTON_HEIGHT);
     if ui::button(fonts_set, mouse, Button::new(options, "OPTIONS")) {
         app.sfx.confirm();
-        return Transition::Push(Screen::Options { selected: 0 });
+        return Transition::Push(Screen::Options { selected: 0, dragging: None });
     }
 
     let quit = Rect::new(x, 172.0, BUTTON_WIDTH, BUTTON_HEIGHT);

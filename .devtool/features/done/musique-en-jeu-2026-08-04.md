@@ -1,15 +1,15 @@
 ---
 id: "musique-en-jeu-2026-08-04"
-status: "review"
+status: "done"
 priority: "medium"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-04T02:08:55.565Z"
-modified: "2026-08-04T22:42:26.243Z"
-completedAt: null
+modified: "2026-08-05T00:39:31.201Z"
+completedAt: "2026-08-05T00:39:31.201Z"
 labels: []
-order: "a4"
+order: "aG"
 ---
 # Musique en jeu
 

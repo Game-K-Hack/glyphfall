@@ -21,8 +21,16 @@ sur Windows, macOS, Linux et dans un navigateur.
 6. **Résultats** — de zéro à trois étoiles, et surtout la liste des signes
    ratés avec la lecture qu'il fallait taper.
 
-La progression est enregistrée automatiquement, tout comme les volumes réglés
-depuis l'écran d'options.
+La progression est enregistrée automatiquement, tout comme les réglages.
+
+Au premier lancement, le jeu demande **combien de temps par jour** vous comptez
+apprendre, et prévient une fois ce temps atteint. Seul le temps réellement
+passé à apprendre est compté : une manche en cours, ou la fiche d'un signe que
+l'on étudie. Ni les menus, ni le briefing, que l'on peut laisser ouvert sans
+rien apprendre. L'alerte n'apparaît **jamais pendant une
+partie** : elle attend le retour aux menus, sinon elle coûterait des vies et
+passerait pour une punition. Tout cela se modifie ou se coupe dans les
+options.
 
 ## Commandes
 
@@ -233,7 +241,8 @@ n'ajoutez que celles qui servent, et une seule graisse.
 | `src/screens/` | Un fichier par écran |
 | `src/session.rs` | Une manche : règles, tuiles, score, bilan |
 | `src/progress.rs` | Étoiles gagnées, déverrouillage |
-| `src/settings.rs` | Réglages du joueur, volumes |
+| `src/settings.rs` | Réglages du joueur : volumes, objectif quotidien |
+| `src/daily.rs` | Temps d'apprentissage du jour |
 | `src/storage.rs` | Sauvegardes, fichiers ou stockage navigateur |
 | `src/audio.rs` | Bruitages synthétisés au démarrage |
 | `src/music.rs` | Playlist des menus, décodage des morceaux |

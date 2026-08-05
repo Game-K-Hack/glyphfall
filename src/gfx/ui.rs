@@ -247,6 +247,81 @@ pub fn progress_bar(rect: Rect, ratio: f32, color: Color) {
     }
 }
 
+/// Un curseur horizontal à crans, pour choisir parmi une petite liste ordonnée.
+///
+/// Contrairement à une jauge de volume, les crans n'ont pas de sens cumulatif :
+/// on ne « remplit » pas une durée, on la désigne. La barre reste donc unie et
+/// seul le curseur bouge.
+pub fn slider(rect: Rect, steps: usize, step: usize, accent: Color) {
+    const CURSOR_WIDTH: f32 = 7.0;
+    const TICK_HEIGHT: f32 = 3.0;
+
+    let middle = (rect.y + rect.h / 2.0).floor();
+    let travel = rect.w - CURSOR_WIDTH;
+
+    // Le rail, et un repère par cran pour montrer qu'il y a des positions
+    // discrètes plutôt qu'un réglage continu.
+    draw_rectangle(rect.x, middle, rect.w, 1.0, role::TEXT_DISABLED);
+    for index in 0..steps {
+        let x = rect.x + tick_offset(travel, steps, index) + (CURSOR_WIDTH / 2.0).floor();
+        draw_rectangle(x, middle - TICK_HEIGHT, 1.0, TICK_HEIGHT * 2.0 + 1.0, role::TEXT_DISABLED);
+    }
+
+    let cursor = Rect::new(
+        rect.x + tick_offset(travel, steps, step),
+        rect.y,
+        CURSOR_WIDTH,
+        rect.h,
+    );
+    panel(cursor, accent);
+}
+
+/// Le cran désigné par le curseur, s'il est sur la barre.
+///
+/// Sert à *attraper* le curseur. Une fois attrapé, c'est `slider_step_from_x`
+/// qui suit le geste.
+pub fn slider_step_at(rect: Rect, steps: usize, mouse: Vec2) -> Option<usize> {
+    if !hit(grab_area(rect), mouse) {
+        return None;
+    }
+
+    Some(slider_step_from_x(rect, steps, mouse.x))
+}
+
+/// Le cran désigné par une abscisse, sans regarder la hauteur.
+///
+/// C'est ce qu'il faut pendant un glissement : la main dérive verticalement
+/// bien au-delà d'une barre de quelques pixels, et exiger d'y rester ferait
+/// décrocher le curseur au premier écart.
+pub fn slider_step_from_x(rect: Rect, steps: usize, x: f32) -> usize {
+    if steps < 2 {
+        return 0;
+    }
+
+    // On arrondit au cran le plus proche : viser un rail au pixel demanderait
+    // une précision que personne n'a, à la souris comme au doigt.
+    let ratio = ((x - rect.x) / rect.w).clamp(0.0, 1.0);
+    (ratio * (steps - 1) as f32).round() as usize
+}
+
+/// La zone où l'on peut attraper un élément fin.
+///
+/// Un rail de quelques pixels de haut est presque impossible à viser au doigt :
+/// on accepte l'appui un peu au-dessus et un peu en dessous.
+pub fn grab_area(rect: Rect) -> Rect {
+    const TOLERANCE: f32 = 6.0;
+
+    Rect::new(rect.x, rect.y - TOLERANCE, rect.w, rect.h + TOLERANCE * 2.0)
+}
+
+fn tick_offset(travel: f32, steps: usize, index: usize) -> f32 {
+    if steps < 2 {
+        return 0.0;
+    }
+
+    (travel * index as f32 / (steps - 1) as f32).round()
+}
+
 // --- Icônes ----------------------------------------------------------------
 
 const STAR: [&str; 7] = [
@@ -323,5 +398,53 @@ pub fn hearts_row(x: f32, y: f32, remaining: u32, total: u32) {
     const GAP: f32 = 2.0;
     for index in 0..total {
         heart(x + index as f32 * (HEART_WIDTH + GAP), y, index < remaining);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const BAR: Rect = Rect { x: 100.0, y: 50.0, w: 200.0, h: 12.0 };
+
+    #[test]
+    fn clicking_the_bar_picks_the_nearest_step() {
+        // Viser un cran au pixel pres serait impossible : on arrondit.
+        assert_eq!(slider_step_at(BAR, 9, vec2(100.0, 56.0)), Some(0));
+        assert_eq!(slider_step_at(BAR, 9, vec2(300.0, 56.0)), Some(8));
+        assert_eq!(slider_step_at(BAR, 9, vec2(200.0, 56.0)), Some(4), "le milieu");
+        assert_eq!(slider_step_at(BAR, 9, vec2(206.0, 56.0)), Some(4), "encore le plus proche");
+    }
+
+    #[test]
+    fn clicking_outside_the_bar_picks_nothing() {
+        assert_eq!(slider_step_at(BAR, 9, vec2(50.0, 56.0)), None);
+        assert_eq!(slider_step_at(BAR, 9, vec2(200.0, 10.0)), None);
+    }
+
+    #[test]
+    fn a_slightly_high_press_still_catches_the_bar() {
+        // Un rail de douze pixels de haut est difficile a viser, surtout au
+        // doigt : on tolere un peu de marge.
+        assert_eq!(slider_step_at(BAR, 9, vec2(200.0, BAR.y - 4.0)), Some(4));
+        assert_eq!(slider_step_at(BAR, 9, vec2(200.0, BAR.y + BAR.h + 4.0)), Some(4));
+    }
+
+    #[test]
+    fn a_drag_follows_the_hand_beyond_the_bar() {
+        // Pendant un glissement la main derive : exiger de rester sur le rail
+        // ferait decrocher le curseur au premier ecart.
+        assert_eq!(slider_step_from_x(BAR, 9, 300.0), 8);
+        assert_eq!(slider_step_from_x(BAR, 9, 1_000.0), 8, "borne a droite");
+        assert_eq!(slider_step_from_x(BAR, 9, -500.0), 0, "borne a gauche");
+    }
+
+    #[test]
+    fn the_cursor_reaches_both_ends() {
+        // Un decalage mal calcule laisserait le dernier cran hors de la barre.
+        let travel = BAR.w - 7.0;
+
+        assert_eq!(tick_offset(travel, 9, 0), 0.0);
+        assert_eq!(tick_offset(travel, 9, 8), travel);
     }
 }

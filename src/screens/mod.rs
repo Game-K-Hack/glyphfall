@@ -1,5 +1,7 @@
 pub mod briefing;
+pub mod daily_goal;
 pub mod game;
+pub mod goal_reached;
 pub mod results;
 pub mod sign;
 pub mod language_select;

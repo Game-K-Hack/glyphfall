@@ -10,6 +10,7 @@
 //! dessous de ses propres pieds au milieu de son rendu.
 
 use crate::audio::Sfx;
+use crate::daily::Daily;
 use crate::data::Catalog;
 use crate::music::Music;
 use crate::gfx::Fonts;
@@ -26,6 +27,8 @@ pub struct App {
     pub music: Music,
     pub progress: Progress,
     pub settings: Settings,
+    /// Le temps d'apprentissage du jour.
+    pub daily: Daily,
 }
 
 pub enum Screen {
@@ -34,10 +37,19 @@ pub enum Screen {
     LanguageSelect {
         selected: usize,
     },
-    /// `selected` retient la ligne de réglage mise en avant.
+    /// `selected` retient la ligne de réglage mise en avant, `dragging` la
+    /// barre attrapée à la souris ou au doigt.
     Options {
         selected: usize,
+        dragging: Option<usize>,
     },
+    /// La question du temps quotidien, posée avant la première partie.
+    DailyGoal {
+        step: usize,
+        dragging: bool,
+    },
+    /// L'objectif du jour est atteint. Jamais empilé pendant une manche.
+    GoalReached,
     LearningPath {
         language: String,
         /// Sélection et défilement, conservés d'une frame à l'autre.

@@ -6,6 +6,7 @@ mod audio;
 /// version navigateur, où il ne serait que du code mort.
 #[cfg(not(target_arch = "wasm32"))]
 mod compose;
+mod daily;
 mod data;
 mod gfx;
 mod music;
@@ -17,6 +18,7 @@ mod storage;
 mod window;
 
 use crate::app::{App, Navigator, Screen, Transition};
+use crate::daily::Daily;
 use crate::audio::Sfx;
 use crate::gfx::{Canvas, Fonts};
 use crate::music::{Ambience, Music};
@@ -24,6 +26,8 @@ use crate::progress::Progress;
 use crate::settings::Settings;
 use crate::session::Session;
 use crate::screens::briefing::briefing_screen;
+use crate::screens::daily_goal::daily_goal_screen;
+use crate::screens::goal_reached::goal_reached_screen;
 use crate::screens::game::game_screen;
 use crate::screens::results::results_screen;
 use crate::screens::sign::sign_screen;
@@ -54,7 +58,7 @@ async fn main() {
     let music = Music::load(settings.music_gain(), settings.music_game_gain());
 
     let mut app =
-        App { catalog, fonts, sfx, music, progress: Progress::load(), settings };
+        App { catalog, fonts, sfx, music, progress: Progress::load(), settings, daily: Daily::load() };
 
     // Génère la musique d'ambiance puis quitte, sans ouvrir de fenêtre de jeu.
     #[cfg(not(target_arch = "wasm32"))]
@@ -91,7 +95,9 @@ async fn main() {
             }),
             _ => match start.as_str() {
                 "languages" => Some(Screen::LanguageSelect { selected: 0 }),
-                "options" => Some(Screen::Options { selected: 0 }),
+                "options" => Some(Screen::Options { selected: 0, dragging: None }),
+                "goal" => Some(Screen::DailyGoal { step: 5, dragging: false }),
+                "alert" => Some(Screen::GoalReached),
                 _ => None,
             },
         };
@@ -109,16 +115,29 @@ async fn main() {
 
         // La manche a sa propre ambiance, plus energique et jouee plus bas pour
         // laisser passer les bruitages.
-        let ambience = match navigator.top_mut() {
-            Screen::Playing(_) => Ambience::Game,
-            _ => Ambience::Menus,
-        };
+        let playing = matches!(navigator.top_mut(), Screen::Playing(_));
+        let ambience = if playing { Ambience::Game } else { Ambience::Menus };
         app.music.update(get_frame_time(), ambience).await;
+
+        // Seul le temps passé à apprendre compte : une manche en cours, ou la
+        // fiche d'un signe que l'on étudie. Le briefing en est exclu — on peut
+        // le laisser ouvert sans rien apprendre, comme n'importe quel menu.
+        let learning =
+            matches!(navigator.top_mut(), Screen::Playing(_) | Screen::Sign { .. });
+        if learning {
+            app.daily.add(get_frame_time());
+        }
 
         let mut transition = match navigator.top_mut() {
             Screen::Title => title_screen(&app, mouse),
             Screen::LanguageSelect { selected } => language_select_screen(&app, selected, mouse),
-            Screen::Options { selected } => options_screen(&mut app, selected, mouse),
+            Screen::Options { selected, dragging } => {
+                options_screen(&mut app, selected, dragging, mouse)
+            }
+            Screen::DailyGoal { step, dragging } => {
+                daily_goal_screen(&mut app, step, dragging, mouse)
+            }
+            Screen::GoalReached => goal_reached_screen(&app, mouse),
             Screen::LearningPath { language, view } => {
                 learning_path_screen(&app, language, view, mouse)
             }
@@ -145,6 +164,18 @@ async fn main() {
                 app.progress.note(&sign.character, sign.hits, sign.misses);
             }
             app.progress.save();
+        }
+
+        // L'alerte attend d'être hors partie, et de ne rien avoir d'autre à
+        // faire : l'empiler pendant une manche ferait perdre des vies, et
+        // par-dessus une transition en cours la ferait disparaître aussitôt.
+        if !playing
+            && matches!(transition, Transition::Stay)
+            && app.daily.goal_reached(app.settings.daily_goal_minutes())
+        {
+            app.daily.mark_alerted();
+            app.sfx.confirm();
+            transition = Transition::Push(Screen::GoalReached);
         }
 
         // Échap revient en arrière partout, sauf sur l'écran-titre où il n'y a

@@ -11,13 +11,13 @@ use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 use crate::music::Ambience;
-use crate::settings::MAX_LEVEL;
+use crate::settings::{DAILY_GOALS, MAX_LEVEL, goal_label};
 
 const ROW_X: f32 = 40.0;
 const ROW_WIDTH: f32 = canvas::WIDTH - ROW_X * 2.0;
 const ROW_HEIGHT: f32 = 26.0;
-const FIRST_ROW_Y: f32 = 62.0;
-const ROW_STEP: f32 = 32.0;
+const FIRST_ROW_Y: f32 = 52.0;
+const ROW_STEP: f32 = 30.0;
 
 /// Largeur du libellé, avant la jauge. « MUSIQUE MENUS » est le plus long.
 const LABEL_WIDTH: f32 = 122.0;
@@ -33,11 +33,18 @@ enum Row {
     /// Musique pendant une manche, réglée à part.
     MusicGame,
     Sfx,
+    /// Le temps d'apprentissage visé chaque jour.
+    DailyGoal,
 }
 
-const ROWS: [Row; 3] = [Row::Music, Row::MusicGame, Row::Sfx];
+const ROWS: [Row; 4] = [Row::Music, Row::MusicGame, Row::Sfx, Row::DailyGoal];
 
-pub fn options_screen(app: &mut App, selected: &mut usize, mouse: Vec2) -> Transition {
+pub fn options_screen(
+    app: &mut App,
+    selected: &mut usize,
+    dragging: &mut Option<usize>,
+    mouse: Vec2,
+) -> Transition {
     clear_background(role::BACKGROUND);
 
     *selected = (*selected).min(ROWS.len() - 1);
@@ -53,19 +60,29 @@ pub fn options_screen(app: &mut App, selected: &mut usize, mouse: Vec2) -> Trans
 
     let mut change: Option<(Row, i8)> = None;
 
+    // Le curseur relâché, plus rien n'est attrapé.
+    if !is_mouse_button_down(MouseButton::Left) {
+        *dragging = None;
+    }
+
     for (index, row) in ROWS.iter().enumerate() {
         let bounds = row_rect(index);
 
         if ui::hit(bounds, mouse) {
             *selected = index;
 
-            // Cliquer directement sur un cran y règle le volume : plus rapide
-            // que de marteler une flèche pour traverser la jauge.
-            if is_mouse_button_pressed(MouseButton::Left) {
-                if let Some(level) = level_at(bounds, mouse) {
-                    change = Some((*row, level as i8 - level_of(app, *row) as i8));
-                }
+            // Un appui sur la barre l'attrape : on peut ensuite la balayer sans
+            // rester dessus, ce qui est le seul geste tenable au doigt.
+            if is_mouse_button_pressed(MouseButton::Left)
+                && value_at(*row, bounds, mouse).is_some()
+            {
+                *dragging = Some(index);
             }
+        }
+
+        if *dragging == Some(index) {
+            let value = value_from_x(*row, bounds, mouse.x);
+            change = Some((*row, value as i8 - level_of(app, *row) as i8));
         }
 
         draw_row(&app.fonts, bounds, *row, level_of(app, *row), index == *selected);
@@ -106,12 +123,12 @@ pub fn options_screen(app: &mut App, selected: &mut usize, mouse: Vec2) -> Trans
         &app.fonts,
         "GAUCHE ET DROITE POUR REGLER",
         canvas::WIDTH / 2.0,
-        162.0,
+        176.0,
         fonts::TEXT,
         role::TEXT_DISABLED,
     );
 
-    let back = Rect::new(((canvas::WIDTH - 120.0) / 2.0).floor(), 176.0, 120.0, 20.0);
+    let back = Rect::new(((canvas::WIDTH - 120.0) / 2.0).floor(), 190.0, 120.0, 20.0);
     if ui::button(&app.fonts, mouse, Button::new(back, "RETOUR").accent(role::TEXT_MUTED)) {
         return Transition::Pop;
     }
@@ -129,32 +146,70 @@ fn gauge_rect(bounds: Rect) -> Rect {
     Rect::new(bounds.x + LABEL_WIDTH, bounds.y + 7.0, width, 12.0)
 }
 
+/// La barre de l'objectif, plus courte que les jauges de volume.
+///
+/// Une durée s'écrit plus long qu'un pourcentage : sans ce retrait, le texte
+/// viendrait mordre sur le curseur. Le dessin et le clic passent tous deux par
+/// cette fonction, faute de quoi on cliquerait à côté de ce que l'on voit.
+fn goal_bar(bounds: Rect) -> Rect {
+    const VALUE_ROOM: f32 = 26.0;
+
+    let gauge = gauge_rect(bounds);
+    Rect::new(gauge.x, gauge.y, gauge.w - VALUE_ROOM, gauge.h)
+}
+
 fn level_of(app: &App, row: Row) -> u8 {
     match row {
         Row::Music => app.settings.music,
         Row::MusicGame => app.settings.music_game,
         Row::Sfx => app.settings.sfx,
+        // L'objectif se compte en crans de durée, pas en dixièmes de volume.
+        Row::DailyGoal => app.settings.daily_goal_step() as u8,
     }
 }
 
-/// Sur quel cran de la jauge se trouve le curseur, s'il est dessus.
-fn level_at(bounds: Rect, mouse: Vec2) -> Option<u8> {
-    let gauge = gauge_rect(bounds);
-    if !ui::hit(gauge, mouse) {
-        return None;
+/// Le nombre de crans d'une ligne. Les volumes en ont dix, l'objectif neuf.
+fn steps_of(row: Row) -> u8 {
+    match row {
+        Row::DailyGoal => DAILY_GOALS.len() as u8 - 1,
+        _ => MAX_LEVEL,
     }
+}
 
-    let offset = mouse.x - gauge.x;
+/// La valeur désignée par un appui, si celui-ci tombe sur la barre.
+fn value_at(row: Row, bounds: Rect, mouse: Vec2) -> Option<u8> {
+    match row {
+        Row::DailyGoal => ui::slider_step_at(goal_bar(bounds), DAILY_GOALS.len(), mouse)
+            .map(|step| step as u8),
+        _ => {
+            let gauge = gauge_rect(bounds);
+            ui::hit(ui::grab_area(gauge), mouse).then(|| level_from_x(gauge, mouse.x))
+        }
+    }
+}
+
+/// La valeur désignée par une abscisse, pendant un glissement.
+fn value_from_x(row: Row, bounds: Rect, x: f32) -> u8 {
+    match row {
+        Row::DailyGoal => ui::slider_step_from_x(goal_bar(bounds), DAILY_GOALS.len(), x) as u8,
+        _ => level_from_x(gauge_rect(bounds), x),
+    }
+}
+
+/// Le cran de jauge sous une abscisse. Le premier cran commence au bord, d'où
+/// le décalage de un : à gauche de la jauge, le volume est nul.
+fn level_from_x(gauge: Rect, x: f32) -> u8 {
+    let offset = x - gauge.x;
     let index = (offset / (SEGMENT_WIDTH + SEGMENT_GAP)).floor() as i32;
 
-    Some((index + 1).clamp(0, MAX_LEVEL as i32) as u8)
+    (index + 1).clamp(0, MAX_LEVEL as i32) as u8
 }
 
 /// Applique un changement de volume : réglage, moteur audio, sauvegarde, et
 /// retour sonore.
 fn apply(app: &mut App, row: Row, delta: i8) {
     let level = level_of(app, row);
-    let next = (level as i8 + delta).clamp(0, MAX_LEVEL as i8) as u8;
+    let next = (level as i8 + delta).clamp(0, steps_of(row) as i8) as u8;
 
     if next == level {
         return;
@@ -176,6 +231,10 @@ fn apply(app: &mut App, row: Row, delta: i8) {
             // blip, on ne saurait pas ce que vaut le cran choisi.
             app.sfx.navigate();
         }
+        Row::DailyGoal => {
+            app.settings.daily_goal = Some(DAILY_GOALS[next as usize]);
+            app.sfx.navigate();
+        }
     }
 
     app.settings.save();
@@ -190,6 +249,7 @@ fn draw_row(fonts_set: &Fonts, bounds: Rect, row: Row, level: u8, selected: bool
         Row::Music => "MUSIQUE MENUS",
         Row::MusicGame => "MUSIQUE JEU",
         Row::Sfx => "BRUITAGES",
+        Row::DailyGoal => "TEMPS PAR JOUR",
     };
     ui::text(
         fonts_set,
@@ -201,6 +261,18 @@ fn draw_row(fonts_set: &Fonts, bounds: Rect, row: Row, level: u8, selected: bool
     );
 
     let gauge = gauge_rect(bounds);
+
+    // L'objectif n'est pas une quantité que l'on remplit mais une valeur que
+    // l'on désigne : une jauge pleine à gauche du curseur mentirait.
+    if row == Row::DailyGoal {
+        let minutes = DAILY_GOALS[level as usize];
+        let bar = goal_bar(bounds);
+
+        ui::slider(bar, DAILY_GOALS.len(), level as usize, if selected { role::ACCENT } else { role::TEXT_MUTED });
+        draw_value(fonts_set, bounds, &goal_label(minutes), minutes == 0);
+        return;
+    }
+
     for index in 0..MAX_LEVEL {
         let segment = Rect::new(
             gauge.x + index as f32 * (SEGMENT_WIDTH + SEGMENT_GAP),
@@ -224,13 +296,18 @@ fn draw_row(fonts_set: &Fonts, bounds: Rect, row: Row, level: u8, selected: bool
     // pour un affichage cassé.
     let value =
         if level == 0 { "COUPE".to_string() } else { format!("{}%", level as u32 * 10) };
-    let width = ui::text_width(fonts_set, &value, fonts::TEXT);
+    draw_value(fonts_set, bounds, &value, level == 0);
+}
+
+/// La valeur, alignée à droite de la ligne.
+fn draw_value(fonts_set: &Fonts, bounds: Rect, value: &str, muted: bool) {
+    let width = ui::text_width(fonts_set, value, fonts::TEXT);
     ui::text(
         fonts_set,
-        &value,
+        value,
         bounds.x + bounds.w - 6.0 - width,
         bounds.y + (ROW_HEIGHT - fonts::TEXT as f32) / 2.0,
         fonts::TEXT,
-        if level == 0 { role::DANGER } else { role::TEXT },
+        if muted { role::DANGER } else { role::TEXT },
     );
 }
