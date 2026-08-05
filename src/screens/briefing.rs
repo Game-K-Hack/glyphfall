@@ -35,12 +35,11 @@ pub fn briefing_screen(
     let Some(level) = language.level(level_id) else { return Transition::Pop };
 
     draw_header(&app.fonts, level, &app.progress);
-    let (hovered, clicked) = draw_glyphs(app, language, level, mouse);
+    let clicked = draw_glyphs(app, language, level, mouse);
     draw_rules(&app.fonts, level);
 
-
-    // Cliquer un signe ouvre sa fiche : le briefing ne peut montrer qu'une
-    // ligne d'aide, la fiche a la place de tout dire.
+    // Cliquer un signe ouvre sa fiche : le briefing n'a pas la place de dire
+    // quoi que ce soit d'un signe, la fiche a celle de tout dire.
     if let Some(index) = clicked {
         app.sfx.confirm();
         return Transition::Push(Screen::Sign {
@@ -54,9 +53,8 @@ pub fn briefing_screen(
 
     let unlocked = app.progress.mode_unlocked(level_id, *mode);
 
-    // Trois messages se disputent le pied de l'écran. L'ordre dit lequel
-    // compte : ce qui bloque le mode choisi passe avant tout, puis l'aide du
-    // signe survolé, puis le rappel par défaut.
+    // Le pied de l'écran ne dit qu'une chose à la fois : ce qui bloque le mode
+    // choisi, ou à défaut le rappel de ce qu'un signe cache.
     if !unlocked {
         ui::text_centered(
             &app.fonts,
@@ -67,17 +65,14 @@ pub fn briefing_screen(
             role::SHAKY,
         );
     } else {
-        match hovered {
-            Some(hint) if !hint.is_empty() => draw_hint(&app.fonts, language, hint),
-            _ => ui::text_centered(
-                &app.fonts,
-                "CLIQUE UN SIGNE POUR SA FICHE",
-                canvas::WIDTH / 2.0,
-                200.0,
-                fonts::TEXT,
-                role::TEXT_DISABLED,
-            ),
-        }
+        ui::text_centered(
+            &app.fonts,
+            "CLIQUE UN SIGNE POUR SA FICHE",
+            canvas::WIDTH / 2.0,
+            200.0,
+            fonts::TEXT,
+            role::TEXT_DISABLED,
+        );
     }
 
     let start = Rect::new(((canvas::WIDTH - 120.0) / 2.0).floor(), 172.0, 120.0, 20.0);
@@ -224,18 +219,12 @@ fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {
     );
 }
 
-/// Dessine la grille des signes, et renvoie l'aide de celui survolé ainsi que
-/// l'indice de celui que l'on vient de cliquer.
-fn draw_glyphs<'a>(
-    app: &App,
-    language: &'a Language,
-    level: &'a Level,
-    mouse: Vec2,
-) -> (Option<&'a str>, Option<usize>) {
+/// Dessine la grille des signes, et renvoie l'indice de celui que l'on vient de
+/// cliquer.
+fn draw_glyphs(app: &App, language: &Language, level: &Level, mouse: Vec2) -> Option<usize> {
     let fonts_set = &app.fonts;
     let script = fonts_set.script(&language.id);
     let capacity = COLUMNS * ROWS;
-    let mut hovered = None;
     let mut clicked = None;
 
     for (index, glyph) in level.glyphs.iter().take(capacity).enumerate() {
@@ -248,7 +237,6 @@ fn draw_glyphs<'a>(
 
         let is_hovered = ui::hit(cell, mouse);
         if is_hovered {
-            hovered = Some(glyph.hint());
             ui::fill(cell, role::PANEL);
             if is_mouse_button_pressed(MouseButton::Left) {
                 clicked = Some(index);
@@ -289,7 +277,7 @@ fn draw_glyphs<'a>(
         );
     }
 
-    (hovered, clicked)
+    clicked
 }
 
 fn draw_rules(fonts_set: &Fonts, level: &Level) {
@@ -331,11 +319,3 @@ fn draw_rules(fonts_set: &Fonts, level: &Level) {
     }
 }
 
-/// L'aide est écrite avec la police de la langue : elle cite souvent les
-/// glyphes eux-mêmes, que la police d'interface ne sait pas dessiner.
-fn draw_hint(fonts_set: &Fonts, language: &Language, hint: &str) {
-    let script = fonts_set.script(&language.id);
-    let box_ = Rect::new(0.0, 196.0, canvas::WIDTH, 12.0);
-
-    ui::glyph_fitted(script, hint, box_, 10, role::HINT);
-}

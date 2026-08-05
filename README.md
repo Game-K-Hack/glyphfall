@@ -14,7 +14,7 @@ sur Windows, macOS, Linux et dans un navigateur.
    ouvrir la suivante. Chaque écriture en compte une quinzaine : trois à cinq
    signes nouveaux par étape, et une révision toutes les deux ou trois.
 3. **Briefing** — tous les signes de l'étape avec leur lecture, les règles et
-   les seuils à viser. Survolez un signe pour son aide mnémotechnique.
+   les seuils à viser. Cliquez un signe pour sa fiche.
 4. **Fiche d'un signe** — en cliquant un signe du briefing : le caractère en
    grand, ses lectures, comment le retenir, et où vous en êtes avec lui.
 5. **La manche** — trois vies et un chronomètre, dans le mode choisi. Chaque
@@ -167,8 +167,7 @@ mnemonics = [                      # au moins un, obligatoire
 ]
 ```
 
-Le premier moyen sert d'aide courte au survol du briefing ; la fiche du signe
-les montre tous. **N'y mettez aucun caractère de l'écriture enseignée** : ils
+La fiche du signe les montre tous. **N'y mettez aucun caractère de l'écriture enseignée** : ils
 sont rendus par la police pixel, qui ne connaît que le latin. Nommez plutôt le
 signe (« le giyeok », « le ha ») — un test le vérifie. La fiche n'en affiche
 que **sept lignes** en tout, bande des tracés oblige ; le signe le plus bavard
@@ -237,10 +236,10 @@ textes français — un accent manquant afficherait « Cor en » sans rien casse
 
 ### Deux pièges
 
-- **Les titres, sous-titres, noms et descriptions sont écrits avec la police
-  pixel**, qui ne connaît que le latin. N'y mettez pas de caractères de
-  l'écriture enseignée : ils s'afficheraient en tofu. Les `hint`, eux, sont
-  écrits avec la police de la langue et peuvent citer les signes.
+- **Tous les textes sont écrits avec la police pixel**, qui ne connaît que le
+  latin : titres, sous-titres, noms, descriptions et moyens mnémotechniques.
+  N'y mettez pas de caractères de l'écriture enseignée, ils s'afficheraient en
+  tofu. Seuls les `char` passent par la police de la langue.
 - **`speed` s'exprime en pixels virtuels par seconde**, sur une toile de
   384 × 216. Un signe parcourt 200 pixels avant d'atteindre la ligne : à 55, il
   laisse un peu moins de quatre secondes pour répondre.

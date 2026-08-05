@@ -129,34 +129,6 @@ mod tests {
     }
 
     #[test]
-    fn every_script_font_can_write_the_hints_it_will_show() {
-        // Les aides mnémotechniques sont dessinées avec la police de l'écriture,
-        // en français : le découpage doit avoir gardé les accents.
-        let catalog = load_catalog().expect("catalogue valide");
-
-        for language in &catalog.languages {
-            for font_name in &language.fonts {
-                let bytes = font_bytes(font_name).expect("police déclarée présente");
-                let font = fontdue::Font::from_bytes(bytes, fontdue::FontSettings::default())
-                    .expect("police lisible");
-
-                let texts = language.levels.iter().flat_map(|level| level.glyphs.iter());
-                for glyph in texts {
-                    for mnemonic in &glyph.mnemonics {
-                        for character in mnemonic.chars() {
-                            assert_ne!(
-                                font.lookup_glyph_index(character),
-                                0,
-                                "« {character} » manque à {font_name}"
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    #[test]
     fn the_ui_font_covers_every_text_it_will_display() {
         // Les noms et descriptions de langues sont écrits en français avec la
         // police pixel : un accent manquant passerait inaperçu jusqu'à ce que

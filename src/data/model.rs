@@ -171,8 +171,8 @@ pub struct Glyph {
     /// Toutes les romanisations correctes. La première est celle qu'on montre
     /// au joueur ; les suivantes sont des variantes tolérées (« si » / « shi »).
     pub answers: Vec<String>,
-    /// Comment retenir ce signe. Au moins un, souvent deux : le premier sert
-    /// d'aide courte au survol, la page de détail les montre tous.
+    /// Comment retenir ce signe. Au moins un, souvent deux ; la fiche du signe
+    /// les montre tous.
     ///
     /// Volontairement écrits sans caractère de l'écriture enseignée, pour
     /// qu'ils restent rendus par la police pixel — voir le test de couverture.
@@ -190,11 +190,6 @@ impl Glyph {
     /// La romanisation de référence, montrée en briefing et en correction.
     pub fn primary_answer(&self) -> &str {
         self.answers.first().map(String::as_str).unwrap_or("")
-    }
-
-    /// L'aide courte, affichée au survol.
-    pub fn hint(&self) -> &str {
-        self.mnemonics.first().map(String::as_str).unwrap_or("")
     }
 }
 
