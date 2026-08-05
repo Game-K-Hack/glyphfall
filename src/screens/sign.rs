@@ -41,6 +41,7 @@ pub fn sign_screen(
     }
 
     *index = (*index).min(level.glyphs.len() - 1);
+    let before = *index;
 
     // Les flèches passent d'un signe à l'autre sans repasser par le briefing :
     // on lit rarement une seule fiche.
@@ -58,7 +59,15 @@ pub fn sign_screen(
     draw_readings(&app.fonts, glyph);
     draw_mnemonics(&app.fonts, glyph);
 
-    draw_navigation(app, level, index, mouse)
+    let transition = draw_navigation(app, level, index, mouse);
+
+    // Flèches du clavier ou boutons de l'écran : changer de fiche est un
+    // déplacement, et s'entend comme tel.
+    if *index != before {
+        app.sfx.navigate();
+    }
+
+    transition
 }
 
 fn draw_header(fonts_set: &Fonts, level: &Level, index: usize) {
@@ -210,13 +219,11 @@ fn draw_navigation(app: &App, level: &Level, index: &mut usize, mouse: Vec2) -> 
     let previous = Rect::new(16.0, Y, ARROW, 16.0);
     if ui::button(&app.fonts, mouse, Button::new(previous, "<")) {
         *index = (*index + level.glyphs.len() - 1) % level.glyphs.len();
-        app.sfx.navigate();
     }
 
     let next = Rect::new(16.0 + ARROW + 4.0, Y, ARROW, 16.0);
     if ui::button(&app.fonts, mouse, Button::new(next, ">")) {
         *index = (*index + 1) % level.glyphs.len();
-        app.sfx.navigate();
     }
 
     let back = Rect::new(canvas::WIDTH - 16.0 - 76.0, Y, 76.0, 16.0);

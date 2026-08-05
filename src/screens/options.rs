@@ -51,6 +51,7 @@ pub fn options_screen(
     clear_background(role::BACKGROUND);
 
     *selected = (*selected).min(ROWS.len() - 1);
+    let before = *selected;
 
     ui::text_centered(
         &app.fonts,
@@ -104,10 +105,13 @@ pub fn options_screen(
 
     if is_key_pressed(KeyCode::Down) {
         *selected = (*selected + 1) % ROWS.len();
-        app.sfx.navigate();
     }
     if is_key_pressed(KeyCode::Up) {
         *selected = (*selected + ROWS.len() - 1) % ROWS.len();
+    }
+
+    // Comme ailleurs, c'est le changement de ligne qui sonne, pas la touche.
+    if *selected != before {
         app.sfx.navigate();
     }
 

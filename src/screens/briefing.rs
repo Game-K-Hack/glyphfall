@@ -121,6 +121,7 @@ fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
 
     let total = WIDTH * Mode::ALL.len() as f32 + GAP * (Mode::ALL.len() - 1) as f32;
     let start_x = ((canvas::WIDTH - total) / 2.0).floor();
+    let before = *mode;
 
     // Un mode fermé se sélectionne quand même : c'est le seul moyen de lire ce
     // qu'il demande. Sauter par-dessus rendrait la condition inatteignable,
@@ -135,7 +136,6 @@ fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
         let from = Mode::ALL.iter().position(|candidate| candidate == mode).unwrap_or(0) as i32;
 
         *mode = Mode::ALL[(from + step).rem_euclid(count) as usize];
-        app.sfx.navigate();
     }
 
     for (index, candidate) in Mode::ALL.iter().enumerate() {
@@ -143,9 +143,12 @@ fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
         let unlocked = app.progress.mode_unlocked(level_id, *candidate);
         let chosen = *candidate == *mode;
 
-        if ui::hit(cell, mouse) && is_mouse_button_pressed(MouseButton::Left) {
-            *mode = *candidate;
-            app.sfx.navigate();
+        if ui::hit(cell, mouse) {
+            // Les modes sonnent au survol comme les boutons : ils en sont.
+            ui::focus(ui::widget_id(candidate.label(), cell));
+            if is_mouse_button_pressed(MouseButton::Left) {
+                *mode = *candidate;
+            }
         }
 
         // Un mode fermé mais choisi garde un contour, sans la couleur pleine :
@@ -178,6 +181,10 @@ fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
         );
     }
 
+    // Comme dans les listes, c'est le mode retenu qui sonne, pas la touche.
+    if *mode != before {
+        app.sfx.navigate();
+    }
 }
 
 fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {

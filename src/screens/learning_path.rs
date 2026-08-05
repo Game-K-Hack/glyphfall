@@ -97,12 +97,10 @@ pub fn learning_path_screen(
     if is_key_pressed(KeyCode::Down) {
         selected = (selected + 1) % count;
         view.scroll = scrolled_into_view(view.scroll, selected);
-        app.sfx.navigate();
     }
     if is_key_pressed(KeyCode::Up) {
         selected = (selected + count - 1) % count;
         view.scroll = scrolled_into_view(view.scroll, selected);
-        app.sfx.navigate();
     }
     if first_visit {
         view.scroll = scrolled_into_view(view.scroll, selected);
@@ -210,6 +208,12 @@ pub fn learning_path_screen(
         }
     }
 
+    // Le bruit suit l'étape désignée, d'où qu'elle vienne : flèche, survol ou
+    // liste que l'on fait défiler sous le curseur. La première visite ne sonne
+    // pas — personne n'a rien déplacé, l'écran vient de s'ouvrir.
+    if view.selected.is_some_and(|previous| previous != selected) {
+        app.sfx.navigate();
+    }
     view.selected = Some(selected);
 
     match chosen {

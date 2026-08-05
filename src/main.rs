@@ -20,7 +20,7 @@ mod window;
 use crate::app::{App, Navigator, Screen, Transition};
 use crate::daily::Daily;
 use crate::audio::Sfx;
-use crate::gfx::{Canvas, Fonts};
+use crate::gfx::{Canvas, Fonts, ui};
 use crate::music::{Ambience, Music};
 use crate::progress::Progress;
 use crate::settings::Settings;
@@ -224,6 +224,18 @@ async fn main() {
             }
             other => other,
         };
+
+        // Le curseur vient de passer sur un autre élément : même bruit qu'une
+        // flèche, parce que c'est le même geste. Le test se fait après le rendu,
+        // seul moment où l'on sait ce que l'écran a mis sous le curseur.
+        if ui::focus_moved() {
+            app.sfx.navigate();
+        }
+        // Changer d'écran remet le compteur à zéro : sinon le bouton qui se
+        // trouve sous le curseur à l'arrivée claquerait pour rien.
+        if !matches!(transition, Transition::Stay) {
+            ui::forget_focus();
+        }
 
         canvas.end();
         capture.tick();

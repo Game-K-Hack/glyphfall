@@ -77,7 +77,10 @@ qu'on puisse lire ce qu'ils demandent — seul le bouton START s'éteint. Une
 | `←` `→` | Changer de mode, régler un volume |
 | `Échap` | Revenir en arrière |
 
-La souris fonctionne partout où le clavier fonctionne.
+La souris fonctionne partout où le clavier fonctionne, et s'entend pareil :
+le blip de déplacement suit **ce qui est désigné**, pas la touche appuyée.
+Survoler une autre étape, une autre carte ou un autre bouton sonne donc
+comme une flèche.
 
 ## Lancer et construire
 

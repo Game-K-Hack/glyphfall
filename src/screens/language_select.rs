@@ -42,6 +42,9 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
     }
 
     *selected = (*selected).min(languages.len() - 1);
+    // La carte désignée en arrivant, pour repérer ensuite tout déplacement,
+    // qu'il vienne des flèches ou de la souris.
+    let before = *selected;
 
     ui::text_centered(
         &app.fonts,
@@ -82,10 +85,15 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
 
     if is_key_pressed(KeyCode::Down) {
         *selected = (*selected + 1) % languages.len();
-        app.sfx.navigate();
     }
     if is_key_pressed(KeyCode::Up) {
         *selected = (*selected + languages.len() - 1) % languages.len();
+    }
+
+    // Le bruit suit la sélection, pas la touche : survoler une autre carte la
+    // déplace tout autant qu'une flèche, et se taire alors donnerait
+    // l'impression que la souris compte moins.
+    if *selected != before {
         app.sfx.navigate();
     }
     if is_key_pressed(KeyCode::Enter) {

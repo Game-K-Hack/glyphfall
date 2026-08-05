@@ -4,6 +4,8 @@
 //! entiers. Un panneau posé en x = 12.5 serait rendu à cheval sur deux pixels
 //! et trahirait immédiatement l'illusion.
 
+use std::cell::Cell;
+
 use macroquad::prelude::*;
 
 use super::fonts::Fonts;
@@ -58,6 +60,81 @@ pub fn blit_scaled(pattern: &[&str], x: f32, y: f32, scale: f32, color: Color) {
 /// Le curseur est-il sur ce rectangle ?
 pub fn hit(rect: Rect, mouse: Vec2) -> bool {
     rect.contains(mouse)
+}
+
+// --- Survol ----------------------------------------------------------------
+//
+// Le bruit de déplacement ne peut pas rester l'affaire des flèches : passer la
+// souris d'un bouton à l'autre est un déplacement comme un autre, et le
+// silence donnait l'impression que la souris était moins bien traitée que le
+// clavier.
+//
+// Les éléments signalent ce qu'ils voient pendant le rendu, et la boucle
+// principale compare d'une frame à l'autre — elle seule a le son sous la main.
+
+/// Aucun élément sous le curseur.
+const NOTHING: u64 = 0;
+
+thread_local! {
+    /// Ce que le curseur survole pendant la frame en cours.
+    static HOVERED: Cell<u64> = const { Cell::new(NOTHING) };
+    /// Ce qu'il survolait à la frame précédente.
+    static PREVIOUS: Cell<u64> = const { Cell::new(NOTHING) };
+    /// La prochaine comparaison doit-elle être passée sous silence ?
+    static MUTED: Cell<bool> = const { Cell::new(false) };
+}
+
+/// Signale que l'élément `id` est sous le curseur.
+///
+/// Le dernier à parler l'emporte : deux éléments superposés désignent le plus
+/// petit, dessiné en dernier, qui est aussi celui que le clic atteindra.
+pub fn focus(id: u64) {
+    HOVERED.with(|hovered| hovered.set(id));
+}
+
+/// Un identifiant d'élément, tiré de son intitulé et de sa taille.
+///
+/// Volontairement indépendant de sa **position** : dans une liste qui défile,
+/// une identité géométrique changerait à chaque frame et ferait crépiter le son
+/// pendant tout le défilement.
+pub fn widget_id(label: &str, rect: Rect) -> u64 {
+    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+
+    for byte in
+        label.bytes().chain(rect.w.to_bits().to_be_bytes()).chain(rect.h.to_bits().to_be_bytes())
+    {
+        hash ^= u64::from(byte);
+        hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+    }
+
+    // `NOTHING` doit rester réservé, sans quoi un élément deviendrait muet.
+    hash | 1
+}
+
+/// Le curseur vient-il d'entrer dans un nouvel élément ?
+///
+/// À appeler une fois par frame, après le rendu : l'appel consomme ce qui a été
+/// signalé. En sortir pour aller sur du vide ne compte pas — c'est l'arrivée
+/// sur quelque chose de cliquable qui mérite d'être entendue.
+pub fn focus_moved() -> bool {
+    let hovered = HOVERED.with(Cell::take);
+    let previous = PREVIOUS.with(|previous| previous.replace(hovered));
+
+    // Le premier relevé d'un écran ne dit rien d'un déplacement : il constate
+    // seulement où se trouve déjà le curseur.
+    if MUTED.with(|muted| muted.replace(false)) {
+        return false;
+    }
+
+    hovered != NOTHING && hovered != previous
+}
+
+/// Oublie le survol : à faire en changeant d'écran, faute de quoi le bouton se
+/// trouvant sous le curseur à l'arrivée claquerait sans qu'on ait rien fait.
+pub fn forget_focus() {
+    HOVERED.with(|hovered| hovered.set(NOTHING));
+    PREVIOUS.with(|previous| previous.set(NOTHING));
+    MUTED.with(|muted| muted.set(true));
 }
 
 // --- Texte -----------------------------------------------------------------
@@ -216,6 +293,9 @@ impl<'a> Button<'a> {
 /// élément a le focus.
 pub fn button(fonts: &Fonts, mouse: Vec2, button: Button) -> bool {
     let hovered = hit(button.rect, mouse);
+    if hovered {
+        focus(widget_id(button.label, button.rect));
+    }
 
     let (background, label_color) = if hovered || button.focused {
         (button.accent, role::BORDER)
@@ -465,6 +545,55 @@ mod tests {
         // doigt : on tolere un peu de marge.
         assert_eq!(slider_step_at(BAR, 9, vec2(200.0, BAR.y - 4.0)), Some(4));
         assert_eq!(slider_step_at(BAR, 9, vec2(200.0, BAR.y + BAR.h + 4.0)), Some(4));
+    }
+
+    #[test]
+    fn arriving_on_an_element_is_heard_once() {
+        forget_focus();
+        assert!(!focus_moved(), "le premier releve d'un ecran ne dit rien");
+
+        focus(widget_id("JOUER", BAR));
+        assert!(focus_moved(), "le curseur vient d'arriver sur le bouton");
+
+        focus(widget_id("JOUER", BAR));
+        assert!(!focus_moved(), "rester dessus ne se reentend pas");
+    }
+
+    #[test]
+    fn leaving_for_empty_space_stays_silent() {
+        // Sinon chaque aller-retour entre deux boutons compterait double.
+        forget_focus();
+        focus_moved();
+        focus(widget_id("OPTIONS", BAR));
+        focus_moved();
+
+        assert!(!focus_moved(), "rien sous le curseur");
+    }
+
+    #[test]
+    fn changing_screen_swallows_the_first_look() {
+        // Le bouton qui se trouve sous le curseur a l'arrivee claquerait sans
+        // que personne n'ait bouge.
+        forget_focus();
+        focus_moved();
+        focus(widget_id("RETOUR", BAR));
+        assert!(focus_moved());
+
+        forget_focus();
+        focus(widget_id("REVISION", BAR));
+
+        assert!(!focus_moved());
+    }
+
+    #[test]
+    fn an_element_keeps_its_identity_while_the_list_scrolls() {
+        // Une identite geometrique changerait a chaque frame et ferait crepiter
+        // le son pendant tout le defilement.
+        let high = Rect::new(0.0, 10.0, 80.0, 16.0);
+        let low = Rect::new(0.0, 190.0, 80.0, 16.0);
+
+        assert_eq!(widget_id("ETAPE 3", high), widget_id("ETAPE 3", low));
+        assert_ne!(widget_id("ETAPE 3", high), widget_id("ETAPE 4", high));
     }
 
     #[test]

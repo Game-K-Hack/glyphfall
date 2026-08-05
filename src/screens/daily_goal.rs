@@ -58,7 +58,12 @@ pub fn daily_goal_screen(
         if minutes == 0 { ("SANS ALERTE".to_string(), role::TEXT_MUTED) } else { (goal_label(minutes), role::ACCENT) };
     ui::text_centered(&app.fonts, &label, canvas::WIDTH / 2.0, 84.0, fonts::TITLE, color);
 
+    let before = *step;
     *step = pick(*step, dragging, BAR, mouse);
+    // Le curseur qui saute d'un cran est un déplacement comme un autre.
+    if *step != before {
+        app.sfx.navigate();
+    }
     ui::slider(BAR, DAILY_GOALS.len(), *step, role::ACCENT);
 
     // Les deux extrémités, pour que la course de la barre se lise d'un coup.
