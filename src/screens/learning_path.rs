@@ -13,7 +13,7 @@ use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 use crate::progress::{MAX_STARS, Progress};
-use crate::session::Session;
+use crate::session::{Mode, Session};
 
 const VIEWPORT_TOP: f32 = 24.0;
 const VIEWPORT_BOTTOM: f32 = 192.0;
@@ -215,6 +215,7 @@ pub fn learning_path_screen(
             Transition::Push(Screen::Briefing {
                 language: language.id.clone(),
                 level: level.id.clone(),
+                mode: Mode::Normal,
             })
         }
         None => Transition::Stay,

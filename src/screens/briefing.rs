@@ -11,7 +11,7 @@ use crate::data::{Language, Level};
 use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
-use crate::progress::MAX_STARS;
+use crate::progress::{MAX_STARS, Progress};
 use crate::session::{Mode, Session};
 
 const GRID_X: f32 = 16.0;
@@ -22,7 +22,13 @@ const COLUMNS: usize = 11;
 const ROWS: usize = 3;
 const GLYPH_SIZE: u16 = 16;
 
-pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2) -> Transition {
+pub fn briefing_screen(
+    app: &App,
+    language_id: &str,
+    level_id: &str,
+    mode: &mut Mode,
+    mouse: Vec2,
+) -> Transition {
     clear_background(role::BACKGROUND);
 
     let Some(language) = app.catalog.language(language_id) else { return Transition::Pop };
@@ -32,19 +38,6 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
     let (hovered, clicked) = draw_glyphs(app, language, level, mouse);
     draw_rules(&app.fonts, level);
 
-    // Survoler un glyphe remplace le rappel des touches par son aide
-    // mnémotechnique : les deux ne tiendraient pas ensemble à cette taille.
-    match hovered {
-        Some(hint) if !hint.is_empty() => draw_hint(&app.fonts, language, hint),
-        _ => ui::text_centered(
-            &app.fonts,
-            "CLIQUE UN SIGNE POUR SA FICHE",
-            canvas::WIDTH / 2.0,
-            200.0,
-            fonts::TEXT,
-            role::TEXT_DISABLED,
-        ),
-    }
 
     // Cliquer un signe ouvre sa fiche : le briefing ne peut montrer qu'une
     // ligne d'aide, la fiche a la place de tout dire.
@@ -57,17 +50,49 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
         });
     }
 
+    draw_modes(app, level_id, mode, mouse);
+
+    let unlocked = app.progress.mode_unlocked(level_id, *mode);
+
+    // Trois messages se disputent le pied de l'écran. L'ordre dit lequel
+    // compte : ce qui bloque le mode choisi passe avant tout, puis l'aide du
+    // signe survolé, puis le rappel par défaut.
+    if !unlocked {
+        ui::text_centered(
+            &app.fonts,
+            Progress::unlock_requirement(*mode),
+            canvas::WIDTH / 2.0,
+            200.0,
+            fonts::TEXT,
+            role::SHAKY,
+        );
+    } else {
+        match hovered {
+            Some(hint) if !hint.is_empty() => draw_hint(&app.fonts, language, hint),
+            _ => ui::text_centered(
+                &app.fonts,
+                "CLIQUE UN SIGNE POUR SA FICHE",
+                canvas::WIDTH / 2.0,
+                200.0,
+                fonts::TEXT,
+                role::TEXT_DISABLED,
+            ),
+        }
+    }
+
     let start = Rect::new(((canvas::WIDTH - 120.0) / 2.0).floor(), 172.0, 120.0, 20.0);
-    // Mis en avant d'office : c'est la seule action attendue de cet écran.
+
+    // Le bouton reste dessiné même quand le mode est fermé : le retirer ferait
+    // sauter la mise en page à chaque changement de mode.
     let pressed = ui::button(
         &app.fonts,
         mouse,
-        Button::new(start, "START").accent(role::SUCCESS).focused(true),
+        Button::new(start, "START").accent(role::SUCCESS).focused(unlocked),
     );
 
-    if pressed || is_key_pressed(KeyCode::Enter) {
+    if unlocked && (pressed || is_key_pressed(KeyCode::Enter)) {
         if let Some(session) =
-            Session::new(&app.catalog, &app.progress, language_id, level_id, Mode::Normal)
+            Session::new(&app.catalog, &app.progress, language_id, level_id, *mode)
         {
             app.sfx.confirm();
             return Transition::Push(Screen::Playing(Box::new(session)));
@@ -75,6 +100,73 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
     }
 
     Transition::Stay
+}
+
+/// La rangée des quatre modes.
+///
+/// Les modes fermés restent affichés, avec ce qu'il faut faire pour les ouvrir.
+/// Les cacher priverait le joueur de la seule chose qui donne envie d'aller
+/// chercher les trois étoiles.
+fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
+    const Y: f32 = 152.0;
+    const WIDTH: f32 = 76.0;
+    const GAP: f32 = 4.0;
+
+    let total = WIDTH * Mode::ALL.len() as f32 + GAP * (Mode::ALL.len() - 1) as f32;
+    let start_x = ((canvas::WIDTH - total) / 2.0).floor();
+
+    // Un mode fermé se sélectionne quand même : c'est le seul moyen de lire ce
+    // qu'il demande. Sauter par-dessus rendrait la condition inatteignable,
+    // et le joueur ne saurait jamais comment ouvrir la suite.
+    let step: i32 = match () {
+        _ if is_key_pressed(KeyCode::Right) => 1,
+        _ if is_key_pressed(KeyCode::Left) => -1,
+        _ => 0,
+    };
+    if step != 0 {
+        let count = Mode::ALL.len() as i32;
+        let from = Mode::ALL.iter().position(|candidate| candidate == mode).unwrap_or(0) as i32;
+
+        *mode = Mode::ALL[(from + step).rem_euclid(count) as usize];
+        app.sfx.navigate();
+    }
+
+    for (index, candidate) in Mode::ALL.iter().enumerate() {
+        let cell = Rect::new(start_x + index as f32 * (WIDTH + GAP), Y, WIDTH, 14.0);
+        let unlocked = app.progress.mode_unlocked(level_id, *candidate);
+        let chosen = *candidate == *mode;
+
+        if ui::hit(cell, mouse) && is_mouse_button_pressed(MouseButton::Left) {
+            *mode = *candidate;
+            app.sfx.navigate();
+        }
+
+        // Un mode fermé mais choisi garde un contour, sans la couleur pleine :
+        // il est bien désigné, il n'est simplement pas jouable.
+        let background = match (unlocked, chosen) {
+            (true, true) => role::ACCENT,
+            _ => role::PANEL,
+        };
+        ui::panel(cell, background);
+        if !unlocked && chosen {
+            ui::stroke(cell, role::SHAKY);
+        }
+
+        let label_color = match (unlocked, chosen) {
+            (false, _) => role::TEXT_DISABLED,
+            (true, true) => role::BORDER,
+            (true, false) => role::TEXT,
+        };
+        ui::text_centered(
+            &app.fonts,
+            candidate.label(),
+            cell.x + cell.w / 2.0,
+            cell.y + 3.0,
+            fonts::TEXT,
+            label_color,
+        );
+    }
+
 }
 
 fn draw_header(fonts_set: &Fonts, level: &Level) {
@@ -171,7 +263,7 @@ fn draw_glyphs<'a>(
 }
 
 fn draw_rules(fonts_set: &Fonts, level: &Level) {
-    const Y: f32 = 122.0;
+    const Y: f32 = 112.0;
 
     let rules = &level.rules;
     let duration = if rules.is_timed() {
@@ -183,7 +275,7 @@ fn draw_rules(fonts_set: &Fonts, level: &Level) {
     ui::text_centered(fonts_set, &summary, canvas::WIDTH / 2.0, Y, fonts::TEXT, role::TEXT);
 
     // Les seuils, pour savoir ce qu'il faut viser avant de commencer.
-    const THRESHOLD_Y: f32 = 140.0;
+    const THRESHOLD_Y: f32 = 126.0;
     let thresholds = [level.stars.one, level.stars.two, level.stars.three];
     let block_width = 100.0;
     let start_x = (canvas::WIDTH - block_width * MAX_STARS as f32) / 2.0;

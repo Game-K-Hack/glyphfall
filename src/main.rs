@@ -89,9 +89,23 @@ async fn main() {
                     view: PathView::new(),
                 })
             }
-            Some(("briefing", target)) => target.split_once('/').map(|(language, level)| {
-                Screen::Briefing { language: language.to_string(), level: level.to_string() }
-            }),
+            // `briefing:ko/ko-04/ultra` ouvre le briefing sur un mode donné.
+            Some(("briefing", target)) => {
+                let mut parts = target.split('/');
+                match (parts.next(), parts.next()) {
+                    (Some(language), Some(level)) => Some(Screen::Briefing {
+                        language: language.to_string(),
+                        level: level.to_string(),
+                        mode: match parts.next() {
+                            Some("fast") => Mode::Fast,
+                            Some("ultra") => Mode::Ultra,
+                            Some("endless") => Mode::Endless,
+                            _ => Mode::Normal,
+                        },
+                    }),
+                    _ => None,
+                }
+            }
             Some(("sign", target)) => target.split_once('/').map(|(language, level)| Screen::Sign {
                 language: language.to_string(),
                 level: level.to_string(),
@@ -149,8 +163,8 @@ async fn main() {
             Screen::LearningPath { language, view } => {
                 learning_path_screen(&app, language, view, mouse)
             }
-            Screen::Briefing { language, level } => {
-                briefing_screen(&app, language, level, mouse)
+            Screen::Briefing { language, level, mode } => {
+                briefing_screen(&app, language, level, mode, mouse)
             }
             Screen::Sign { language, level, index } => {
                 sign_screen(&app, language, level, index, mouse)

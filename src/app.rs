@@ -17,7 +17,7 @@ use crate::gfx::Fonts;
 use crate::progress::Progress;
 use crate::settings::Settings;
 use crate::screens::learning_path::PathView;
-use crate::session::{Outcome, Session};
+use crate::session::{Mode, Outcome, Session};
 
 /// Ce qui vit pour toute la durée du programme.
 pub struct App {
@@ -58,6 +58,9 @@ pub enum Screen {
     Briefing {
         language: String,
         level: String,
+        /// Le mode mis en avant. Il survit d'une frame à l'autre, et au retour
+        /// depuis la fiche d'un signe.
+        mode: Mode,
     },
     /// La fiche d'un signe, ouverte depuis le briefing.
     Sign {
@@ -184,6 +187,7 @@ mod tests {
         navigator.apply(Transition::Push(Screen::Briefing {
             language: "ko".into(),
             level: "ko-01".into(),
+            mode: Mode::Normal,
         }));
         let before = navigator.depth();
 
