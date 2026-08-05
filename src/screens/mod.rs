@@ -1,5 +1,6 @@
 pub mod briefing;
 pub mod daily_goal;
+pub mod font_choice;
 pub mod game;
 pub mod goal_reached;
 pub mod results;

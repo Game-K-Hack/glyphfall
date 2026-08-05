@@ -92,8 +92,11 @@ pub fn daily_goal_screen(
         app.sfx.confirm();
 
         // `Replace` et non `Push` : la question ne doit pas réapparaître en
-        // revenant du choix de la langue.
-        return Transition::Replace(Screen::LanguageSelect { selected: 0 });
+        // revenant de l'écran suivant.
+        return Transition::Replace(match app.settings.random_fonts {
+            None => Screen::FontChoice,
+            Some(_) => Screen::LanguageSelect { selected: 0 },
+        });
     }
 
     Transition::Stay

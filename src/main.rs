@@ -27,6 +27,7 @@ use crate::settings::Settings;
 use crate::session::{Mode, Session};
 use crate::screens::briefing::briefing_screen;
 use crate::screens::daily_goal::daily_goal_screen;
+use crate::screens::font_choice::font_choice_screen;
 use crate::screens::goal_reached::goal_reached_screen;
 use crate::screens::game::game_screen;
 use crate::screens::results::results_screen;
@@ -120,6 +121,7 @@ async fn main() {
                 "options" => Some(Screen::Options { selected: 0, dragging: None }),
                 "goal" => Some(Screen::DailyGoal { step: 5, dragging: false }),
                 "alert" => Some(Screen::GoalReached),
+                "fonts" => Some(Screen::FontChoice),
                 _ => None,
             },
         };
@@ -160,6 +162,7 @@ async fn main() {
                 daily_goal_screen(&mut app, step, dragging, mouse)
             }
             Screen::GoalReached => goal_reached_screen(&app, mouse),
+            Screen::FontChoice => font_choice_screen(&mut app, mouse),
             Screen::LearningPath { language, view } => {
                 learning_path_screen(&app, language, view, mouse)
             }

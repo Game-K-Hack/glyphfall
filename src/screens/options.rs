@@ -15,9 +15,9 @@ use crate::settings::{DAILY_GOALS, MAX_LEVEL, goal_label};
 
 const ROW_X: f32 = 40.0;
 const ROW_WIDTH: f32 = canvas::WIDTH - ROW_X * 2.0;
-const ROW_HEIGHT: f32 = 26.0;
-const FIRST_ROW_Y: f32 = 52.0;
-const ROW_STEP: f32 = 30.0;
+const ROW_HEIGHT: f32 = 24.0;
+const FIRST_ROW_Y: f32 = 40.0;
+const ROW_STEP: f32 = 28.0;
 
 /// Largeur du libellé, avant la jauge. « MUSIQUE MENUS » est le plus long.
 const LABEL_WIDTH: f32 = 122.0;
@@ -35,9 +35,12 @@ enum Row {
     Sfx,
     /// Le temps d'apprentissage visé chaque jour.
     DailyGoal,
+    /// Faire varier le tracé des signes.
+    RandomFonts,
 }
 
-const ROWS: [Row; 4] = [Row::Music, Row::MusicGame, Row::Sfx, Row::DailyGoal];
+const ROWS: [Row; 5] =
+    [Row::Music, Row::MusicGame, Row::Sfx, Row::DailyGoal, Row::RandomFonts];
 
 pub fn options_screen(
     app: &mut App,
@@ -53,7 +56,7 @@ pub fn options_screen(
         &app.fonts,
         "OPTIONS",
         canvas::WIDTH / 2.0,
-        24.0,
+        16.0,
         fonts::TITLE,
         role::TITLE,
     );
@@ -123,12 +126,12 @@ pub fn options_screen(
         &app.fonts,
         "GAUCHE ET DROITE POUR REGLER",
         canvas::WIDTH / 2.0,
-        176.0,
+        182.0,
         fonts::TEXT,
         role::TEXT_DISABLED,
     );
 
-    let back = Rect::new(((canvas::WIDTH - 120.0) / 2.0).floor(), 190.0, 120.0, 20.0);
+    let back = Rect::new(((canvas::WIDTH - 120.0) / 2.0).floor(), 194.0, 120.0, 20.0);
     if ui::button(&app.fonts, mouse, Button::new(back, "RETOUR").accent(role::TEXT_MUTED)) {
         return Transition::Pop;
     }
@@ -165,6 +168,7 @@ fn level_of(app: &App, row: Row) -> u8 {
         Row::Sfx => app.settings.sfx,
         // L'objectif se compte en crans de durée, pas en dixièmes de volume.
         Row::DailyGoal => app.settings.daily_goal_step() as u8,
+        Row::RandomFonts => app.settings.varies_fonts() as u8,
     }
 }
 
@@ -172,6 +176,8 @@ fn level_of(app: &App, row: Row) -> u8 {
 fn steps_of(row: Row) -> u8 {
     match row {
         Row::DailyGoal => DAILY_GOALS.len() as u8 - 1,
+        // Oui ou non : deux crans, donc un seul pas.
+        Row::RandomFonts => 1,
         _ => MAX_LEVEL,
     }
 }
@@ -235,6 +241,10 @@ fn apply(app: &mut App, row: Row, delta: i8) {
             app.settings.daily_goal = Some(DAILY_GOALS[next as usize]);
             app.sfx.navigate();
         }
+        Row::RandomFonts => {
+            app.settings.random_fonts = Some(next == 1);
+            app.sfx.navigate();
+        }
     }
 
     app.settings.save();
@@ -250,6 +260,7 @@ fn draw_row(fonts_set: &Fonts, bounds: Rect, row: Row, level: u8, selected: bool
         Row::MusicGame => "MUSIQUE JEU",
         Row::Sfx => "BRUITAGES",
         Row::DailyGoal => "TEMPS PAR JOUR",
+        Row::RandomFonts => "TRACES VARIES",
     };
     ui::text(
         fonts_set,
@@ -264,6 +275,13 @@ fn draw_row(fonts_set: &Fonts, bounds: Rect, row: Row, level: u8, selected: bool
 
     // L'objectif n'est pas une quantité que l'on remplit mais une valeur que
     // l'on désigne : une jauge pleine à gauche du curseur mentirait.
+    if row == Row::RandomFonts {
+        let bar = goal_bar(bounds);
+        ui::slider(bar, 2, level as usize, if selected { role::ACCENT } else { role::TEXT_MUTED });
+        draw_value(fonts_set, bounds, if level == 1 { "OUI" } else { "NON" }, level == 0);
+        return;
+    }
+
     if row == Row::DailyGoal {
         let minutes = DAILY_GOALS[level as usize];
         let bar = goal_bar(bounds);

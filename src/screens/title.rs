@@ -8,6 +8,22 @@ use crate::gfx::{canvas, fonts};
 /// Trente minutes : le cran proposé d'emblée, ni décourageant ni symbolique.
 const DEFAULT_GOAL_STEP: usize = 5;
 
+/// La première question restée sans réponse, ou le choix de l'alphabet s'il
+/// n'en reste aucune.
+///
+/// Les écrans de question s'enchaînent par `Replace`, si bien que chacun sait
+/// seulement passer au suivant sans connaître toute la file.
+fn first_question(app: &App) -> Screen {
+    if app.settings.daily_goal.is_none() {
+        return Screen::DailyGoal { step: DEFAULT_GOAL_STEP, dragging: false };
+    }
+    if app.settings.random_fonts.is_none() {
+        return Screen::FontChoice;
+    }
+
+    Screen::LanguageSelect { selected: 0 }
+}
+
 pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
     let fonts_set = &app.fonts;
     clear_background(role::BACKGROUND);
@@ -37,12 +53,9 @@ pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
     if ui::button(fonts_set, mouse, Button::new(play, "JOUER")) || is_key_pressed(KeyCode::Enter) {
         app.sfx.confirm();
 
-        // La question du temps quotidien n'est posée qu'une fois. Avoir répondu
-        // « désactivé » est une réponse : on ne la repose pas.
-        return match app.settings.daily_goal {
-            None => Transition::Push(Screen::DailyGoal { step: DEFAULT_GOAL_STEP, dragging: false }),
-            Some(_) => Transition::Push(Screen::LanguageSelect { selected: 0 }),
-        };
+        // Les questions du premier lancement ne sont posées qu'une fois
+        // chacune. Y avoir répondu « non » est une réponse : on ne repose rien.
+        return Transition::Push(first_question(app));
     }
 
     let options = Rect::new(x, 144.0, BUTTON_WIDTH, BUTTON_HEIGHT);

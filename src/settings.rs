@@ -59,6 +59,12 @@ pub struct Settings {
     /// l'écran de réglage au premier lancement.
     #[serde(default)]
     pub daily_goal: Option<u32>,
+    /// Faire varier le tracé des signes d'une tuile à l'autre.
+    ///
+    /// `None` signifie que la question n'a jamais été posée. Refuser est une
+    /// réponse, et on ne la repose pas.
+    #[serde(default)]
+    pub random_fonts: Option<bool>,
 }
 
 impl Default for Settings {
@@ -69,6 +75,7 @@ impl Default for Settings {
             music_game: default_music_game(),
             sfx: default_sfx(),
             daily_goal: None,
+            random_fonts: None,
         }
     }
 }
@@ -109,6 +116,11 @@ impl Settings {
     /// question n'a pas encore été posée.
     pub fn daily_goal_minutes(&self) -> u32 {
         self.daily_goal.unwrap_or(0)
+    }
+
+    /// Les tracés doivent-ils varier en jeu ?
+    pub fn varies_fonts(&self) -> bool {
+        self.random_fonts.unwrap_or(false)
     }
 
     /// Le cran correspondant dans `DAILY_GOALS`.
@@ -182,6 +194,7 @@ mod tests {
             music_game: 2,
             sfx: 9,
             daily_goal: Some(30),
+            random_fonts: Some(true),
         };
 
         let written = toml::to_string(&settings).expect("réglages sérialisables");
@@ -191,6 +204,7 @@ mod tests {
         assert_eq!(read.music_game, 2);
         assert_eq!(read.sfx, 9);
         assert_eq!(read.daily_goal, Some(30));
+        assert_eq!(read.random_fonts, Some(true));
     }
 
     #[test]
@@ -242,6 +256,19 @@ mod goal_tests {
         let disabled = Settings { daily_goal: Some(0), ..Settings::default() };
         assert!(disabled.daily_goal.is_some());
         assert_eq!(disabled.daily_goal_minutes(), 0);
+    }
+
+    #[test]
+    fn refusing_varied_tracings_is_an_answer() {
+        // Sans cette distinction, la question reviendrait a chaque lancement
+        // chez quelqu'un qui a dit non.
+        let untouched = Settings::default();
+        assert!(untouched.random_fonts.is_none());
+        assert!(!untouched.varies_fonts());
+
+        let refused = Settings { random_fonts: Some(false), ..Settings::default() };
+        assert!(refused.random_fonts.is_some());
+        assert!(!refused.varies_fonts());
     }
 
     #[test]

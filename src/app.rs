@@ -43,6 +43,8 @@ pub enum Screen {
         selected: usize,
         dragging: Option<usize>,
     },
+    /// La question des tracés variés, posée juste après celle du temps.
+    FontChoice,
     /// La question du temps quotidien, posée avant la première partie.
     DailyGoal {
         step: usize,
