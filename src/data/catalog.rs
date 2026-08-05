@@ -233,7 +233,7 @@ mod tests {
             name: id.to_string(),
             native_name: id.to_string(),
             description: String::new(),
-            font: None,
+            fonts: Vec::new(),
             levels,
         }
     }

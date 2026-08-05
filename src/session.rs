@@ -701,7 +701,7 @@ mod tests {
                 name: "Coréen".into(),
                 native_name: "한국어".into(),
                 description: String::new(),
-                font: None,
+                fonts: Vec::new(),
                 levels,
             }],
         }

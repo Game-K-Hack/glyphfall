@@ -2,4 +2,4 @@ id = "ko"
 name = "Coréen"
 native_name = "한국어"
 description = "Le hangeul : 14 consonnes et 10 voyelles qui se combinent en syllabes."
-font = "NotoSansKR-Regular.ttf"
+fonts = ["NotoSansKR-Regular.ttf", "NotoSerifKR-Regular.ttf"]

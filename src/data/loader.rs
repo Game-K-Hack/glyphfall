@@ -99,26 +99,57 @@ mod tests {
     }
 
     #[test]
-    fn every_glyph_is_drawable_by_its_language_font() {
-        // Un caractère absent de la police s'afficherait en tofu (□) sans que
-        // rien ne plante : ce test attrape le problème au moment du contenu.
+    fn every_glyph_is_drawable_by_every_font_of_its_language() {
+        // Toutes les polices, pas seulement la première : une manche en tire une
+        // au hasard, et un signe manquant dans la deuxième s'afficherait en tofu
+        // au beau milieu d'une partie. C'est aussi ce qui protège du découpage
+        // des polices, qui pourrait retirer un signe sans prévenir.
         let catalog = load_catalog().expect("catalogue valide");
 
         for language in &catalog.languages {
-            let Some(font_name) = &language.font else { continue };
-            let bytes = font_bytes(font_name).expect("police déclarée présente");
-            let font = fontdue::Font::from_bytes(bytes, fontdue::FontSettings::default())
-                .unwrap_or_else(|error| panic!("« {font_name} » illisible : {error}"));
+            for font_name in &language.fonts {
+                let bytes = font_bytes(font_name).expect("police déclarée présente");
+                let font = fontdue::Font::from_bytes(bytes, fontdue::FontSettings::default())
+                    .unwrap_or_else(|error| panic!("« {font_name} » illisible : {error}"));
 
-            for level in &language.levels {
-                for glyph in &level.glyphs {
-                    for character in glyph.char.chars() {
-                        assert_ne!(
-                            font.lookup_glyph_index(character),
-                            0,
-                            "« {character} » (niveau {}) est absent de {font_name}",
-                            level.id
-                        );
+                for level in &language.levels {
+                    for glyph in &level.glyphs {
+                        for character in glyph.char.chars() {
+                            assert_ne!(
+                                font.lookup_glyph_index(character),
+                                0,
+                                "« {character} » (niveau {}) est absent de {font_name}",
+                                level.id
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn every_script_font_can_write_the_hints_it_will_show() {
+        // Les aides mnémotechniques sont dessinées avec la police de l'écriture,
+        // en français : le découpage doit avoir gardé les accents.
+        let catalog = load_catalog().expect("catalogue valide");
+
+        for language in &catalog.languages {
+            for font_name in &language.fonts {
+                let bytes = font_bytes(font_name).expect("police déclarée présente");
+                let font = fontdue::Font::from_bytes(bytes, fontdue::FontSettings::default())
+                    .expect("police lisible");
+
+                let texts = language.levels.iter().flat_map(|level| level.glyphs.iter());
+                for glyph in texts {
+                    for mnemonic in &glyph.mnemonics {
+                        for character in mnemonic.chars() {
+                            assert_ne!(
+                                font.lookup_glyph_index(character),
+                                0,
+                                "« {character} » manque à {font_name}"
+                            );
+                        }
                     }
                 }
             }
@@ -190,17 +221,32 @@ mod tests {
     }
 
     #[test]
-    fn every_language_declares_a_font_that_exists() {
+    fn every_language_declares_fonts_that_exist() {
         let catalog = load_catalog().expect("catalogue valide");
 
         for language in &catalog.languages {
-            if let Some(font) = &language.font {
+            for font in &language.fonts {
                 assert!(
                     font_bytes(font).is_some(),
                     "la langue « {} » référence la police « {font} », absente de assets/fonts/",
                     language.id
                 );
             }
+        }
+    }
+
+    #[test]
+    fn a_non_latin_script_offers_several_tracings() {
+        // Un seul tracé ne permet pas d'apprendre à reconnaître un signe
+        // ailleurs que dans la police du jeu.
+        let catalog = load_catalog().expect("catalogue valide");
+
+        for language in &catalog.languages {
+            assert!(
+                language.fonts.len() >= 2,
+                "« {} » n'a qu'un tracé : le tirage aléatoire n'aurait rien à tirer",
+                language.id
+            );
         }
     }
 }

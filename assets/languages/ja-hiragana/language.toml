@@ -2,4 +2,4 @@ id = "ja-hiragana"
 name = "Japonais — Hiragana"
 native_name = "ひらがな"
 description = "Le syllabaire des mots japonais et de la grammaire. 46 signes de base."
-font = "NotoSansJP-Regular.ttf"
+fonts = ["NotoSansJP-Regular.ttf", "NotoSerifJP-Regular.ttf"]

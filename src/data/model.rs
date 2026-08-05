@@ -20,10 +20,14 @@ pub struct Language {
     pub native_name: String,
     #[serde(default)]
     pub description: String,
-    /// Nom de fichier dans `assets/fonts/`, capable de rendre cette écriture.
-    /// `None` = la police par défaut de macroquad suffit (écritures latines).
+    /// Les polices capables de rendre cette écriture, dans `assets/fonts/`.
+    ///
+    /// Plusieurs, et volontairement différentes : un signe ne se reconnaît
+    /// vraiment que lorsqu'on le reconnaît dans plusieurs tracés. La première
+    /// sert de référence, les suivantes sont tirées au sort en jeu si le joueur
+    /// l'a demandé. Vide = l'écriture latine, que la police d'interface couvre.
     #[serde(default)]
-    pub font: Option<String>,
+    pub fonts: Vec<String>,
 
     /// Rempli par le chargeur depuis `levels/*.toml`, jamais par le manifeste.
     #[serde(skip)]
