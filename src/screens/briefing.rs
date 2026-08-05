@@ -12,7 +12,7 @@ use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 use crate::progress::MAX_STARS;
-use crate::session::Session;
+use crate::session::{Mode, Session};
 
 const GRID_X: f32 = 16.0;
 const GRID_Y: f32 = 32.0;
@@ -66,7 +66,9 @@ pub fn briefing_screen(app: &App, language_id: &str, level_id: &str, mouse: Vec2
     );
 
     if pressed || is_key_pressed(KeyCode::Enter) {
-        if let Some(session) = Session::new(&app.catalog, &app.progress, language_id, level_id) {
+        if let Some(session) =
+            Session::new(&app.catalog, &app.progress, language_id, level_id, Mode::Normal)
+        {
             app.sfx.confirm();
             return Transition::Push(Screen::Playing(Box::new(session)));
         }

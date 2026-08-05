@@ -9,6 +9,8 @@ use macroquad::prelude::*;
 
 use std::collections::{BTreeMap, HashSet, VecDeque};
 
+use serde::{Deserialize, Serialize};
+
 use crate::data::{Catalog, GameMode, Glyph, Language, Level, Rules, Speed, Stars};
 use crate::progress::Progress;
 
@@ -104,6 +106,94 @@ pub struct Session {
     shake: f32,
     /// Révision libre plutôt qu'étape du chemin.
     is_revision: bool,
+    pub mode: Mode,
+}
+
+/// Comment un niveau se joue.
+///
+/// Un mode ne change ni les signes ni le chemin : il ne fait que durcir les
+/// règles du niveau. Tout se dérive donc de celles du fichier TOML, pour qu'un
+/// niveau réglé lentement reste lent dans tous ses modes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Mode {
+    #[default]
+    Normal,
+    Fast,
+    Ultra,
+    /// Sans chronomètre : la chute accélère jusqu'à ce que les vies tombent.
+    Endless,
+}
+
+impl Mode {
+    pub const ALL: [Mode; 4] = [Mode::Normal, Mode::Fast, Mode::Ultra, Mode::Endless];
+
+    pub fn label(self) -> &'static str {
+        match self {
+            Mode::Normal => "NORMAL",
+            Mode::Fast => "RAPIDE",
+            Mode::Ultra => "ULTRA",
+            Mode::Endless => "INFINI",
+        }
+    }
+
+    /// Ce mode se juge-t-il au sans-faute ?
+    ///
+    /// Le normal se note en étoiles, du plus approximatif au parfait. Le rapide
+    /// et l'ultra ne connaissent que deux issues : sans faute, ou à refaire.
+    pub fn demands_perfection(self) -> bool {
+        matches!(self, Mode::Fast | Mode::Ultra)
+    }
+
+    /// Le mode à débloquer une fois celui-ci maîtrisé.
+    pub fn next(self) -> Option<Mode> {
+        match self {
+            Mode::Normal => Some(Mode::Fast),
+            Mode::Fast => Some(Mode::Ultra),
+            Mode::Ultra => Some(Mode::Endless),
+            Mode::Endless => None,
+        }
+    }
+
+    /// Les règles du niveau, durcies selon le mode.
+    fn apply(self, rules: &Rules) -> Rules {
+        let mut rules = rules.clone();
+
+        match self {
+            Mode::Normal => {}
+            Mode::Fast => {
+                rules.speed = scaled(rules.speed, 1.5);
+                rules.spawn_interval *= 0.72;
+            }
+            Mode::Ultra => {
+                rules.speed = scaled(rules.speed, 2.1);
+                rules.spawn_interval *= 0.55;
+            }
+            Mode::Endless => {
+                // On repart doucement — plus doucement que le normal — mais
+                // rien n'arrête plus l'accélération. C'est elle qui finit la
+                // partie, pas le chronomètre.
+                rules.duration = 0.0;
+                rules.speed = Speed {
+                    start: rules.speed.start * 0.8,
+                    ramp: rules.speed.ramp.max(1.0) * 2.5,
+                    max: rules.speed.max * 6.0,
+                };
+                rules.spawn_interval *= 0.9;
+            }
+        }
+
+        rules
+    }
+}
+
+/// Multiplie une vitesse sans toucher à sa montée en difficulté relative.
+fn scaled(speed: Speed, factor: f32) -> Speed {
+    Speed {
+        start: speed.start * factor,
+        ramp: speed.ramp * factor,
+        max: speed.max * factor,
+    }
 }
 
 /// Les règles d'une révision libre.
@@ -151,7 +241,11 @@ pub struct Outcome {
     /// Une révision libre ne correspond à aucune étape du chemin : elle ne
     /// rapporte donc pas d'étoiles, seulement de la maîtrise.
     pub is_revision: bool,
+    pub mode: Mode,
     /// Les glyphes ratés, sans doublon, pour la correction de fin.
+    /// Une manche sans la moindre faute : c'est ce qui décroche les étoiles de
+    /// couleur, et rien d'autre ne les décroche.
+    pub is_perfect: bool,
     pub missed_glyphs: Vec<String>,
     /// Ce que chaque signe a donné, pour mettre la maîtrise à jour.
     pub signs: Vec<SignResult>,
@@ -227,6 +321,7 @@ impl Session {
             events: Vec::new(),
             shake: 0.0,
             is_revision: true,
+            mode: Mode::Normal,
         })
     }
 
@@ -236,6 +331,7 @@ impl Session {
         progress: &Progress,
         language_id: &str,
         level_id: &str,
+        mode: Mode,
     ) -> Option<Self> {
         let language = catalog.language(language_id)?;
         let level = language.level(level_id)?;
@@ -266,7 +362,7 @@ impl Session {
             language_id: language_id.to_string(),
             level_id: level_id.to_string(),
             level_title: level.title.clone(),
-            rules: level.rules.clone(),
+            rules: mode.apply(&level.rules),
             stars: level.stars,
             glyphs: level.glyphs.clone(),
             review,
@@ -278,7 +374,7 @@ impl Session {
             score: 0,
             lives: level.rules.lives,
             input: String::new(),
-            time_left: level.rules.duration,
+            time_left: mode.apply(&level.rules).duration,
             spawn_timer: 0.0,
             spawned: 0,
             since_retry: 0,
@@ -289,6 +385,7 @@ impl Session {
             events: Vec::new(),
             shake: 0.0,
             is_revision: false,
+            mode,
         })
     }
 
@@ -495,6 +592,10 @@ impl Session {
             reason,
             is_record: false,
             is_revision: self.is_revision,
+            mode: self.mode,
+            // Aucun raté, aucune réponse fausse, et au moins un signe reconnu :
+            // rester immobile ne saurait passer pour un sans-faute.
+            is_perfect: self.hits > 0 && self.missed == 0 && self.wrong == 0,
             missed_glyphs: self.missed_glyphs.clone(),
             signs: self
                 .tally
@@ -618,7 +719,7 @@ mod tests {
 
     fn session(levels: Vec<Level>, level_id: &str) -> Session {
         let catalog = catalog(levels);
-        Session::new(&catalog, &Progress::new(), "ko", level_id).expect("niveau présent")
+        Session::new(&catalog, &Progress::new(), "ko", level_id, Mode::Normal).expect("niveau présent")
     }
 
     fn falling_tile(session: &mut Session, character: &str, answer: &str, y: f32) {
@@ -865,7 +966,8 @@ mod tests {
             &[],
             vec![glyph("ㄱ", "g"), glyph("ㄴ", "n")],
         )]);
-        let mut session = Session::new(&catalog, &progress, "ko", "ko-01").expect("niveau");
+        let mut session =
+            Session::new(&catalog, &progress, "ko", "ko-01", Mode::Normal).expect("niveau");
         session.warmup.clear();
 
         let mut shaky = 0;
@@ -924,6 +1026,77 @@ mod tests {
 
         assert!(outcome.is_revision);
         assert_eq!(outcome.signs.len(), 1, "la maitrise est bien mise a jour");
+    }
+
+    #[test]
+    fn each_mode_hardens_the_rules_of_its_level() {
+        // Les modes derivent des reglages du niveau : un niveau volontairement
+        // lent doit rester le plus lent de tous, meme en ultra.
+        let calm = Rules { speed: Speed { start: 40.0, ramp: 1.0, max: 100.0 }, ..Rules::default() };
+
+        let normal = Mode::Normal.apply(&calm);
+        let fast = Mode::Fast.apply(&calm);
+        let ultra = Mode::Ultra.apply(&calm);
+
+        assert_eq!(normal.speed.start, calm.speed.start);
+        assert!(fast.speed.start > normal.speed.start);
+        assert!(ultra.speed.start > fast.speed.start);
+        assert!(ultra.spawn_interval < fast.spawn_interval);
+        assert!(fast.spawn_interval < normal.spawn_interval);
+    }
+
+    #[test]
+    fn the_endless_mode_has_no_clock_and_no_ceiling() {
+        // Elle commence plus doucement que le normal, mais rien n'arrete plus
+        // l'acceleration : c'est elle qui finit la partie.
+        let base = Rules { duration: 90.0, ..Rules::default() };
+
+        let endless = Mode::Endless.apply(&base);
+
+        assert!(!endless.is_timed(), "un chronometre bornerait l'infini");
+        assert!(endless.speed.start < base.speed.start);
+        assert!(endless.speed.ramp > base.speed.ramp);
+        assert!(endless.speed.max > base.speed.max * 2.0);
+    }
+
+    #[test]
+    fn a_flawless_round_is_reported_as_such() {
+        let mut session = session(vec![level("ko-01", &[], vec![glyph("\u{3131}", "g")])], "ko-01");
+        falling_tile(&mut session, "\u{3131}", "g", 10.0);
+        session.input = "g".into();
+        session.validate();
+
+        assert!(session.outcome(EndReason::TimeUp).is_perfect);
+    }
+
+    #[test]
+    fn a_single_slip_ruins_a_flawless_round() {
+        // C'est tout l'objet des modes rapides : le sans-faute ou rien.
+        let mut session = session(vec![level("ko-01", &[], vec![glyph("\u{3131}", "g")])], "ko-01");
+        session.lives = 9;
+
+        falling_tile(&mut session, "\u{3131}", "g", 10.0);
+        session.input = "g".into();
+        session.validate();
+        session.input = "zzz".into();
+        session.validate();
+
+        assert!(!session.outcome(EndReason::TimeUp).is_perfect);
+    }
+
+    #[test]
+    fn an_empty_round_is_not_flawless() {
+        let session = session(vec![level("ko-01", &[], vec![glyph("\u{3131}", "g")])], "ko-01");
+
+        assert!(!session.outcome(EndReason::TimeUp).is_perfect, "rester immobile n'est pas parfait");
+    }
+
+    #[test]
+    fn the_modes_form_a_chain() {
+        assert_eq!(Mode::Normal.next(), Some(Mode::Fast));
+        assert_eq!(Mode::Fast.next(), Some(Mode::Ultra));
+        assert_eq!(Mode::Ultra.next(), Some(Mode::Endless));
+        assert_eq!(Mode::Endless.next(), None, "l'infini est le dernier");
     }
 
     #[test]

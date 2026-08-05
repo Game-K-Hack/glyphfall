@@ -1,15 +1,15 @@
 ---
 id: "mode-rapide-2026-08-04"
-status: "todo"
+status: "in-progress"
 priority: "medium"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-04T21:57:40.658Z"
-modified: "2026-08-05T01:28:37.985Z"
+modified: "2026-08-05T01:48:51.742Z"
 completedAt: null
 labels: []
-order: "a7"
+order: "a0"
 ---
 # Mode rapide
 

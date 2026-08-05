@@ -61,7 +61,13 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
         let again = if outcome.is_revision {
             Session::revision(&app.catalog, &app.progress, &outcome.language_id)
         } else {
-            Session::new(&app.catalog, &app.progress, &outcome.language_id, &outcome.level_id)
+            Session::new(
+                &app.catalog,
+                &app.progress,
+                &outcome.language_id,
+                &outcome.level_id,
+                outcome.mode,
+            )
         };
 
         return match again {

@@ -24,7 +24,7 @@ use crate::gfx::{Canvas, Fonts};
 use crate::music::{Ambience, Music};
 use crate::progress::Progress;
 use crate::settings::Settings;
-use crate::session::Session;
+use crate::session::{Mode, Session};
 use crate::screens::briefing::briefing_screen;
 use crate::screens::daily_goal::daily_goal_screen;
 use crate::screens::goal_reached::goal_reached_screen;
@@ -98,7 +98,7 @@ async fn main() {
                 index: 0,
             }),
             Some(("play", target)) => target.split_once('/').and_then(|(language, level)| {
-                Session::new(&app.catalog, &app.progress, language, level)
+                Session::new(&app.catalog, &app.progress, language, level, Mode::Normal)
                     .map(|session| Screen::Playing(Box::new(session)))
             }),
             _ => match start.as_str() {
