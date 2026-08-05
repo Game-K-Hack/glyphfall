@@ -1,4 +1,4 @@
-# AlphaTiles
+# Glyphfall
 
 Un jeu pour apprendre les alphabets qui ne s'écrivent pas en lettres latines :
 hangeul, hiragana, katakana, kanji. Les signes tombent, vous tapez leur lecture
@@ -80,7 +80,7 @@ Pour le navigateur :
 ```sh
 rustup target add wasm32-unknown-unknown
 cargo build --release --target wasm32-unknown-unknown
-cp target/wasm32-unknown-unknown/release/alphatiles.wasm web/
+cp target/wasm32-unknown-unknown/release/glyphfall.wasm web/
 ```
 
 Puis servez le dossier `web/` par HTTP — ouvrir `index.html` depuis le disque
@@ -288,18 +288,18 @@ raisonnent donc en pixels virtuels et n'appellent jamais `screen_width()`.
 ### Raccourcis de développement
 
 ```sh
-ALPHATILES_START=languages           cargo run
-ALPHATILES_START=options             cargo run
-ALPHATILES_START=path:ja-hiragana    cargo run
-ALPHATILES_START=briefing:ko/ko-01   cargo run
-ALPHATILES_START=briefing:ko/ko-04/ultra cargo run   # sur un mode donné
-ALPHATILES_START=play:ko/ko-03       cargo run
+GLYPHFALL_START=languages           cargo run
+GLYPHFALL_START=options             cargo run
+GLYPHFALL_START=path:ja-hiragana    cargo run
+GLYPHFALL_START=briefing:ko/ko-01   cargo run
+GLYPHFALL_START=briefing:ko/ko-04/ultra cargo run   # sur un mode donné
+GLYPHFALL_START=play:ko/ko-03       cargo run
 
 # Capture une image après N frames puis quitte, pour vérifier un écran.
-ALPHATILES_SCREENSHOT=ecran.png ALPHATILES_SCREENSHOT_AFTER=120 cargo run
+GLYPHFALL_SCREENSHOT=ecran.png GLYPHFALL_SCREENSHOT_AFTER=120 cargo run
 
 # Régénère la musique d'ambiance après avoir retouché src/compose.rs.
-ALPHATILES_COMPOSE=assets/music/menu/Claude.wav cargo run --release
+GLYPHFALL_COMPOSE=assets/music/menu/Claude.wav cargo run --release
 ```
 
 ## Crédits

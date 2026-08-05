@@ -16,7 +16,7 @@ mod backend {
     use directories::ProjectDirs;
 
     fn save_path(name: &str) -> Option<PathBuf> {
-        let dirs = ProjectDirs::from("", "", "AlphaTiles")?;
+        let dirs = ProjectDirs::from("", "", "Glyphfall")?;
         Some(dirs.data_dir().join(name))
     }
 

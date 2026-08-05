@@ -10,7 +10,7 @@
 //! l'écho. La synthèse additive donne d'excellents résultats sur ce registre,
 //! là où elle peine à produire une mélodie chiptune convaincante.
 //!
-//! Lancer : `ALPHATILES_COMPOSE=assets/music/menu/Claude.wav cargo run --release`
+//! Lancer : `GLYPHFALL_COMPOSE=assets/music/menu/Claude.wav cargo run --release`
 
 use crate::audio::{WAV_HEADER_SIZE, to_pcm16, write_wav_header};
 

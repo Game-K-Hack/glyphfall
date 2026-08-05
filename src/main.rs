@@ -70,7 +70,7 @@ async fn main() {
 
     // Génère la musique d'ambiance puis quitte, sans ouvrir de fenêtre de jeu.
     #[cfg(not(target_arch = "wasm32"))]
-    if let Ok(path) = std::env::var("ALPHATILES_COMPOSE") {
+    if let Ok(path) = std::env::var("GLYPHFALL_COMPOSE") {
         compose::write(&path);
         return;
     }
@@ -80,8 +80,8 @@ async fn main() {
     let mut capture = Capture::from_environment();
 
     // Raccourci de développement : démarrer directement sur un écran donné,
-    // par exemple `ALPHATILES_START=path:ja-hiragana`.
-    if let Ok(start) = std::env::var("ALPHATILES_START") {
+    // par exemple `GLYPHFALL_START=path:ja-hiragana`.
+    if let Ok(start) = std::env::var("GLYPHFALL_START") {
         let screen = match start.split_once(':') {
             Some(("path", language)) => {
                 Some(Screen::LearningPath {
@@ -245,7 +245,7 @@ async fn fatal_error_screen(message: &str) {
 
 /// Capture d'écran de contrôle, pour vérifier le rendu sans oeil humain.
 ///
-/// `ALPHATILES_SCREENSHOT=chemin.png` enregistre une image après quelques
+/// `GLYPHFALL_SCREENSHOT=chemin.png` enregistre une image après quelques
 /// frames — le temps que les atlas de police soient remplis — puis quitte.
 struct Capture {
     path: Option<String>,
@@ -255,17 +255,17 @@ struct Capture {
 
 impl Capture {
     /// Frames à laisser passer par défaut : la première frame dessine parfois
-    /// avant que les glyphes ne soient rastérisés. `ALPHATILES_SCREENSHOT_AFTER`
+    /// avant que les glyphes ne soient rastérisés. `GLYPHFALL_SCREENSHOT_AFTER`
     /// permet d'attendre plus longtemps, le temps qu'une scène s'anime.
     const DELAY: u32 = 20;
 
     fn from_environment() -> Self {
-        let delay = std::env::var("ALPHATILES_SCREENSHOT_AFTER")
+        let delay = std::env::var("GLYPHFALL_SCREENSHOT_AFTER")
             .ok()
             .and_then(|value| value.parse().ok())
             .unwrap_or(Self::DELAY);
 
-        Self { path: std::env::var("ALPHATILES_SCREENSHOT").ok(), frames: 0, delay }
+        Self { path: std::env::var("GLYPHFALL_SCREENSHOT").ok(), frames: 0, delay }
     }
 
     fn tick(&mut self) {

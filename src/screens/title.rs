@@ -14,7 +14,7 @@ pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
 
     ui::text_centered(
         fonts_set,
-        "ALPHA TILES",
+        "GLYPHFALL",
         canvas::WIDTH / 2.0,
         48.0,
         fonts::TITLE,
@@ -22,7 +22,7 @@ pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
     );
     ui::text_centered(
         fonts_set,
-        "apprends un alphabet",
+        "hangeul  kana  kanji",
         canvas::WIDTH / 2.0,
         72.0,
         fonts::TEXT,
