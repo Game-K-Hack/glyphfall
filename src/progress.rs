@@ -9,6 +9,7 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use crate::data::{Catalog, Language, Level};
+use crate::session::Mode;
 use crate::storage;
 
 /// Étoiles maximales pour un niveau.
@@ -56,6 +57,14 @@ pub struct Progress {
     #[serde(default)]
     signs: BTreeMap<String, BTreeMap<String, i8>>,
 
+    /// Ce que les modes rapides ont donné, par niveau.
+    ///
+    /// Séparé de `best` parce qu'il ne s'agit pas de la même monnaie : `best`
+    /// compte des étoiles gagnées à la précision, ceci retient des sans-faute
+    /// et un record.
+    #[serde(default)]
+    modes: BTreeMap<String, LevelModes>,
+
     /// L'ancienne table, toutes écritures confondues.
     ///
     /// Conservée le temps de la relire une fois, puis vidée. Sans elle, la
@@ -63,6 +72,20 @@ pub struct Progress {
     /// perdrait aussi ses étoiles.
     #[serde(default, rename = "mastery", skip_serializing_if = "BTreeMap::is_empty")]
     legacy_mastery: BTreeMap<String, i8>,
+}
+
+/// Ce qu'un niveau a rendu dans ses modes au-delà du normal.
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
+pub struct LevelModes {
+    /// Le mode rapide a été bouclé sans la moindre faute.
+    #[serde(default)]
+    pub fast_perfect: bool,
+    /// Le mode ultra aussi.
+    #[serde(default)]
+    pub ultra_perfect: bool,
+    /// Meilleur score en mode infini. Il n'y a rien d'autre à y gagner.
+    #[serde(default)]
+    pub endless_best: u32,
 }
 
 impl Progress {
@@ -196,6 +219,75 @@ impl Progress {
         true
     }
 
+    /// Ce que les modes ont donné sur ce niveau.
+    pub fn modes(&self, level_id: &str) -> LevelModes {
+        self.modes.get(level_id).copied().unwrap_or_default()
+    }
+
+    /// Ce mode est-il ouvert sur ce niveau ?
+    ///
+    /// Chaque mode s'ouvre en maîtrisant le précédent : trois étoiles au
+    /// normal, puis un sans-faute à chaque étage. On ne saute pas de marche.
+    pub fn mode_unlocked(&self, level_id: &str, mode: Mode) -> bool {
+        let modes = self.modes(level_id);
+
+        match mode {
+            Mode::Normal => true,
+            Mode::Fast => self.stars(level_id) >= MAX_STARS,
+            Mode::Ultra => modes.fast_perfect,
+            Mode::Endless => modes.ultra_perfect,
+        }
+    }
+
+    /// Ce que le joueur doit faire pour ouvrir ce mode.
+    pub fn unlock_requirement(mode: Mode) -> &'static str {
+        match mode {
+            Mode::Normal => "",
+            Mode::Fast => "3 ETOILES EN NORMAL",
+            Mode::Ultra => "SANS FAUTE EN RAPIDE",
+            Mode::Endless => "SANS FAUTE EN ULTRA",
+        }
+    }
+
+    /// Ce mode a-t-il déjà été maîtrisé sur ce niveau ?
+    pub fn mode_mastered(&self, level_id: &str, mode: Mode) -> bool {
+        let modes = self.modes(level_id);
+
+        match mode {
+            Mode::Normal => self.stars(level_id) >= MAX_STARS,
+            Mode::Fast => modes.fast_perfect,
+            Mode::Ultra => modes.ultra_perfect,
+            // L'infini ne se maîtrise pas, il se pousse.
+            Mode::Endless => false,
+        }
+    }
+
+    /// Enregistre une manche jouée dans un mode au-delà du normal.
+    ///
+    /// Renvoie `true` si quelque chose de nouveau a été décroché : une étoile
+    /// de couleur, ou un record en infini.
+    pub fn record_mode(&mut self, level_id: &str, mode: Mode, perfect: bool, score: u32) -> bool {
+        let entry = self.modes.entry(level_id.to_string()).or_default();
+
+        match mode {
+            // Le normal passe par `record`, qui compte en étoiles.
+            Mode::Normal => false,
+            Mode::Fast if perfect && !entry.fast_perfect => {
+                entry.fast_perfect = true;
+                true
+            }
+            Mode::Ultra if perfect && !entry.ultra_perfect => {
+                entry.ultra_perfect = true;
+                true
+            }
+            Mode::Endless if score > entry.endless_best => {
+                entry.endless_best = score;
+                true
+            }
+            _ => false,
+        }
+    }
+
     /// Le niveau est-il jouable ? Il l'est quand tous ses prérequis sont faits.
     pub fn is_unlocked(&self, level: &Level) -> bool {
         level.requires.iter().all(|required| self.is_completed(required))
@@ -271,6 +363,90 @@ mod tests {
         assert!(progress.record("ko-01", 3));
         assert!(!progress.record("ko-01", 1), "ce n'est pas un nouveau record");
         assert_eq!(progress.stars("ko-01"), 3);
+    }
+
+    #[test]
+    fn a_mode_opens_only_once_the_previous_one_is_mastered() {
+        // On ne saute pas de marche : chaque etage demande le precedent.
+        let mut progress = Progress::new();
+
+        assert!(progress.mode_unlocked("ko-01", Mode::Normal), "le normal est toujours ouvert");
+        assert!(!progress.mode_unlocked("ko-01", Mode::Fast));
+
+        progress.record("ko-01", 2);
+        assert!(!progress.mode_unlocked("ko-01", Mode::Fast), "deux etoiles ne suffisent pas");
+
+        progress.record("ko-01", 3);
+        assert!(progress.mode_unlocked("ko-01", Mode::Fast));
+        assert!(!progress.mode_unlocked("ko-01", Mode::Ultra));
+
+        progress.record_mode("ko-01", Mode::Fast, true, 0);
+        assert!(progress.mode_unlocked("ko-01", Mode::Ultra));
+        assert!(!progress.mode_unlocked("ko-01", Mode::Endless));
+
+        progress.record_mode("ko-01", Mode::Ultra, true, 0);
+        assert!(progress.mode_unlocked("ko-01", Mode::Endless));
+    }
+
+    #[test]
+    fn only_a_flawless_round_earns_a_coloured_star() {
+        // Une manche presque parfaite reste une manche a refaire.
+        let mut progress = Progress::new();
+
+        assert!(!progress.record_mode("ko-01", Mode::Fast, false, 0));
+        assert!(!progress.modes("ko-01").fast_perfect);
+
+        assert!(progress.record_mode("ko-01", Mode::Fast, true, 0));
+        assert!(progress.modes("ko-01").fast_perfect);
+    }
+
+    #[test]
+    fn an_already_earned_star_is_not_earned_twice() {
+        let mut progress = Progress::new();
+        progress.record_mode("ko-01", Mode::Fast, true, 0);
+
+        assert!(!progress.record_mode("ko-01", Mode::Fast, true, 0), "plus rien de neuf");
+    }
+
+    #[test]
+    fn the_endless_mode_only_keeps_the_best_score() {
+        let mut progress = Progress::new();
+
+        assert!(progress.record_mode("ko-01", Mode::Endless, false, 300));
+        assert_eq!(progress.modes("ko-01").endless_best, 300);
+
+        assert!(!progress.record_mode("ko-01", Mode::Endless, false, 120), "moins bien");
+        assert_eq!(progress.modes("ko-01").endless_best, 300);
+
+        assert!(progress.record_mode("ko-01", Mode::Endless, false, 900));
+        assert_eq!(progress.modes("ko-01").endless_best, 900);
+    }
+
+    #[test]
+    fn modes_survive_a_round_trip() {
+        let mut progress = Progress::new();
+        progress.record_mode("ko-01", Mode::Fast, true, 0);
+        progress.record_mode("ko-01", Mode::Endless, false, 750);
+
+        let written = toml::to_string(&progress).expect("progression serialisable");
+        let read: Progress = toml::from_str(&written).expect("progression relisible");
+
+        assert!(read.modes("ko-01").fast_perfect);
+        assert!(!read.modes("ko-01").ultra_perfect);
+        assert_eq!(read.modes("ko-01").endless_best, 750);
+    }
+
+    #[test]
+    fn an_older_save_simply_has_no_modes_yet() {
+        // Les sauvegardes d'avant les modes doivent rester lisibles telles
+        // quelles, sans rien perdre.
+        let old = "version = 1\n\n[best]\n\"ko-01\" = 3\n";
+
+        let progress: Progress = toml::from_str(old).expect("ancienne sauvegarde relisible");
+
+        assert_eq!(progress.stars("ko-01"), 3);
+        assert!(progress.mode_unlocked("ko-01", Mode::Fast), "les trois etoiles comptent");
+        assert!(!progress.modes("ko-01").fast_perfect);
     }
 
     #[test]

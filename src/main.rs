@@ -167,7 +167,15 @@ async fn main() {
             // Une révision libre ne correspond à aucune étape : elle ne peut donc
             // ni décrocher d'étoiles ni en faire perdre.
             if !outcome.is_revision {
-                outcome.is_record = app.progress.record(&outcome.level_id, outcome.stars);
+                outcome.is_record = match outcome.mode {
+                    Mode::Normal => app.progress.record(&outcome.level_id, outcome.stars),
+                    mode => app.progress.record_mode(
+                        &outcome.level_id,
+                        mode,
+                        outcome.is_perfect,
+                        outcome.score,
+                    ),
+                };
             }
 
             // La maîtrise de chaque signe est mise à jour même sans record :
