@@ -1,15 +1,15 @@
 ---
 id: "sparer-les-signes-appris-2026-08-05"
-status: "todo"
+status: "in-progress"
 priority: "high"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-04T23:06:53.969Z"
-modified: "2026-08-04T23:06:53.969Z"
+modified: "2026-08-05T01:21:48.669Z"
 completedAt: null
 labels: []
-order: "a8"
+order: "a0"
 ---
 # Séparer les signes appris
 

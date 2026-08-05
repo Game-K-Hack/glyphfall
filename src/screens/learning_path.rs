@@ -10,9 +10,10 @@ use macroquad::prelude::*;
 use crate::app::{App, Screen, Transition};
 use crate::data::{Language, Level};
 use crate::gfx::palette::role;
-use crate::gfx::ui;
+use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 use crate::progress::{MAX_STARS, Progress};
+use crate::session::Session;
 
 const VIEWPORT_TOP: f32 = 24.0;
 const VIEWPORT_BOTTOM: f32 = 192.0;
@@ -183,7 +184,21 @@ pub fn learning_path_screen(
 
     draw_header(&app.fonts, language, &app.progress);
     draw_scrollbar(view.scroll, limit);
-    draw_footer(&app.fonts, language, selected, &app.progress);
+
+    // La révision libre demande d'avoir déjà croisé des signes : proposer de
+    // revoir un alphabet auquel on n'a jamais touché n'aurait aucun sens.
+    let can_revise = !app.progress.learned_signs(language_id).is_empty();
+    if can_revise {
+        let revise = Rect::new(canvas::WIDTH - 16.0 - 82.0, 194.0, 82.0, 16.0);
+        if ui::button(&app.fonts, mouse, Button::new(revise, "REVISION").accent(role::SUCCESS)) {
+            if let Some(session) = Session::revision(&app.catalog, &app.progress, language_id) {
+                app.sfx.confirm();
+                return Transition::Push(Screen::Playing(Box::new(session)));
+            }
+        }
+    }
+
+    draw_footer(&app.fonts, language, selected, &app.progress, can_revise);
 
     if is_key_pressed(KeyCode::Enter) {
         let level = &language.levels[selected];
@@ -338,16 +353,25 @@ fn draw_row(
     }
 }
 
-fn draw_footer(fonts_set: &Fonts, language: &Language, selected: usize, progress: &Progress) {
+fn draw_footer(
+    fonts_set: &Fonts,
+    language: &Language,
+    selected: usize,
+    progress: &Progress,
+    crowded: bool,
+) {
     let level = &language.levels[selected];
 
-    let hint = if progress.is_unlocked(level) {
-        "ENTREE JOUER   ECHAP RETOUR"
-    } else {
-        "TERMINE LES ETAPES PRECEDENTES"
+    let hint = match (progress.is_unlocked(level), crowded) {
+        // Le bouton de révision occupe la droite : le rappel raccourcit pour ne
+        // pas passer dessous.
+        (true, true) => "ENTREE JOUER",
+        (true, false) => "ENTREE JOUER   ECHAP RETOUR",
+        (false, _) => "TERMINE LES ETAPES PRECEDENTES",
     };
 
-    ui::text_centered(fonts_set, hint, canvas::WIDTH / 2.0, 200.0, fonts::TEXT, role::TEXT_DISABLED);
+    let center = if crowded { 150.0 } else { canvas::WIDTH / 2.0 };
+    ui::text_centered(fonts_set, hint, center, 198.0, fonts::TEXT, role::TEXT_DISABLED);
 }
 
 #[cfg(test)]

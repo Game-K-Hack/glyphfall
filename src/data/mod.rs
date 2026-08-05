@@ -9,4 +9,4 @@ pub mod model;
 
 pub use catalog::Catalog;
 pub use loader::{font_bytes, load_catalog};
-pub use model::{GameMode, Glyph, Language, Level, Rules, Stars};
+pub use model::{GameMode, Glyph, Language, Level, Rules, Speed, Stars};

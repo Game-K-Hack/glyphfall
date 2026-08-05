@@ -89,7 +89,7 @@ fn draw_card(app: &App, language: &Language, glyph: &Glyph) {
 
     // Un rappel de ce que le jeu sait du joueur sur ce signe précis : c'est ce
     // qui distingue une fiche d'un simple dictionnaire.
-    let (label, color) = match app.progress.mastery(&glyph.char) {
+    let (label, color) = match app.progress.mastery(&language.id, &glyph.char) {
         score if score < 0 => ("A CONSOLIDER", role::SHAKY),
         0 => ("PAS ENCORE VU", role::TEXT_DISABLED),
         score if score >= 3 => ("ACQUIS", role::SUCCESS),

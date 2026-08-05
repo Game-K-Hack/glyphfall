@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::{Language, Level};
+use crate::data::{Catalog, Language, Level};
 use crate::storage;
 
 /// Étoiles maximales pour un niveau.
@@ -44,13 +44,25 @@ pub struct Progress {
     /// écriture à l'autre et lisible à l'oeil.
     #[serde(default)]
     best: BTreeMap<String, u8>,
-    /// Maîtrise de chaque signe, entre `WEAKEST` et `STRONGEST`.
+    /// Maîtrise de chaque signe, entre `WEAKEST` et `STRONGEST`, rangée par
+    /// alphabet puis par signe.
     ///
-    /// Indexée par le signe lui-même et non par niveau : un signe appris à
-    /// l'étape 2 et revu à l'étape 9 est le même signe, et c'est bien sa
-    /// solidité que l'on veut suivre.
+    /// Rangée par alphabet parce qu'un signe n'existe pas en dehors du sien :
+    /// mélanger le coréen et le japonais dans une même table rendait impossible
+    /// de dire ce qui a été appris d'une écriture donnée.
+    ///
+    /// Dans un alphabet, l'index reste le signe et non le niveau : un signe
+    /// appris à l'étape 2 et revu à l'étape 9 est le même signe.
     #[serde(default)]
-    mastery: BTreeMap<String, i8>,
+    signs: BTreeMap<String, BTreeMap<String, i8>>,
+
+    /// L'ancienne table, toutes écritures confondues.
+    ///
+    /// Conservée le temps de la relire une fois, puis vidée. Sans elle, la
+    /// sauvegarde d'une version précédente serait refusée en bloc et le joueur
+    /// perdrait aussi ses étoiles.
+    #[serde(default, rename = "mastery", skip_serializing_if = "BTreeMap::is_empty")]
+    legacy_mastery: BTreeMap<String, i8>,
 }
 
 impl Progress {
@@ -105,33 +117,83 @@ impl Progress {
     }
 
     /// La solidité d'un signe. Zéro pour un signe jamais rencontré.
-    pub fn mastery(&self, character: &str) -> i8 {
-        self.mastery.get(character).copied().unwrap_or(0)
+    pub fn mastery(&self, language_id: &str, character: &str) -> i8 {
+        self.signs
+            .get(language_id)
+            .and_then(|signs| signs.get(character))
+            .copied()
+            .unwrap_or(0)
     }
 
     /// Ce signe est-il encore fragile ?
-    pub fn is_shaky(&self, character: &str) -> bool {
-        self.mastery(character) < 0
+    pub fn is_shaky(&self, language_id: &str, character: &str) -> bool {
+        self.mastery(language_id, character) < 0
     }
 
     /// Poids de tirage d'un signe : plus il est mal su, plus il revient.
     ///
     /// C'est le coeur de la révision. Tirer uniformément ferait revenir aussi
     /// souvent un signe acquis depuis dix étapes qu'un signe raté hier.
-    pub fn draw_weight(&self, character: &str) -> u32 {
-        (STRONGEST - self.mastery(character) + 1) as u32
+    pub fn draw_weight(&self, language_id: &str, character: &str) -> u32 {
+        (STRONGEST - self.mastery(language_id, character) + 1) as u32
     }
 
     /// Enregistre le bilan d'un signe sur une manche.
-    pub fn note(&mut self, character: &str, hits: u32, misses: u32) {
+    pub fn note(&mut self, language_id: &str, character: &str, hits: u32, misses: u32) {
         let delta = hits as i32 * HIT_GAIN as i32 - misses as i32 * MISS_COST as i32;
         if delta == 0 {
             return;
         }
 
-        let updated =
-            (self.mastery(character) as i32 + delta).clamp(WEAKEST as i32, STRONGEST as i32) as i8;
-        self.mastery.insert(character.to_string(), updated);
+        let updated = (self.mastery(language_id, character) as i32 + delta)
+            .clamp(WEAKEST as i32, STRONGEST as i32) as i8;
+
+        self.signs
+            .entry(language_id.to_string())
+            .or_default()
+            .insert(character.to_string(), updated);
+    }
+
+    /// Les signes déjà rencontrés dans cet alphabet.
+    ///
+    /// Un signe entre dans cette liste dès sa première apparition, réussie ou
+    /// non : c'est ce qui a été *vu*, et donc ce qu'il y a à réviser.
+    pub fn learned_signs(&self, language_id: &str) -> Vec<&str> {
+        self.signs
+            .get(language_id)
+            .map(|signs| signs.keys().map(String::as_str).collect())
+            .unwrap_or_default()
+    }
+
+    /// Reprend l'ancienne table à plat et range chaque signe sous son alphabet.
+    ///
+    /// Le catalogue est nécessaire : rien dans l'ancienne sauvegarde ne dit à
+    /// quelle écriture appartient un signe. Renvoie `true` si quelque chose a
+    /// été déplacé, auquel cas il faut réécrire le fichier.
+    pub fn migrate(&mut self, catalog: &Catalog) -> bool {
+        if self.legacy_mastery.is_empty() {
+            return false;
+        }
+
+        for (character, score) in std::mem::take(&mut self.legacy_mastery) {
+            let owner = catalog.languages.iter().find(|language| {
+                language
+                    .levels
+                    .iter()
+                    .any(|level| level.glyphs.iter().any(|glyph| glyph.char == character))
+            });
+
+            // Un signe qui n'appartient plus à aucune écriture est abandonné :
+            // le garder sans savoir où le ranger ne servirait à personne.
+            if let Some(language) = owner {
+                self.signs
+                    .entry(language.id.clone())
+                    .or_default()
+                    .insert(character, score);
+            }
+        }
+
+        true
     }
 
     /// Le niveau est-il jouable ? Il l'est quand tous ses prérequis sont faits.
@@ -242,15 +304,15 @@ mod tests {
         let mut progress = Progress::new();
 
         // Trois reussites d'affilee sur le premier, un rate sur le second.
-        progress.note("\u{3131}", 3, 0);
-        progress.note("\u{3134}", 0, 1);
+        progress.note("ko", "\u{3131}", 3, 0);
+        progress.note("ko", "\u{3134}", 0, 1);
 
         assert!(
-            progress.draw_weight("\u{3134}") > progress.draw_weight("\u{3131}"),
+            progress.draw_weight("ko", "\u{3134}") > progress.draw_weight("ko", "\u{3131}"),
             "le signe rate doit peser plus lourd dans le tirage"
         );
-        assert!(progress.is_shaky("\u{3134}"));
-        assert!(!progress.is_shaky("\u{3131}"));
+        assert!(progress.is_shaky("ko", "\u{3134}"));
+        assert!(!progress.is_shaky("ko", "\u{3131}"));
     }
 
     #[test]
@@ -258,9 +320,9 @@ mod tests {
         // Une manche a deux tiers de reussite ne doit pas consolider un signe.
         let mut progress = Progress::new();
 
-        progress.note("\u{3131}", 2, 1);
+        progress.note("ko", "\u{3131}", 2, 1);
 
-        assert_eq!(progress.mastery("\u{3131}"), 0, "deux bonnes et une ratee s'annulent");
+        assert_eq!(progress.mastery("ko", "\u{3131}"), 0, "deux bonnes et une ratee s'annulent");
     }
 
     #[test]
@@ -269,33 +331,33 @@ mod tests {
         // faire ressortir en revision.
         let mut progress = Progress::new();
 
-        progress.note("\u{3131}", 100, 0);
-        assert_eq!(progress.mastery("\u{3131}"), STRONGEST);
-        assert_eq!(progress.draw_weight("\u{3131}"), 1, "un signe acquis garde une chance");
+        progress.note("ko", "\u{3131}", 100, 0);
+        assert_eq!(progress.mastery("ko", "\u{3131}"), STRONGEST);
+        assert_eq!(progress.draw_weight("ko", "\u{3131}"), 1, "un signe acquis garde une chance");
 
-        progress.note("\u{3134}", 0, 100);
-        assert_eq!(progress.mastery("\u{3134}"), WEAKEST);
+        progress.note("ko", "\u{3134}", 0, 100);
+        assert_eq!(progress.mastery("ko", "\u{3134}"), WEAKEST);
     }
 
     #[test]
     fn an_unseen_sign_sits_in_the_middle() {
         let progress = Progress::new();
 
-        assert_eq!(progress.mastery("\u{3131}"), 0);
-        assert!(!progress.is_shaky("\u{3131}"), "jamais vu n'est pas fragile, juste inconnu");
+        assert_eq!(progress.mastery("ko", "\u{3131}"), 0);
+        assert!(!progress.is_shaky("ko", "\u{3131}"), "jamais vu n'est pas fragile, juste inconnu");
     }
 
     #[test]
     fn mastery_survives_a_round_trip() {
         let mut progress = Progress::new();
-        progress.note("\u{3131}", 4, 0);
-        progress.note("\u{3134}", 0, 2);
+        progress.note("ko", "\u{3131}", 4, 0);
+        progress.note("ko", "\u{3134}", 0, 2);
 
         let written = toml::to_string(&progress).expect("progression serialisable");
         let read: Progress = toml::from_str(&written).expect("progression relisible");
 
-        assert_eq!(read.mastery("\u{3131}"), 4);
-        assert_eq!(read.mastery("\u{3134}"), -4);
+        assert_eq!(read.mastery("ko", "\u{3131}"), 4);
+        assert_eq!(read.mastery("ko", "\u{3134}"), -4);
     }
 
     #[test]

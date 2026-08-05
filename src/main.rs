@@ -57,8 +57,16 @@ async fn main() {
     let sfx = Sfx::load(settings.sfx_gain()).await;
     let music = Music::load(settings.music_gain(), settings.music_game_gain());
 
+    // L'ancienne sauvegarde rangeait tous les signes dans une même table, sans
+    // distinguer les écritures. Les répartir demande le catalogue, d'où cette
+    // reprise après chargement plutôt qu'à l'intérieur de `Progress::load`.
+    let mut progress = Progress::load();
+    if progress.migrate(&catalog) {
+        progress.save();
+    }
+
     let mut app =
-        App { catalog, fonts, sfx, music, progress: Progress::load(), settings, daily: Daily::load() };
+        App { catalog, fonts, sfx, music, progress, settings, daily: Daily::load() };
 
     // Génère la musique d'ambiance puis quitte, sans ouvrir de fenêtre de jeu.
     #[cfg(not(target_arch = "wasm32"))]
@@ -156,12 +164,16 @@ async fn main() {
         // La progression s'enregistre au moment de la transition, et non a
         // chaque frame de l'ecran de resultats qui reste affiche longtemps.
         if let Transition::Replace(Screen::Results { outcome, .. }) = &mut transition {
-            outcome.is_record = app.progress.record(&outcome.level_id, outcome.stars);
+            // Une révision libre ne correspond à aucune étape : elle ne peut donc
+            // ni décrocher d'étoiles ni en faire perdre.
+            if !outcome.is_revision {
+                outcome.is_record = app.progress.record(&outcome.level_id, outcome.stars);
+            }
 
             // La maîtrise de chaque signe est mise à jour même sans record :
             // c'est elle qui pilotera le tirage des prochaines révisions.
             for sign in &outcome.signs {
-                app.progress.note(&sign.character, sign.hits, sign.misses);
+                app.progress.note(&outcome.language_id, &sign.character, sign.hits, sign.misses);
             }
             app.progress.save();
         }

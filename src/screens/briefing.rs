@@ -136,7 +136,7 @@ fn draw_glyphs<'a>(
         // Les signes déjà ratés par le passé ressortent : le briefing dit ainsi
         // quoi travailler, au lieu de présenter une liste uniforme où les
         // faiblesses se noient.
-        let color = match (is_hovered, app.progress.is_shaky(&glyph.char)) {
+        let color = match (is_hovered, app.progress.is_shaky(&language.id, &glyph.char)) {
             (true, _) => role::ACCENT,
             (false, true) => role::SHAKY,
             (false, false) => role::TEXT_MUTED,

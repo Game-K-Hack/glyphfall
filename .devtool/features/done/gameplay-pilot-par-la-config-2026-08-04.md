@@ -6,9 +6,9 @@ assignee: null
 epic: null
 dueDate: null
 created: "2026-08-04T00:15:58.967Z"
-modified: "2026-08-04T00:26:22.880Z"
-completedAt: "2026-08-04T00:26:22.880Z"
+modified: "2026-08-05T01:45:34.746Z"
+completedAt: "2026-08-05T01:45:34.746Z"
 labels: []
-order: "a8"
+order: "Zq"
 ---
 # Gameplay piloté par la config

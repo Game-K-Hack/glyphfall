@@ -58,7 +58,13 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
         || is_key_pressed(KeyCode::Enter);
 
     if ready && restart {
-        return match Session::new(&app.catalog, &app.progress, &outcome.language_id, &outcome.level_id) {
+        let again = if outcome.is_revision {
+            Session::revision(&app.catalog, &app.progress, &outcome.language_id)
+        } else {
+            Session::new(&app.catalog, &app.progress, &outcome.language_id, &outcome.level_id)
+        };
+
+        return match again {
             Some(session) => Transition::Replace(Screen::Playing(Box::new(session))),
             // Le niveau a disparu du catalogue : on ne peut que remonter.
             None => Transition::Pop,
@@ -77,6 +83,17 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
 }
 
 fn draw_verdict(fonts_set: &Fonts, outcome: &Outcome) {
+    if outcome.is_revision {
+        ui::text_centered(
+            fonts_set,
+            "REVISION",
+            canvas::WIDTH / 2.0,
+            32.0,
+            fonts::TEXT,
+            role::TEXT_MUTED,
+        );
+    }
+
     let (verdict, color) = match (outcome.stars, outcome.reason) {
         (0, EndReason::OutOfLives) => ("PLUS DE VIES", role::DANGER),
         (0, EndReason::TimeUp) => ("TEMPS ECOULE", role::DANGER),

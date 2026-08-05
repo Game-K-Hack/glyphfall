@@ -9,7 +9,7 @@ use macroquad::prelude::*;
 
 use std::collections::{BTreeMap, HashSet, VecDeque};
 
-use crate::data::{Catalog, GameMode, Glyph, Language, Level, Rules, Stars};
+use crate::data::{Catalog, GameMode, Glyph, Language, Level, Rules, Speed, Stars};
 use crate::progress::Progress;
 
 /// Hauteur d'une tuile, en pixels virtuels.
@@ -102,7 +102,24 @@ pub struct Session {
     events: Vec<Event>,
     /// Secondes de tremblement restantes.
     shake: f32,
+    /// Révision libre plutôt qu'étape du chemin.
+    is_revision: bool,
 }
+
+/// Les règles d'une révision libre.
+///
+/// Ni découverte ni examen : un rythme soutenu mais pas punitif, sur une durée
+/// qui laisse passer une bonne trentaine de signes.
+const REVISION_RULES: Rules = Rules {
+    lives: 3,
+    duration: 90.0,
+    columns: 4,
+    spawn_interval: 1.5,
+    speed: Speed { start: 55.0, ramp: 1.2, max: 170.0 },
+    review_ratio: 0.0,
+};
+
+const REVISION_STARS: Stars = Stars { one: 0.5, two: 0.75, three: 0.9 };
 
 /// Un fait de jeu, remonte a l'ecran le temps d'une frame.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -131,6 +148,9 @@ pub struct Outcome {
     pub reason: EndReason,
     /// Renseigne par la boucle principale : ce resultat bat-il le precedent ?
     pub is_record: bool,
+    /// Une révision libre ne correspond à aucune étape du chemin : elle ne
+    /// rapporte donc pas d'étoiles, seulement de la maîtrise.
+    pub is_revision: bool,
     /// Les glyphes ratés, sans doublon, pour la correction de fin.
     pub missed_glyphs: Vec<String>,
     /// Ce que chaque signe a donné, pour mettre la maîtrise à jour.
@@ -146,6 +166,70 @@ pub struct SignResult {
 }
 
 impl Session {
+    /// Prépare une révision libre de tout ce qui a été appris dans un alphabet.
+    ///
+    /// `None` s'il n'y a rien à réviser — un alphabet auquel on n'a jamais
+    /// touché n'a aucun signe à revoir.
+    pub fn revision(catalog: &Catalog, progress: &Progress, language_id: &str) -> Option<Self> {
+        let language = catalog.language(language_id)?;
+
+        // On ne révise que ce que l'on a déjà croisé, pas tout l'alphabet :
+        // réviser des signes jamais vus serait un examen, pas une révision.
+        let learned = progress.learned_signs(language_id);
+        let glyphs: Vec<Glyph> = language
+            .levels
+            .iter()
+            .flat_map(|level| level.glyphs.iter())
+            .filter(|glyph| learned.contains(&glyph.char.as_str()))
+            .fold(Vec::new(), |mut unique, glyph| {
+                // Un signe repris par une étape de révision apparaît plusieurs
+                // fois dans le chemin ; il ne doit compter qu'une.
+                if !unique.iter().any(|kept: &Glyph| kept.char == glyph.char) {
+                    unique.push(glyph.clone());
+                }
+                unique
+            });
+
+        if glyphs.is_empty() {
+            return None;
+        }
+
+        let weights = glyphs
+            .iter()
+            .map(|glyph| (glyph.char.clone(), progress.draw_weight(language_id, &glyph.char)))
+            .collect();
+
+        Some(Self {
+            language_id: language_id.to_string(),
+            level_id: String::new(),
+            level_title: "Revision libre".to_string(),
+            rules: REVISION_RULES,
+            stars: REVISION_STARS,
+            // Pas de mise en bouche : aucun de ces signes n'est nouveau.
+            warmup: VecDeque::new(),
+            glyphs,
+            review: Vec::new(),
+            retry: VecDeque::new(),
+            weights,
+            tally: BTreeMap::new(),
+            tiles: Vec::new(),
+            score: 0,
+            lives: REVISION_RULES.lives,
+            input: String::new(),
+            time_left: REVISION_RULES.duration,
+            spawn_timer: 0.0,
+            spawned: 0,
+            since_retry: 0,
+            hits: 0,
+            missed: 0,
+            wrong: 0,
+            missed_glyphs: Vec::new(),
+            events: Vec::new(),
+            shake: 0.0,
+            is_revision: true,
+        })
+    }
+
     /// Prépare une manche. `None` si le niveau n'existe pas dans le catalogue.
     pub fn new(
         catalog: &Catalog,
@@ -170,7 +254,7 @@ impl Session {
             .glyphs
             .iter()
             .chain(review.iter())
-            .map(|glyph| (glyph.char.clone(), progress.draw_weight(&glyph.char)))
+            .map(|glyph| (glyph.char.clone(), progress.draw_weight(language_id, &glyph.char)))
             .collect();
 
         // Chaque signe neuf passe une première fois, dans l'ordre du fichier.
@@ -204,6 +288,7 @@ impl Session {
             missed_glyphs: Vec::new(),
             events: Vec::new(),
             shake: 0.0,
+            is_revision: false,
         })
     }
 
@@ -409,6 +494,7 @@ impl Session {
             stars: self.stars.rate(accuracy),
             reason,
             is_record: false,
+            is_revision: self.is_revision,
             missed_glyphs: self.missed_glyphs.clone(),
             signs: self
                 .tally
@@ -771,8 +857,8 @@ mod tests {
         // La ponderation vient de la progression : sans elle, une revision
         // passerait le plus clair de son temps sur ce qui est deja su.
         let mut progress = Progress::new();
-        progress.note("ㄱ", 0, 4); // fragile
-        progress.note("ㄴ", 4, 0); // solide
+        progress.note("ko", "ㄱ", 0, 4); // fragile
+        progress.note("ko", "ㄴ", 4, 0); // solide
 
         let catalog = catalog(vec![level(
             "ko-01",
@@ -790,6 +876,54 @@ mod tests {
         }
 
         assert!(shaky > 240, "le signe fragile devrait dominer, obtenu {shaky}/400");
+    }
+
+    #[test]
+    fn a_revision_only_holds_signs_already_met() {
+        // Reviser des signes jamais vus serait un examen, pas une revision.
+        let levels = vec![
+            level("ko-01", &[], vec![glyph("ㄱ", "g"), glyph("ㄴ", "n")]),
+            level("ko-02", &["ko-01"], vec![glyph("ㄷ", "d")]),
+        ];
+        let catalog = catalog(levels);
+
+        let mut progress = Progress::new();
+        progress.note("ko", "ㄱ", 1, 0);
+        progress.note("ko", "ㄴ", 0, 1);
+
+        let session = Session::revision(&catalog, &progress, "ko").expect("de quoi reviser");
+
+        let mut signs: Vec<&str> = session.glyphs.iter().map(|g| g.char.as_str()).collect();
+        signs.sort_unstable();
+        assert_eq!(signs, vec!["ㄱ", "ㄴ"], "le signe jamais croise reste dehors");
+        assert!(session.is_revision);
+        assert!(session.warmup.is_empty(), "aucun de ces signes n'est nouveau");
+    }
+
+    #[test]
+    fn an_untouched_alphabet_has_nothing_to_revise() {
+        let catalog = catalog(vec![level("ko-01", &[], vec![glyph("ㄱ", "g")])]);
+
+        assert!(Session::revision(&catalog, &Progress::new(), "ko").is_none());
+    }
+
+    #[test]
+    fn a_revision_earns_no_star_but_still_teaches() {
+        // Elle ne correspond a aucune etape du chemin : lui faire rapporter des
+        // etoiles reviendrait a debloquer des niveaux sans les avoir joues.
+        let catalog = catalog(vec![level("ko-01", &[], vec![glyph("ㄱ", "g")])]);
+        let mut progress = Progress::new();
+        progress.note("ko", "ㄱ", 1, 0);
+
+        let mut session = Session::revision(&catalog, &progress, "ko").expect("de quoi reviser");
+        falling_tile(&mut session, "ㄱ", "g", 10.0);
+        session.input = "g".into();
+        session.validate();
+
+        let outcome = session.outcome(EndReason::TimeUp);
+
+        assert!(outcome.is_revision);
+        assert_eq!(outcome.signs.len(), 1, "la maitrise est bien mise a jour");
     }
 
     #[test]

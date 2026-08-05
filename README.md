@@ -163,6 +163,14 @@ le tirage des tuiles n'est pas uniforme :
 - **Le tirage favorise ce qui est mal su.** Chaque signe porte une note de
   maîtrise, gardée d'une partie à l'autre : une réussite la monte d'un point,
   une erreur la descend de deux. Plus elle est basse, plus le signe revient.
+  Ces notes sont rangées **par alphabet** : un signe n'existe pas en dehors du
+  sien, et les mélanger empêcherait de dire ce qui a été appris d'une écriture
+  donnée.
+
+Le chemin d'apprentissage offre enfin un bouton **révision**, qui rejoue tous
+les signes déjà croisés dans l'alphabet, du plus fragile au mieux su. Elle ne
+rapporte pas d'étoiles — elle ne correspond à aucune étape — mais elle nourrit
+la maîtrise comme n'importe quelle manche.
 
 Cette asymétrie entre réussite et erreur est volontaire : sans elle, un signe
 raté une fois sur trois finirait par passer pour acquis.
