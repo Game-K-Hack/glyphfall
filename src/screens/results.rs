@@ -62,8 +62,9 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
         || is_key_pressed(KeyCode::Enter);
 
     if ready && restart {
+        let tracings = app.tracings(&outcome.language_id);
         let again = if outcome.is_revision {
-            Session::revision(&app.catalog, &app.progress, &outcome.language_id)
+            Session::revision(&app.catalog, &app.progress, &outcome.language_id, tracings)
         } else {
             Session::new(
                 &app.catalog,
@@ -71,6 +72,7 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
                 &outcome.language_id,
                 &outcome.level_id,
                 outcome.mode,
+                tracings,
             )
         };
 

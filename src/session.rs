@@ -49,6 +49,11 @@ pub struct Tile {
     pub glyph: Glyph,
     /// Décompte du flash de validation ; `None` tant que la tuile tombe.
     pub cleared: Option<f32>,
+    /// Le tracé dans lequel ce signe est dessiné.
+    ///
+    /// Choisi à l'apparition et non au rendu : une tuile qui changerait de
+    /// police d'une frame à l'autre serait illisible.
+    pub font: usize,
 }
 
 impl Tile {
@@ -107,6 +112,8 @@ pub struct Session {
     /// Révision libre plutôt qu'étape du chemin.
     is_revision: bool,
     pub mode: Mode,
+    /// Nombre de tracés à faire tourner. `1` quand le joueur n'en veut qu'un.
+    tracings: usize,
 }
 
 /// Comment un niveau se joue.
@@ -254,7 +261,12 @@ impl Session {
     ///
     /// `None` s'il n'y a rien à réviser — un alphabet auquel on n'a jamais
     /// touché n'a aucun signe à revoir.
-    pub fn revision(catalog: &Catalog, progress: &Progress, language_id: &str) -> Option<Self> {
+    pub fn revision(
+        catalog: &Catalog,
+        progress: &Progress,
+        language_id: &str,
+        tracings: usize,
+    ) -> Option<Self> {
         let language = catalog.language(language_id)?;
 
         // On ne révise que ce que l'on a déjà croisé, pas tout l'alphabet :
@@ -312,6 +324,7 @@ impl Session {
             shake: 0.0,
             is_revision: true,
             mode: Mode::Normal,
+            tracings: tracings.max(1),
         })
     }
 
@@ -322,6 +335,7 @@ impl Session {
         language_id: &str,
         level_id: &str,
         mode: Mode,
+        tracings: usize,
     ) -> Option<Self> {
         let language = catalog.language(language_id)?;
         let level = language.level(level_id)?;
@@ -376,6 +390,7 @@ impl Session {
             shake: 0.0,
             is_revision: false,
             mode,
+            tracings: tracings.max(1),
         })
     }
 
@@ -495,8 +510,9 @@ impl Session {
 
         let glyph = self.pick_glyph();
         let column = rand::gen_range(0, self.rules.columns);
+        let font = rand::gen_range(0, self.tracings);
 
-        self.tiles.push(Tile { column, y: -TILE_HEIGHT, glyph, cleared: None });
+        self.tiles.push(Tile { column, y: -TILE_HEIGHT, glyph, cleared: None, font });
         self.spawned += 1;
         self.since_retry += 1;
     }
@@ -709,11 +725,18 @@ mod tests {
 
     fn session(levels: Vec<Level>, level_id: &str) -> Session {
         let catalog = catalog(levels);
-        Session::new(&catalog, &Progress::new(), "ko", level_id, Mode::Normal).expect("niveau présent")
+        Session::new(&catalog, &Progress::new(), "ko", level_id, Mode::Normal, 1)
+            .expect("niveau présent")
     }
 
     fn falling_tile(session: &mut Session, character: &str, answer: &str, y: f32) {
-        session.tiles.push(Tile { column: 0, y, glyph: glyph(character, answer), cleared: None });
+        session.tiles.push(Tile {
+            column: 0,
+            y,
+            glyph: glyph(character, answer),
+            cleared: None,
+            font: 0,
+        });
     }
 
     #[test]
@@ -957,7 +980,7 @@ mod tests {
             vec![glyph("ㄱ", "g"), glyph("ㄴ", "n")],
         )]);
         let mut session =
-            Session::new(&catalog, &progress, "ko", "ko-01", Mode::Normal).expect("niveau");
+            Session::new(&catalog, &progress, "ko", "ko-01", Mode::Normal, 1).expect("niveau");
         session.warmup.clear();
 
         let mut shaky = 0;
@@ -983,7 +1006,7 @@ mod tests {
         progress.note("ko", "ㄱ", 1, 0);
         progress.note("ko", "ㄴ", 0, 1);
 
-        let session = Session::revision(&catalog, &progress, "ko").expect("de quoi reviser");
+        let session = Session::revision(&catalog, &progress, "ko", 1).expect("de quoi reviser");
 
         let mut signs: Vec<&str> = session.glyphs.iter().map(|g| g.char.as_str()).collect();
         signs.sort_unstable();
@@ -996,7 +1019,7 @@ mod tests {
     fn an_untouched_alphabet_has_nothing_to_revise() {
         let catalog = catalog(vec![level("ko-01", &[], vec![glyph("ㄱ", "g")])]);
 
-        assert!(Session::revision(&catalog, &Progress::new(), "ko").is_none());
+        assert!(Session::revision(&catalog, &Progress::new(), "ko", 1).is_none());
     }
 
     #[test]
@@ -1007,7 +1030,7 @@ mod tests {
         let mut progress = Progress::new();
         progress.note("ko", "ㄱ", 1, 0);
 
-        let mut session = Session::revision(&catalog, &progress, "ko").expect("de quoi reviser");
+        let mut session = Session::revision(&catalog, &progress, "ko", 1).expect("de quoi reviser");
         falling_tile(&mut session, "ㄱ", "g", 10.0);
         session.input = "g".into();
         session.validate();
@@ -1079,6 +1102,36 @@ mod tests {
         let session = session(vec![level("ko-01", &[], vec![glyph("\u{3131}", "g")])], "ko-01");
 
         assert!(!session.outcome(EndReason::TimeUp).is_perfect, "rester immobile n'est pas parfait");
+    }
+
+    #[test]
+    fn a_single_tracing_always_draws_the_same_one() {
+        // Reglage refuse : toutes les tuiles doivent porter le trace de
+        // reference, faute de quoi le refus ne servirait a rien.
+        let mut session = session(vec![level("ko-01", &[], vec![glyph("\u{3131}", "g")])], "ko-01");
+
+        for _ in 0..20 {
+            session.spawn(session.rules.spawn_interval + 0.1);
+        }
+
+        assert!(session.tiles.iter().all(|tile| tile.font == 0));
+    }
+
+    #[test]
+    fn several_tracings_get_mixed() {
+        // Sur vingt tuiles, tirer deux traces et n'en voir qu'un seul serait
+        // moins probable qu'une chance sur cinq cent mille.
+        let catalog = catalog(vec![level("ko-01", &[], vec![glyph("\u{3131}", "g")])]);
+        let mut session =
+            Session::new(&catalog, &Progress::new(), "ko", "ko-01", Mode::Normal, 2)
+                .expect("niveau");
+
+        for _ in 0..20 {
+            session.spawn(session.rules.spawn_interval + 0.1);
+        }
+
+        assert!(session.tiles.iter().any(|tile| tile.font == 0));
+        assert!(session.tiles.iter().any(|tile| tile.font == 1));
     }
 
     #[test]

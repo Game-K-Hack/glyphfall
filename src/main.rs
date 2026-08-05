@@ -113,7 +113,8 @@ async fn main() {
                 index: 0,
             }),
             Some(("play", target)) => target.split_once('/').and_then(|(language, level)| {
-                Session::new(&app.catalog, &app.progress, language, level, Mode::Normal)
+                let tracings = app.tracings(language);
+                Session::new(&app.catalog, &app.progress, language, level, Mode::Normal, tracings)
                     .map(|session| Screen::Playing(Box::new(session)))
             }),
             _ => match start.as_str() {

@@ -92,7 +92,14 @@ pub fn briefing_screen(
 
     if unlocked && (pressed || is_key_pressed(KeyCode::Enter)) {
         if let Some(session) =
-            Session::new(&app.catalog, &app.progress, language_id, level_id, *mode)
+            Session::new(
+                &app.catalog,
+                &app.progress,
+                language_id,
+                level_id,
+                *mode,
+                app.tracings(language_id),
+            )
         {
             app.sfx.confirm();
             return Transition::Push(Screen::Playing(Box::new(session)));

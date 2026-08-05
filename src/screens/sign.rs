@@ -87,6 +87,8 @@ fn draw_card(app: &App, language: &Language, glyph: &Glyph) {
         role::TEXT,
     );
 
+    draw_tracings(app, language, glyph);
+
     // Un rappel de ce que le jeu sait du joueur sur ce signe précis : c'est ce
     // qui distingue une fiche d'un simple dictionnaire.
     let (label, color) = match app.progress.mastery(&language.id, &glyph.char) {
@@ -102,6 +104,50 @@ fn draw_card(app: &App, language: &Language, glyph: &Glyph) {
         CARD.y + CARD.h + 6.0,
         fonts::TEXT,
         color,
+    );
+}
+
+/// Le même signe dans les autres tracés disponibles.
+///
+/// C'est ici que la fiche gagne son nom : reconnaître un signe dans une seule
+/// police, c'est reconnaître une image, pas un caractère. Les variantes sont
+/// montrées même quand le joueur a refusé de les voir tomber — il a le temps de
+/// les comparer, ce qui est justement ce que la manche ne permet pas.
+fn draw_tracings(app: &App, language: &Language, glyph: &Glyph) {
+    const SIZE: f32 = 26.0;
+    const GAP: f32 = 4.0;
+
+    let count = app.fonts.script_count(&language.id);
+    if count < 2 {
+        return;
+    }
+
+    // Le tracé de référence figure dans la rangée avec les autres : une case
+    // isolée sous le grand signe ne dirait pas ce qu'elle montre, alors qu'une
+    // rangée du même signe se lit d'elle-même comme une comparaison.
+    let y = CARD.y + CARD.h + 16.0;
+    let total = SIZE * count as f32 + GAP * (count - 1) as f32;
+    let start_x = (CARD.x + (CARD.w - total) / 2.0).floor();
+
+    for variant in 0..count {
+        let cell = Rect::new(start_x + variant as f32 * (SIZE + GAP), y, SIZE, SIZE);
+        ui::fill(cell, role::PANEL);
+        ui::glyph_fitted(
+            app.fonts.script_variant(&language.id, variant),
+            &glyph.char,
+            cell,
+            20,
+            role::TEXT_MUTED,
+        );
+    }
+
+    ui::text_centered(
+        &app.fonts,
+        "AUTRES TRACES",
+        CARD.x + CARD.w / 2.0,
+        y + SIZE + 4.0,
+        fonts::TEXT,
+        role::TEXT_DISABLED,
     );
 }
 

@@ -191,7 +191,10 @@ pub fn learning_path_screen(
     if can_revise {
         let revise = Rect::new(canvas::WIDTH - 16.0 - 82.0, 194.0, 82.0, 16.0);
         if ui::button(&app.fonts, mouse, Button::new(revise, "REVISION").accent(role::SUCCESS)) {
-            if let Some(session) = Session::revision(&app.catalog, &app.progress, language_id) {
+            let tracings = app.tracings(language_id);
+            if let Some(session) =
+                Session::revision(&app.catalog, &app.progress, language_id, tracings)
+            {
                 app.sfx.confirm();
                 return Transition::Push(Screen::Playing(Box::new(session)));
             }

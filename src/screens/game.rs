@@ -55,7 +55,6 @@ fn draw(app: &App, session: &Session) {
     // qu'une tuile sur le point de mourir passe visiblement par-dessus.
     draw_rectangle(playfield_x, TARGET_Y, playfield_width, 1.0, role::DANGER);
 
-    let script = app.fonts.script(&session.language_id);
     for tile in &session.tiles {
         let rect = Rect::new(
             playfield_x + tile.column as f32 * tile_width + 1.0,
@@ -66,7 +65,13 @@ fn draw(app: &App, session: &Session) {
 
         let background = if tile.cleared.is_some() { role::SUCCESS } else { role::BORDER };
         ui::panel(rect, background);
-        ui::glyph_fitted(script, &tile.glyph.char, rect, GLYPH_SIZE, role::TEXT);
+        ui::glyph_fitted(
+            app.fonts.script_variant(&session.language_id, tile.font),
+            &tile.glyph.char,
+            rect,
+            GLYPH_SIZE,
+            role::TEXT,
+        );
     }
 
     draw_hud(&app.fonts, session);

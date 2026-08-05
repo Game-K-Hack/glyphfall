@@ -31,6 +31,21 @@ pub struct App {
     pub daily: Daily,
 }
 
+impl App {
+    /// Combien de tracés une manche doit faire tourner pour cette écriture.
+    ///
+    /// Un seul si le joueur n'en veut pas plusieurs, et un seul aussi quand
+    /// l'écriture n'en déclare qu'un : le réglage ne peut pas inventer des
+    /// polices qui n'existent pas.
+    pub fn tracings(&self, language_id: &str) -> usize {
+        if self.settings.varies_fonts() {
+            self.fonts.script_count(language_id)
+        } else {
+            1
+        }
+    }
+}
+
 pub enum Screen {
     Title,
     /// `selected` survit d'une frame à l'autre : c'est la carte mise en avant.
