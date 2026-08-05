@@ -17,7 +17,7 @@ sur Windows, macOS, Linux et dans un navigateur.
    les seuils à viser. Survolez un signe pour son aide mnémotechnique.
 4. **Fiche d'un signe** — en cliquant un signe du briefing : le caractère en
    grand, ses lectures, comment le retenir, et où vous en êtes avec lui.
-5. **La manche** — trois vies et un chronomètre.
+5. **La manche** — trois vies et un chronomètre, dans le mode choisi.
 6. **Résultats** — de zéro à trois étoiles, et surtout la liste des signes
    ratés avec la lecture qu'il fallait taper.
 
@@ -32,6 +32,30 @@ partie** : elle attend le retour aux menus, sinon elle coûterait des vies et
 passerait pour une punition. Tout cela se modifie ou se coupe dans les
 options.
 
+## Les quatre modes
+
+Chaque étape se rejoue de plus en plus vite. Un mode s'ouvre en maîtrisant le
+précédent — on ne saute pas de marche.
+
+| Mode | S'ouvre quand | Rapporte |
+|---|---|---|
+| Normal | toujours | 0 à 3 étoiles dorées, à la précision |
+| Rapide | le normal a ses 3 étoiles | une **étoile bleue**, au sans-faute |
+| Ultra | le rapide est sans faute | une **étoile violette**, au sans-faute |
+| Infini | l'ultra est sans faute | rien qu'un meilleur score |
+
+Un niveau vaut donc jusqu'à cinq étoiles. Les deux dernières ne s'obtiennent
+qu'**au sans-faute** : aucun signe manqué, aucune réponse fausse. Une manche
+presque parfaite reste une manche à refaire.
+
+Le mode infini n'a pas de chronomètre. Il démarre plus doucement que le normal
+mais son accélération n'a pas de plafond : c'est elle qui finit la partie.
+
+Les modes fermés restent affichés au briefing, et **se sélectionnent** pour
+qu'on puisse lire ce qu'ils demandent — seul le bouton START s'éteint. Une
+étoile pas encore gagnée est dessinée dans sa propre teinte, assombrie : une
+étoile bleue sombre annonce qu'il y a une étoile bleue à décrocher.
+
 ## Commandes
 
 | Touche | Effet |
@@ -40,7 +64,7 @@ options.
 | `Entrée` / `Espace` | Valider la saisie |
 | `Retour arrière` | Corriger |
 | `↑` `↓` | Naviguer dans les menus |
-| `←` `→` | Régler un volume, dans les options |
+| `←` `→` | Changer de mode, régler un volume |
 | `Échap` | Revenir en arrière |
 
 La souris fonctionne partout où le clavier fonctionne.
@@ -268,6 +292,7 @@ ALPHATILES_START=languages           cargo run
 ALPHATILES_START=options             cargo run
 ALPHATILES_START=path:ja-hiragana    cargo run
 ALPHATILES_START=briefing:ko/ko-01   cargo run
+ALPHATILES_START=briefing:ko/ko-04/ultra cargo run   # sur un mode donné
 ALPHATILES_START=play:ko/ko-03       cargo run
 
 # Capture une image après N frames puis quitte, pour vérifier un écran.
