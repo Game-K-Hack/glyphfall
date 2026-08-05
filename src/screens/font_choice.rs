@@ -2,7 +2,7 @@
 //!
 //! Elle n'est pas anodine : jouer avec un tracé unique est nettement plus
 //! facile, et beaucoup de joueurs préféreront commencer ainsi. L'écran montre
-//! donc le même signe dans les deux tracés plutôt que de le décrire — la
+//! donc le même signe dans tous ses tracés plutôt que de le décrire — la
 //! différence se voit en une seconde, elle s'explique mal en une phrase.
 
 use macroquad::prelude::*;
@@ -14,8 +14,8 @@ use crate::gfx::{canvas, fonts};
 
 /// Le signe montré en exemple, et l'écriture dont il vient.
 ///
-/// Le hangeul est le seul dont le sans et le serif diffèrent assez pour que la
-/// démonstration porte à cette taille.
+/// Le hangeul, parce que son tracé au stylo s'écarte le plus de l'imprimé :
+/// c'est l'exemple qui démontre le mieux ce que la question propose.
 const SAMPLE_LANGUAGE: &str = "ko";
 const SAMPLE_GLYPH: &str = "ㅎ";
 

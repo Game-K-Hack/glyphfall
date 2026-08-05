@@ -34,7 +34,7 @@ passerait pour une punition. Tout cela se modifie ou se coupe dans les
 options.
 
 Il demande aussi si les **tracés doivent varier** : un signe tombe alors tantôt
-dans une police sans empattement, tantôt dans une police à empattements. C'est
+imprimé, tantôt manuscrit, tantôt tracé au feutre. C'est
 plus difficile, et c'est le but — un signe reconnu dans une seule police est
 reconnu comme une image, pas comme un caractère. La question se repose depuis
 les options, à tout moment. Quel que soit le réglage, la fiche d'un signe
@@ -102,8 +102,8 @@ python -m http.server --directory web 8080
 Tout le contenu (langues, polices) est embarqué dans le binaire à la
 compilation : il n'y a rien à distribuer à côté de l'exécutable. En
 contrepartie le `.wasm` est lourd, la musique en constituant l'essentiel — les
-polices, elles, sont réduites aux signes du catalogue et pèsent moins d'un
-mégaoctet à elles quatre. Servez-le avec la compression `gzip` activée.
+polices, elles, sont réduites aux signes du catalogue et pèsent une poignée de
+centaines de kilo-octets chacune. Servez-le avec la compression `gzip` activée.
 
 ## Ajouter une langue
 
@@ -126,8 +126,8 @@ name = "Grec"                      # nom affiché, en français
 native_name = "Ελληνικά"           # nom dans l'écriture elle-même
 description = "L'alphabet grec, 24 lettres."
 fonts = [                          # fichiers de assets/fonts/, au moins deux
-  "NotoSansGreek-Regular.ttf",
-  "NotoSerifGreek-Regular.ttf",
+  "NotoSansGreek-Regular.ttf",     # le tracé de référence
+  "GreekHandwriting-Regular.ttf",  # les autres, tirés au sort en jeu
 ]
 ```
 
@@ -277,8 +277,15 @@ Déposez le `.ttf` dans `assets/fonts/` et nommez-le dans la liste `fonts` de
 `language.toml`. **Une écriture en déclare au moins deux** — un test le vérifie
 — parce que les tuiles y puisent au hasard, et qu'une liste d'un seul élément
 priverait les joueurs du réglage des tracés variés. Prenez des tracés
-franchement différents, une sans empattement et une avec : deux graisses de la
-même famille ne se distinguent pas à 24 pixels et n'apprennent rien.
+**franchement** différents. Une sans empattement et une avec ne suffit pas :
+sur du hangeul comme sur du kana, sans et serif se ressemblent trop à
+24 pixels. Ce qui marche, ce sont des familles de mains différentes —
+imprimé, manuscrit, enseigne :
+
+| Écriture | Tracés livrés |
+|---|---|
+| Coréen | Noto Sans KR, Nanum Pen Script (stylo), Jua (affiche) |
+| Japonais | Noto Sans JP, Klee One (manuel scolaire), Yusei Magic (feutre) |
 
 La première de la liste est le **tracé de référence** : c'est elle qui écrit le
 briefing, les aides et le grand signe de la fiche. Les autres n'apparaissent
@@ -336,9 +343,12 @@ GLYPHFALL_COMPOSE=assets/music/menu/Claude.wav cargo run --release
 
 - Polices : [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P),
   [Noto Sans KR](https://fonts.google.com/noto/specimen/Noto+Sans+KR) et
-  [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP) et leurs
-  variantes [Noto Serif](https://fonts.google.com/noto), toutes sous SIL Open
-  Font License, réduites aux signes du catalogue.
+  [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP),
+  [Nanum Pen Script](https://fonts.google.com/specimen/Nanum+Pen+Script),
+  [Jua](https://fonts.google.com/specimen/Jua),
+  [Klee One](https://fonts.google.com/specimen/Klee+One) et
+  [Yusei Magic](https://fonts.google.com/specimen/Yusei+Magic), toutes sous SIL
+  Open Font License, réduites aux signes du catalogue.
 - Palette : « Sweetie 16 » de GrafxKid, domaine public.
 - Bruitages et musique « Claude » : synthétisés par le jeu lui-même, voir
   `src/audio.rs` et `src/compose.rs`.

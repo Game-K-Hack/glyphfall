@@ -2,4 +2,4 @@ id = "ja-kanji-n5"
 name = "Japonais — Kanji N5"
 native_name = "漢字"
 description = "Les premiers idéogrammes du niveau JLPT N5. On répond ici par le sens, pas par la lecture."
-fonts = ["NotoSansJP-Regular.ttf", "NotoSerifJP-Regular.ttf"]
+fonts = ["NotoSansJP-Regular.ttf", "KleeOne-Regular.ttf", "YuseiMagic-Regular.ttf"]
