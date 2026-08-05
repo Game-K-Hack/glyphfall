@@ -17,7 +17,8 @@ sur Windows, macOS, Linux et dans un navigateur.
    les seuils à viser. Survolez un signe pour son aide mnémotechnique.
 4. **Fiche d'un signe** — en cliquant un signe du briefing : le caractère en
    grand, ses lectures, comment le retenir, et où vous en êtes avec lui.
-5. **La manche** — trois vies et un chronomètre, dans le mode choisi.
+5. **La manche** — trois vies et un chronomètre, dans le mode choisi. Chaque
+   tuile tire sa police au sort si les **tracés variés** sont activés.
 6. **Résultats** — de zéro à trois étoiles, et surtout la liste des signes
    ratés avec la lecture qu'il fallait taper.
 
@@ -31,6 +32,14 @@ rien apprendre. L'alerte n'apparaît **jamais pendant une
 partie** : elle attend le retour aux menus, sinon elle coûterait des vies et
 passerait pour une punition. Tout cela se modifie ou se coupe dans les
 options.
+
+Il demande aussi si les **tracés doivent varier** : un signe tombe alors tantôt
+dans une police sans empattement, tantôt dans une police à empattements. C'est
+plus difficile, et c'est le but — un signe reconnu dans une seule police est
+reconnu comme une image, pas comme un caractère. La question se repose depuis
+les options, à tout moment. Quel que soit le réglage, la fiche d'un signe
+montre toujours tous ses tracés côte à côte : on peut les comparer sans que
+rien ne tombe.
 
 ## Les quatre modes
 
@@ -92,9 +101,9 @@ python -m http.server --directory web 8080
 
 Tout le contenu (langues, polices) est embarqué dans le binaire à la
 compilation : il n'y a rien à distribuer à côté de l'exécutable. En
-contrepartie le `.wasm` pèse environ 17 Mo, dont l'essentiel est constitué des
-deux polices CJK. Servez-le avec la compression `gzip` activée, cela le ramène
-à quelques mégaoctets.
+contrepartie le `.wasm` est lourd, la musique en constituant l'essentiel — les
+polices, elles, sont réduites aux signes du catalogue et pèsent moins d'un
+mégaoctet à elles quatre. Servez-le avec la compression `gzip` activée.
 
 ## Ajouter une langue
 
@@ -116,7 +125,10 @@ id = "el-grec"                     # identifiant stable, utilisé par la sauvega
 name = "Grec"                      # nom affiché, en français
 native_name = "Ελληνικά"           # nom dans l'écriture elle-même
 description = "L'alphabet grec, 24 lettres."
-font = "NotoSansGreek-Regular.ttf" # fichier de assets/fonts/, facultatif
+fonts = [                          # fichiers de assets/fonts/, au moins deux
+  "NotoSansGreek-Regular.ttf",
+  "NotoSerifGreek-Regular.ttf",
+]
 ```
 
 Un fichier par étape dans `levels/` :
@@ -187,7 +199,8 @@ le tirage des tuiles n'est pas uniforme :
 - **Le tirage favorise ce qui est mal su.** Chaque signe porte une note de
   maîtrise, gardée d'une partie à l'autre : une réussite la monte d'un point,
   une erreur la descend de deux. Plus elle est basse, plus le signe revient.
-  Ces notes sont rangées **par alphabet** : un signe n'existe pas en dehors du
+  Ces notes suivent le signe, pas son tracé : changer de police ne remet pas
+  la maîtrise à zéro. Ces notes sont rangées **par alphabet** : un signe n'existe pas en dehors du
   sien, et les mélanger empêcherait de dire ce qui a été appris d'une écriture
   donnée.
 
@@ -260,9 +273,24 @@ Le dossier peut rester vide : le jeu se lance alors sans musique.
 
 ### Ajouter une police
 
-Déposez le `.ttf` dans `assets/fonts/` et nommez-le dans `language.toml`. Une
-police CJK complète pèse plusieurs mégaoctets et alourdit d'autant le binaire :
-n'ajoutez que celles qui servent, et une seule graisse.
+Déposez le `.ttf` dans `assets/fonts/` et nommez-le dans la liste `fonts` de
+`language.toml`. **Une écriture en déclare au moins deux** — un test le vérifie
+— parce que les tuiles y puisent au hasard, et qu'une liste d'un seul élément
+priverait les joueurs du réglage des tracés variés. Prenez des tracés
+franchement différents, une sans empattement et une avec : deux graisses de la
+même famille ne se distinguent pas à 24 pixels et n'apprennent rien.
+
+La première de la liste est le **tracé de référence** : c'est elle qui écrit le
+briefing, les aides et le grand signe de la fiche. Les autres n'apparaissent
+qu'en jeu et dans la rangée de comparaison de la fiche.
+
+Une police CJK complète pèse plusieurs mégaoctets et alourdit d'autant le
+binaire. Réduisez-la aux signes du catalogue avant de la déposer — `fonttools`
+fait passer les quatre polices CJK de 50 Mo à moins d'un :
+
+```sh
+pyftsubset NotoSerifJP-Regular.ttf --text-file=signes.txt --output-file=...
+```
 
 ## Organisation du code
 
@@ -294,6 +322,8 @@ GLYPHFALL_START=path:ja-hiragana    cargo run
 GLYPHFALL_START=briefing:ko/ko-01   cargo run
 GLYPHFALL_START=briefing:ko/ko-04/ultra cargo run   # sur un mode donné
 GLYPHFALL_START=play:ko/ko-03       cargo run
+GLYPHFALL_START=sign:ko/ko-01       cargo run   # la fiche du premier signe
+GLYPHFALL_START=fonts               cargo run   # la question des tracés variés
 
 # Capture une image après N frames puis quitte, pour vérifier un écran.
 GLYPHFALL_SCREENSHOT=ecran.png GLYPHFALL_SCREENSHOT_AFTER=120 cargo run
@@ -306,8 +336,9 @@ GLYPHFALL_COMPOSE=assets/music/menu/Claude.wav cargo run --release
 
 - Polices : [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P),
   [Noto Sans KR](https://fonts.google.com/noto/specimen/Noto+Sans+KR) et
-  [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP), toutes
-  sous SIL Open Font License.
+  [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP) et leurs
+  variantes [Noto Serif](https://fonts.google.com/noto), toutes sous SIL Open
+  Font License, réduites aux signes du catalogue.
 - Palette : « Sweetie 16 » de GrafxKid, domaine public.
 - Bruitages et musique « Claude » : synthétisés par le jeu lui-même, voir
   `src/audio.rs` et `src/compose.rs`.
