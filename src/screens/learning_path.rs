@@ -170,7 +170,7 @@ pub fn learning_path_screen(
             );
         }
 
-        draw_row(&app.fonts, level, row, index == selected, unlocked, app.progress.stars(&level.id));
+            draw_row(&app.fonts, level, row, index == selected, unlocked, &app.progress);
     }
 
     // Les lignes sont dessinées entières, quitte à déborder, puis on recouvre ce
@@ -300,8 +300,9 @@ fn draw_row(
     row: Rect,
     selected: bool,
     unlocked: bool,
-    stars: u8,
+    progress: &Progress,
 ) {
+    let stars = progress.stars(&level.id);
     if selected {
         ui::stroke(row, role::ACCENT);
     }
@@ -333,7 +334,7 @@ fn draw_row(
         (role::TEXT_DISABLED, role::TEXT_DISABLED)
     };
 
-    let stars_x = canvas::WIDTH - NODE_X - ui::stars_row_width(MAX_STARS);
+    let stars_x = canvas::WIDTH - NODE_X - ui::level_stars_width(MAX_STARS);
     // Le titre s'arrête avant les étoiles, le sous-titre peut courir dessous.
     let title_width = stars_x - TEXT_X - 6.0;
     let subtitle_width = canvas::WIDTH - NODE_X - TEXT_X;
@@ -350,7 +351,15 @@ fn draw_row(
     );
 
     if unlocked {
-        ui::stars_row(stars_x, row.y + 2.0, stars, MAX_STARS);
+        let modes = progress.modes(&level.id);
+        ui::level_stars(
+            stars_x,
+            row.y + 2.0,
+            stars,
+            MAX_STARS,
+            modes.fast_perfect,
+            modes.ultra_perfect,
+        );
     }
 }
 

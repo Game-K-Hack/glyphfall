@@ -364,6 +364,22 @@ pub fn star_scaled(x: f32, y: f32, scale: f32, earned: bool) {
     blit_scaled(&STAR, x, y, scale, if earned { role::STAR } else { role::STAR_EMPTY });
 }
 
+/// Une étoile dans sa propre teinte, éteinte tant qu'elle n'est pas gagnée.
+///
+/// Éteinte plutôt qu'absente, et dans sa couleur plutôt qu'en gris : une étoile
+/// bleue sombre annonce qu'il y a une étoile bleue à décrocher. La faire
+/// disparaître ne dirait rien, la griser en ferait une étoile ordinaire.
+pub fn star_colored(x: f32, y: f32, scale: f32, color: Color, earned: bool) {
+    blit_scaled(&STAR, x, y, scale, if earned { color } else { dimmed(color) });
+}
+
+/// Une couleur assombrie, assez pour dire « pas encore » sans perdre sa teinte.
+pub fn dimmed(color: Color) -> Color {
+    const KEEP: f32 = 0.34;
+
+    Color { r: color.r * KEEP, g: color.g * KEEP, b: color.b * KEEP, a: color.a }
+}
+
 pub fn heart(x: f32, y: f32, remaining: bool) {
     blit(&HEART, x, y, if remaining { role::DANGER } else { role::TEXT_DISABLED });
 }
@@ -391,6 +407,27 @@ pub fn stars_row(x: f32, y: f32, earned: u8, total: u8) {
 
 pub fn stars_row_width(total: u8) -> f32 {
     total as f32 * STAR_WIDTH + (total.saturating_sub(1)) as f32 * 2.0
+}
+
+/// Le palmarès complet d'un niveau : les étoiles dorées, puis celles des modes.
+///
+/// Les cinq sont toujours dessinées. Ce qui reste à décrocher se lit d'un coup
+/// d'oeil, ce qui est le seul intérêt de les montrer.
+pub fn level_stars(x: f32, y: f32, gold: u8, gold_total: u8, fast: bool, ultra: bool) {
+    const GAP: f32 = 2.0;
+
+    stars_row(x, y, gold, gold_total);
+
+    let mut next = x + stars_row_width(gold_total) + GAP + 2.0;
+    for (color, earned) in [(role::STAR_FAST, fast), (role::STAR_ULTRA, ultra)] {
+        star_colored(next, y, 1.0, color, earned);
+        next += STAR_WIDTH + GAP;
+    }
+}
+
+/// Largeur du palmarès complet.
+pub fn level_stars_width(gold_total: u8) -> f32 {
+    stars_row_width(gold_total) + 2.0 + (STAR_WIDTH + 2.0) * 2.0
 }
 
 /// Les vies restantes, coeurs pleins puis éteints.

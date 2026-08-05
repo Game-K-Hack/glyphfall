@@ -34,7 +34,7 @@ pub fn briefing_screen(
     let Some(language) = app.catalog.language(language_id) else { return Transition::Pop };
     let Some(level) = language.level(level_id) else { return Transition::Pop };
 
-    draw_header(&app.fonts, level);
+    draw_header(&app.fonts, level, &app.progress);
     let (hovered, clicked) = draw_glyphs(app, language, level, mouse);
     draw_rules(&app.fonts, level);
 
@@ -169,7 +169,7 @@ fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
 
 }
 
-fn draw_header(fonts_set: &Fonts, level: &Level) {
+fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {
     ui::text_truncated(
         fonts_set,
         &level.title,
@@ -192,6 +192,18 @@ fn draw_header(fonts_set: &Fonts, level: &Level) {
     let count = format!("{} SIGNES", level.glyphs.len());
     let width = ui::text_width(fonts_set, &count, fonts::TEXT);
     ui::text(fonts_set, &count, canvas::WIDTH - 8.0 - width, 6.0, fonts::TEXT, role::TEXT_MUTED);
+
+    // Le palmarès du niveau, juste sous le décompte des signes : on voit en
+    // arrivant ce qui a été décroché et ce qui reste.
+    let modes = progress.modes(&level.id);
+    ui::level_stars(
+        canvas::WIDTH - 8.0 - ui::level_stars_width(MAX_STARS),
+        18.0,
+        progress.stars(&level.id),
+        MAX_STARS,
+        modes.fast_perfect,
+        modes.ultra_perfect,
+    );
 }
 
 /// Dessine la grille des signes, et renvoie l'aide de celui survolé ainsi que

@@ -38,6 +38,14 @@ pub const SILVER: Color = hex(0x94b0c2);
 pub const SLATE: Color = hex(0x566c86);
 pub const CHARCOAL: Color = hex(0x333c57);
 
+/// La seule couleur ajoutée à Sweetie 16.
+///
+/// La palette n'a qu'un violet, `PLUM`, pensé comme teinte d'ombre : posé sur
+/// le fond sombre du jeu il ne se voit pas, et assombri pour dire « pas encore
+/// gagné » il disparaît tout à fait. L'étoile du mode ultra a besoin d'un
+/// violet qui tienne debout à côté du doré et du bleu ciel.
+pub const VIOLET: Color = hex(0xa45ecc);
+
 /// Les rôles d'interface, pour que les écrans parlent d'intention plutôt que
 /// de teinte : changer la palette ne demandera pas de relire chaque écran.
 pub mod role {
@@ -71,4 +79,8 @@ pub mod role {
     pub const STAR: Color = GOLD;
     /// Étoiles non gagnées.
     pub const STAR_EMPTY: Color = SLATE;
+    /// L'étoile du mode rapide.
+    pub const STAR_FAST: Color = SKY;
+    /// Celle du mode ultra.
+    pub const STAR_ULTRA: Color = VIOLET;
 }
