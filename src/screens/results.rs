@@ -8,7 +8,7 @@ use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 use crate::progress::MAX_STARS;
-use crate::session::{EndReason, Outcome, Session};
+use crate::session::{EndReason, Mode, Outcome, Session};
 
 /// Les étoiles du bilan sont dessinées plus grandes que celles des listes.
 const STAR_SCALE: f32 = 3.0;
@@ -43,7 +43,11 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
     let ready = accepts_input(*elapsed);
 
     draw_verdict(&app.fonts, outcome);
-    draw_stars(outcome.stars, *elapsed);
+    match outcome.mode {
+        Mode::Normal => draw_stars(outcome.stars, *elapsed),
+        Mode::Endless => draw_endless(app, outcome),
+        mode => draw_mode_star(app, outcome, mode, *elapsed),
+    }
     draw_figures(&app.fonts, outcome);
     draw_missed(app, outcome);
 
@@ -89,10 +93,13 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
 }
 
 fn draw_verdict(fonts_set: &Fonts, outcome: &Outcome) {
-    if outcome.is_revision {
+    // Le mode joué, rappelé sous le verdict : trois manches d'affilée sur le
+    // même niveau ne se distinguent que par lui.
+    let subtitle = if outcome.is_revision { "REVISION" } else { outcome.mode.label() };
+    if outcome.is_revision || outcome.mode != Mode::Normal {
         ui::text_centered(
             fonts_set,
-            "REVISION",
+            subtitle,
             canvas::WIDTH / 2.0,
             32.0,
             fonts::TEXT,
@@ -100,10 +107,17 @@ fn draw_verdict(fonts_set: &Fonts, outcome: &Outcome) {
         );
     }
 
-    let (verdict, color) = match (outcome.stars, outcome.reason) {
-        (0, EndReason::OutOfLives) => ("PLUS DE VIES", role::DANGER),
-        (0, EndReason::TimeUp) => ("TEMPS ECOULE", role::DANGER),
-        (MAX_STARS.., _) => ("PARFAIT", role::SUCCESS),
+    // Les modes rapides ne connaissent que deux issues, et le verdict doit le
+    // dire : « terminé » y serait un demi-mensonge.
+    let (verdict, color) = match (outcome.mode, outcome.reason) {
+        (Mode::Endless, _) => ("PARTIE FINIE", role::TITLE),
+        (mode, _) if mode.demands_perfection() && outcome.is_perfect => {
+            ("SANS FAUTE", role::SUCCESS)
+        }
+        (mode, _) if mode.demands_perfection() => ("UNE FAUTE DE TROP", role::DANGER),
+        (_, EndReason::OutOfLives) if outcome.stars == 0 => ("PLUS DE VIES", role::DANGER),
+        (_, EndReason::TimeUp) if outcome.stars == 0 => ("TEMPS ECOULE", role::DANGER),
+        _ if outcome.stars >= MAX_STARS => ("PARFAIT", role::SUCCESS),
         _ => ("TERMINE", role::TITLE),
     };
 
@@ -145,31 +159,82 @@ fn draw_stars(earned: u8, elapsed: f32) {
     }
 }
 
+/// L'étoile du mode joué, seule au milieu : il n'y en a qu'une à gagner.
+fn draw_mode_star(app: &App, outcome: &Outcome, mode: Mode, elapsed: f32) {
+    const Y: f32 = 46.0;
+
+    let color = if mode == Mode::Fast { role::STAR_FAST } else { role::STAR_ULTRA };
+    let size = ui::STAR_WIDTH * STAR_SCALE;
+    let x = ((canvas::WIDTH - size) / 2.0).floor();
+
+    // Même attente que pour les étoiles dorées : elle doit se poser, pas
+    // apparaître avec l'écran.
+    if !outcome.is_perfect || elapsed < STAR_OPENING {
+        ui::star_colored(x, Y, STAR_SCALE, color, false);
+        return;
+    }
+
+    let popping = elapsed - STAR_OPENING < STAR_POP;
+    let scale = if popping { STAR_SCALE + 1.0 } else { STAR_SCALE };
+    let offset = (ui::STAR_WIDTH * (scale - STAR_SCALE)) / 2.0;
+
+    ui::star_colored(x - offset, Y - offset, scale, color, true);
+    let _ = app;
+}
+
+/// Le mode infini ne rapporte pas d'étoile : il n'y a qu'un score, et le
+/// meilleur à battre.
+fn draw_endless(app: &App, outcome: &Outcome) {
+    const Y: f32 = 46.0;
+
+    ui::text_centered(
+        &app.fonts,
+        &format!("{:05}", outcome.score),
+        canvas::WIDTH / 2.0,
+        Y,
+        fonts::TITLE,
+        role::TITLE,
+    );
+
+    let best = app.progress.modes(&outcome.level_id).endless_best;
+    let (label, color) = if outcome.is_record {
+        ("NOUVEAU RECORD", role::STAR)
+    } else {
+        (&*format!("RECORD : {best:05}"), role::TEXT_MUTED)
+    };
+    ui::text_centered(&app.fonts, label, canvas::WIDTH / 2.0, Y + 20.0, fonts::TEXT, color);
+}
+
 fn draw_figures(fonts_set: &Fonts, outcome: &Outcome) {
-    const Y: f32 = 76.0;
+    // Le mode infini affiche déjà son score en grand, et le record dessous :
+    // les chiffres descendent pour ne pas s'y cogner.
+    let endless = outcome.mode == Mode::Endless;
+    let y = if endless { 92.0 } else { 76.0 };
 
     let accuracy = format!("{}% DE REUSSITE", (outcome.accuracy * 100.0).round() as u32);
-    ui::text_centered(fonts_set, &accuracy, canvas::WIDTH / 2.0, Y, fonts::TEXT, role::TEXT);
+    ui::text_centered(fonts_set, &accuracy, canvas::WIDTH / 2.0, y, fonts::TEXT, role::TEXT);
 
-    let detail = format!("{} SIGNES   {:05} POINTS", outcome.hits, outcome.score);
+    // Répéter le score sous le grand chiffre ne dirait rien de plus.
+    let detail = if endless {
+        format!("{} SIGNES", outcome.hits)
+    } else {
+        format!("{} SIGNES   {:05} POINTS", outcome.hits, outcome.score)
+    };
     ui::text_centered(
         fonts_set,
         &detail,
         canvas::WIDTH / 2.0,
-        Y + 12.0,
+        y + 12.0,
         fonts::TEXT,
         role::TEXT_MUTED,
     );
 
-    if outcome.is_record {
-        ui::text_centered(
-            fonts_set,
-            "NOUVEAU RECORD",
-            canvas::WIDTH / 2.0,
-            Y + 24.0,
-            fonts::TEXT,
-            role::STAR,
-        );
+    if outcome.is_record && !endless {
+        let earned = match outcome.mode {
+            Mode::Normal => "NOUVEAU RECORD",
+            _ => "ETOILE DECROCHEE",
+        };
+        ui::text_centered(fonts_set, earned, canvas::WIDTH / 2.0, y + 24.0, fonts::TEXT, role::STAR);
     }
 }
 

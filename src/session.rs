@@ -145,16 +145,6 @@ impl Mode {
         matches!(self, Mode::Fast | Mode::Ultra)
     }
 
-    /// Le mode à débloquer une fois celui-ci maîtrisé.
-    pub fn next(self) -> Option<Mode> {
-        match self {
-            Mode::Normal => Some(Mode::Fast),
-            Mode::Fast => Some(Mode::Ultra),
-            Mode::Ultra => Some(Mode::Endless),
-            Mode::Endless => None,
-        }
-    }
-
     /// Les règles du niveau, durcies selon le mode.
     fn apply(self, rules: &Rules) -> Rules {
         let mut rules = rules.clone();
@@ -1089,14 +1079,6 @@ mod tests {
         let session = session(vec![level("ko-01", &[], vec![glyph("\u{3131}", "g")])], "ko-01");
 
         assert!(!session.outcome(EndReason::TimeUp).is_perfect, "rester immobile n'est pas parfait");
-    }
-
-    #[test]
-    fn the_modes_form_a_chain() {
-        assert_eq!(Mode::Normal.next(), Some(Mode::Fast));
-        assert_eq!(Mode::Fast.next(), Some(Mode::Ultra));
-        assert_eq!(Mode::Ultra.next(), Some(Mode::Endless));
-        assert_eq!(Mode::Endless.next(), None, "l'infini est le dernier");
     }
 
     #[test]

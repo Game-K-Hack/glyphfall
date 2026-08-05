@@ -152,10 +152,14 @@ fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
             ui::stroke(cell, role::SHAKY);
         }
 
-        let label_color = match (unlocked, chosen) {
-            (false, _) => role::TEXT_DISABLED,
-            (true, true) => role::BORDER,
-            (true, false) => role::TEXT,
+        // Un mode déjà maîtrisé se signale en vert : on voit d'un coup d'oeil
+        // ce qui reste à faire sur ce niveau.
+        let mastered = app.progress.mode_mastered(level_id, *candidate);
+        let label_color = match (unlocked, chosen, mastered) {
+            (false, _, _) => role::TEXT_DISABLED,
+            (true, true, _) => role::BORDER,
+            (true, false, true) => role::SUCCESS,
+            (true, false, false) => role::TEXT,
         };
         ui::text_centered(
             &app.fonts,
