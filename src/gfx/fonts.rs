@@ -1,5 +1,5 @@
-//! Les polices : une police pixel pour l'interface, une police par écriture
-//! pour les glyphes à apprendre.
+//! Les polices : une police pixel pour l'interface, et plusieurs par écriture
+//! pour les glyphes à apprendre — imprimé, manuscrit, affiche.
 //!
 //! Les deux sont rendues en filtrage « au plus proche ». La police pixel est
 //! dessinée sur une grille de 8 px : l'afficher à un multiple de 8 la rend

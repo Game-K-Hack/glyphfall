@@ -89,21 +89,29 @@ pub fn font_choice_screen(app: &mut App, mouse: Vec2) -> Transition {
 /// Le même signe dans chacun des tracés disponibles, côte à côte.
 fn draw_samples(app: &App) {
     const Y: f32 = 74.0;
-    const SIZE: f32 = 58.0;
-    const GAP: f32 = 12.0;
+    const GAP: f32 = 6.0;
+    /// Largeur laissée à la rangée, marges comprises.
+    const BAND: f32 = 344.0;
+    /// Au-delà, une seule écriture remplirait l'écran de démonstration.
+    const MAX_SIZE: f32 = 58.0;
 
-    let count = app.fonts.script_count(SAMPLE_LANGUAGE);
-    let total = SIZE * count as f32 + GAP * (count.saturating_sub(1)) as f32;
+    let count = app.fonts.script_count(SAMPLE_LANGUAGE).max(1);
+
+    // Les cases se serrent pour tenir en une rangée : les faire déborder ou les
+    // replier sur deux lignes casserait la lecture d'un coup d'oeil, qui est
+    // tout ce que cet écran a à offrir.
+    let size = ((BAND - GAP * (count - 1) as f32) / count as f32).min(MAX_SIZE).floor();
+    let total = size * count as f32 + GAP * (count - 1) as f32;
     let start_x = ((canvas::WIDTH - total) / 2.0).floor();
 
     for index in 0..count {
-        let cell = Rect::new(start_x + index as f32 * (SIZE + GAP), Y, SIZE, SIZE);
+        let cell = Rect::new(start_x + index as f32 * (size + GAP), Y, size, size);
         ui::panel(cell, role::PANEL);
         ui::glyph_fitted(
             app.fonts.script_variant(SAMPLE_LANGUAGE, index),
             SAMPLE_GLYPH,
             cell,
-            40,
+            (size * 0.7) as u16,
             role::TEXT,
         );
     }

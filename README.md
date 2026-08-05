@@ -33,10 +33,11 @@ partie** : elle attend le retour aux menus, sinon elle coûterait des vies et
 passerait pour une punition. Tout cela se modifie ou se coupe dans les
 options.
 
-Il demande aussi si les **tracés doivent varier** : un signe tombe alors tantôt
-imprimé, tantôt manuscrit, tantôt tracé au feutre. C'est
-plus difficile, et c'est le but — un signe reconnu dans une seule police est
-reconnu comme une image, pas comme un caractère. La question se repose depuis
+Il demande aussi si les **tracés doivent varier** : un signe tombe alors dans
+l'une des sept mains de son écriture — imprimé, manuscrit au stylo, au crayon,
+au pinceau, tracé d'affiche. C'est plus difficile, et c'est le but : un signe
+reconnu dans une seule police est reconnu comme une image, pas comme un
+caractère. La question se repose depuis
 les options, à tout moment. Quel que soit le réglage, la fiche d'un signe
 montre toujours tous ses tracés côte à côte : on peut les comparer sans que
 rien ne tombe.
@@ -166,7 +167,9 @@ mnemonics = [                      # au moins un, obligatoire
 Le premier moyen sert d'aide courte au survol du briefing ; la fiche du signe
 les montre tous. **N'y mettez aucun caractère de l'écriture enseignée** : ils
 sont rendus par la police pixel, qui ne connaît que le latin. Nommez plutôt le
-signe (« le giyeok », « le ha ») — un test le vérifie.
+signe (« le giyeok », « le ha ») — un test le vérifie. La fiche n'en affiche
+que **sept lignes** en tout, bande des tracés oblige ; le signe le plus bavard
+du catalogue les occupe déjà toutes.
 
 ### Comment découper un chemin
 
@@ -282,10 +285,19 @@ sur du hangeul comme sur du kana, sans et serif se ressemblent trop à
 24 pixels. Ce qui marche, ce sont des familles de mains différentes —
 imprimé, manuscrit, enseigne :
 
-| Écriture | Tracés livrés |
-|---|---|
-| Coréen | Noto Sans KR, Nanum Pen Script (stylo), Jua (affiche) |
-| Japonais | Noto Sans JP, Klee One (manuel scolaire), Yusei Magic (feutre) |
+Chaque écriture en compte sept — assez pour qu'un signe ne revienne jamais
+deux fois de suite dans la même main :
+
+| Rôle | Coréen | Japonais |
+|---|---|---|
+| Imprimé, sans empattement | Noto Sans KR | Noto Sans JP |
+| Imprimé, à empattements | Nanum Myeongjo | Shippori Mincho |
+| Manuscrit, stylo | Nanum Pen Script | Klee One |
+| Manuscrit, crayon | Gaegu | — |
+| Manuscrit, pinceau | Nanum Brush Script | Yuji Syuku |
+| Manuscrit, feutre | — | Yusei Magic |
+| Affiche, ronde | Jua | Zen Maru Gothic |
+| Affiche, grasse | Do Hyeon | RocknRoll One |
 
 La première de la liste est le **tracé de référence** : c'est elle qui écrit le
 briefing, les aides et le grand signe de la fiche. Les autres n'apparaissent
@@ -344,10 +356,9 @@ GLYPHFALL_COMPOSE=assets/music/menu/Claude.wav cargo run --release
 - Polices : [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P),
   [Noto Sans KR](https://fonts.google.com/noto/specimen/Noto+Sans+KR) et
   [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP),
-  [Nanum Pen Script](https://fonts.google.com/specimen/Nanum+Pen+Script),
-  [Jua](https://fonts.google.com/specimen/Jua),
-  [Klee One](https://fonts.google.com/specimen/Klee+One) et
-  [Yusei Magic](https://fonts.google.com/specimen/Yusei+Magic), toutes sous SIL
+  Nanum Myeongjo, Nanum Pen Script, Nanum Brush Script, Gaegu, Jua, Do Hyeon,
+  Shippori Mincho, Klee One, Yuji Syuku, Yusei Magic, Zen Maru Gothic et
+  RocknRoll One — toutes sur [Google Fonts](https://fonts.google.com), sous SIL
   Open Font License, réduites aux signes du catalogue.
 - Palette : « Sweetie 16 » de GrafxKid, domaine public.
 - Bruitages et musique « Claude » : synthétisés par le jeu lui-même, voir

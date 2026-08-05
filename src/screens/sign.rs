@@ -18,6 +18,9 @@ const CARD: Rect = Rect { x: 16.0, y: 34.0, w: 96.0, h: 96.0 };
 /// Taille du signe dans son pavé.
 const GLYPH_SIZE: u16 = 64;
 
+/// La bande des tracés, en bas, sur toute la largeur.
+const TRACINGS_Y: f32 = 166.0;
+
 /// Colonne de droite, où vont les lectures et les moyens de retenir.
 const TEXT_X: f32 = CARD.x + CARD.w + 14.0;
 const TEXT_WIDTH: f32 = canvas::WIDTH - TEXT_X - 16.0;
@@ -114,41 +117,36 @@ fn draw_card(app: &App, language: &Language, glyph: &Glyph) {
 /// montrées même quand le joueur a refusé de les voir tomber — il a le temps de
 /// les comparer, ce qui est justement ce que la manche ne permet pas.
 fn draw_tracings(app: &App, language: &Language, glyph: &Glyph) {
-    const SIZE: f32 = 26.0;
-    const GAP: f32 = 4.0;
+    const Y: f32 = TRACINGS_Y;
+    const SIZE: f32 = 22.0;
+    const GAP: f32 = 3.0;
+    /// Là où commencent les cases, une fois l'intitulé posé à leur gauche.
+    const X: f32 = 100.0;
 
     let count = app.fonts.script_count(&language.id);
     if count < 2 {
         return;
     }
 
-    // Le tracé de référence figure dans la rangée avec les autres : une case
-    // isolée sous le grand signe ne dirait pas ce qu'elle montre, alors qu'une
-    // rangée du même signe se lit d'elle-même comme une comparaison.
-    let y = CARD.y + CARD.h + 16.0;
-    let total = SIZE * count as f32 + GAP * (count - 1) as f32;
-    let start_x = (CARD.x + (CARD.w - total) / 2.0).floor();
+    // La bande occupe toute la largeur, sous les deux colonnes : sept cases ne
+    // tiennent pas sous le pavé du signe, et les rétrécir jusque-là les rendrait
+    // illisibles — or c'est précisément leur lisibilité que la fiche démontre.
+    ui::text(&app.fonts, "TRACES", 16.0, Y + 8.0, fonts::TEXT, role::TEXT_DISABLED);
 
+    // Le tracé de référence figure dans la rangée avec les autres : une case
+    // isolée ne dirait pas ce qu'elle montre, alors qu'une rangée du même signe
+    // se lit d'elle-même comme une comparaison.
     for variant in 0..count {
-        let cell = Rect::new(start_x + variant as f32 * (SIZE + GAP), y, SIZE, SIZE);
+        let cell = Rect::new(X + variant as f32 * (SIZE + GAP), Y, SIZE, SIZE);
         ui::fill(cell, role::PANEL);
         ui::glyph_fitted(
             app.fonts.script_variant(&language.id, variant),
             &glyph.char,
             cell,
-            20,
+            16,
             role::TEXT_MUTED,
         );
     }
-
-    ui::text_centered(
-        &app.fonts,
-        "AUTRES TRACES",
-        CARD.x + CARD.w / 2.0,
-        y + SIZE + 4.0,
-        fonts::TEXT,
-        role::TEXT_DISABLED,
-    );
 }
 
 /// Les romanisations acceptées, la principale en évidence.
@@ -174,8 +172,10 @@ fn draw_readings(fonts_set: &Fonts, glyph: &Glyph) {
 fn draw_mnemonics(fonts_set: &Fonts, glyph: &Glyph) {
     const TOP: f32 = 72.0;
     const LINE: f32 = 10.0;
-    /// Au-delà, la fiche déborderait sur les boutons.
-    const MAX_LINES: usize = 11;
+    /// Au-delà, la fiche déborderait sur la bande des tracés. Le signe le plus
+    /// bavard du catalogue en occupe exactement sept : la marge est nulle, un
+    /// moyen mnémotechnique de plus se ferait couper sans prévenir.
+    const MAX_LINES: usize = 7;
 
     ui::text(fonts_set, "POUR LE RETENIR", TEXT_X, TOP, fonts::TEXT, role::TEXT_MUTED);
 

@@ -2,4 +2,12 @@ id = "ja-katakana"
 name = "Japonais — Katakana"
 native_name = "カタカナ"
 description = "Le syllabaire des mots étrangers et des onomatopées. Mêmes sons que les hiragana, tracés anguleux."
-fonts = ["NotoSansJP-Regular.ttf", "KleeOne-Regular.ttf", "YuseiMagic-Regular.ttf"]
+fonts = [
+  "NotoSansJP-Regular.ttf",        # imprime, sans empattement
+  "ShipporiMincho-Regular.ttf",    # imprime, mincho
+  "KleeOne-Regular.ttf",           # manuel scolaire
+  "YujiSyuku-Regular.ttf",         # manuscrit au pinceau
+  "YuseiMagic-Regular.ttf",        # manuscrit au feutre
+  "ZenMaruGothic-Regular.ttf",     # affiche, ronde
+  "RocknRollOne-Regular.ttf",      # affiche, grasse
+]
