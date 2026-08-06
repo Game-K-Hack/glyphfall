@@ -255,6 +255,14 @@ def main():
     apk = assembler(abis, o)
     poids = apk.stat().st_size / 1048576
     print(f"\n{apk}  ({poids:.0f} Mo)")
+    print("  architectures :", ", ".join(abis))
+
+    # Un APK sans arm64 s'installe sur l'émulateur et sur rien d'autre : tous
+    # les téléphones vendus depuis des années sont en arm64. L'oubli ne se voit
+    # qu'à l'installation, par un message qui n'explique rien.
+    if "arm64-v8a" not in abis:
+        print("  ATTENTION : sans arm64-v8a, aucun téléphone n'acceptera cet APK.")
+
     print("  installation :  adb install -r", apk)
 
 
