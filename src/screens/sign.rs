@@ -13,17 +13,21 @@ use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 
-/// Le pavé qui porte le signe, à gauche.
-const CARD: Rect = Rect { x: 16.0, y: 34.0, w: 96.0, h: 96.0 };
+/// Le pavé qui porte le signe, centré en haut.
+const CARD: Rect = Rect { x: 60.0, y: 32.0, w: 96.0, h: 96.0 };
 /// Taille du signe dans son pavé.
 const GLYPH_SIZE: u16 = 64;
 
-/// La bande des tracés, en bas, sur toute la largeur.
-const TRACINGS_Y: f32 = 166.0;
+/// La bande des tracés, sous les lectures.
+const TRACINGS_Y: f32 = 190.0;
 
-/// Colonne de droite, où vont les lectures et les moyens de retenir.
-const TEXT_X: f32 = CARD.x + CARD.w + 14.0;
-const TEXT_WIDTH: f32 = canvas::WIDTH - TEXT_X - 16.0;
+/// La colonne de texte.
+///
+/// En portrait la fiche s'empile au lieu de se lire en deux colonnes, qui
+/// feraient huit caractères chacune : le pavé et les lectures en haut, les
+/// moyens de retenir dessous, sur toute la largeur.
+const TEXT_X: f32 = 10.0;
+const TEXT_WIDTH: f32 = canvas::WIDTH - TEXT_X * 2.0;
 
 pub fn sign_screen(
     app: &App,
@@ -78,7 +82,7 @@ fn draw_header(fonts_set: &Fonts, level: &Level, index: usize) {
         8.0,
         fonts::TEXT,
         role::TITLE,
-        canvas::WIDTH - 90.0,
+        canvas::WIDTH - 62.0,
     );
 
     let position = format!("{} / {}", index + 1, level.glyphs.len());
@@ -127,32 +131,32 @@ fn draw_card(app: &App, language: &Language, glyph: &Glyph) {
 /// les comparer, ce qui est justement ce que la manche ne permet pas.
 fn draw_tracings(app: &App, language: &Language, glyph: &Glyph) {
     const Y: f32 = TRACINGS_Y;
-    const SIZE: f32 = 22.0;
+    const SIZE: f32 = 24.0;
     const GAP: f32 = 3.0;
-    /// Là où commencent les cases, une fois l'intitulé posé à leur gauche.
-    const X: f32 = 100.0;
 
     let count = app.fonts.script_count(&language.id);
     if count < 2 {
         return;
     }
 
-    // La bande occupe toute la largeur, sous les deux colonnes : sept cases ne
-    // tiennent pas sous le pavé du signe, et les rétrécir jusque-là les rendrait
-    // illisibles — or c'est précisément leur lisibilité que la fiche démontre.
-    ui::text(&app.fonts, "TRACES", 16.0, Y + 8.0, fonts::TEXT, role::TEXT_DISABLED);
-
+    // La bande est centrée sous le pavé : sept cases y tiennent tout juste, et
+    // les rétrécir davantage les rendrait illisibles — or c'est précisément
+    // leur lisibilité que la fiche démontre.
+    //
     // Le tracé de référence figure dans la rangée avec les autres : une case
     // isolée ne dirait pas ce qu'elle montre, alors qu'une rangée du même signe
     // se lit d'elle-même comme une comparaison.
+    let total = SIZE * count as f32 + GAP * (count - 1) as f32;
+    let start_x = ((canvas::WIDTH - total) / 2.0).floor();
+
     for variant in 0..count {
-        let cell = Rect::new(X + variant as f32 * (SIZE + GAP), Y, SIZE, SIZE);
+        let cell = Rect::new(start_x + variant as f32 * (SIZE + GAP), Y, SIZE, SIZE);
         ui::fill(cell, role::PANEL);
         ui::glyph_fitted(
             app.fonts.script_variant(&language.id, variant),
             &glyph.char,
             cell,
-            16,
+            18,
             role::TEXT_MUTED,
         );
     }
@@ -160,31 +164,37 @@ fn draw_tracings(app: &App, language: &Language, glyph: &Glyph) {
 
 /// Les romanisations acceptées, la principale en évidence.
 fn draw_readings(fonts_set: &Fonts, glyph: &Glyph) {
-    ui::text(fonts_set, glyph.primary_answer(), TEXT_X, 34.0, fonts::TITLE, role::ACCENT);
+    ui::text_centered(
+        fonts_set,
+        glyph.primary_answer(),
+        canvas::WIDTH / 2.0,
+        148.0,
+        fonts::TITLE,
+        role::ACCENT,
+    );
 
     if glyph.answers.len() > 1 {
         // Les variantes tolérées : les taire ferait croire à une seule bonne
         // réponse, alors que le jeu en accepte plusieurs.
         let others = glyph.answers[1..].join("  ");
-        ui::text_truncated(
+        ui::text_centered(
             fonts_set,
             &format!("aussi : {others}"),
-            TEXT_X,
-            54.0,
+            canvas::WIDTH / 2.0,
+            170.0,
             fonts::TEXT,
             role::TEXT_MUTED,
-            TEXT_WIDTH,
         );
     }
 }
 
 fn draw_mnemonics(fonts_set: &Fonts, glyph: &Glyph) {
-    const TOP: f32 = 72.0;
+    const TOP: f32 = 226.0;
     const LINE: f32 = 10.0;
-    /// Au-delà, la fiche déborderait sur la bande des tracés. Le signe le plus
-    /// bavard du catalogue en occupe exactement sept : la marge est nulle, un
-    /// moyen mnémotechnique de plus se ferait couper sans prévenir.
-    const MAX_LINES: usize = 7;
+    /// Au-delà, la fiche déborderait sur les boutons du bas. Le portrait laisse
+    /// moins de largeur mais plus de hauteur : dix lignes de vingt-cinq
+    /// caractères, contre sept de vingt-neuf auparavant.
+    const MAX_LINES: usize = 10;
 
     ui::text(fonts_set, "POUR LE RETENIR", TEXT_X, TOP, fonts::TEXT, role::TEXT_MUTED);
 
@@ -213,20 +223,20 @@ fn draw_mnemonics(fonts_set: &Fonts, glyph: &Glyph) {
 }
 
 fn draw_navigation(app: &App, level: &Level, index: &mut usize, mouse: Vec2) -> Transition {
-    const Y: f32 = 194.0;
-    const ARROW: f32 = 22.0;
+    const Y: f32 = 356.0;
+    const ARROW: f32 = 30.0;
 
-    let previous = Rect::new(16.0, Y, ARROW, 16.0);
+    let previous = Rect::new(10.0, Y, ARROW, 20.0);
     if ui::button(&app.fonts, mouse, Button::new(previous, "<")) {
         *index = (*index + level.glyphs.len() - 1) % level.glyphs.len();
     }
 
-    let next = Rect::new(16.0 + ARROW + 4.0, Y, ARROW, 16.0);
+    let next = Rect::new(10.0 + ARROW + 4.0, Y, ARROW, 20.0);
     if ui::button(&app.fonts, mouse, Button::new(next, ">")) {
         *index = (*index + 1) % level.glyphs.len();
     }
 
-    let back = Rect::new(canvas::WIDTH - 16.0 - 76.0, Y, 76.0, 16.0);
+    let back = Rect::new(canvas::WIDTH - 10.0 - 76.0, Y, 76.0, 20.0);
     if ui::button(&app.fonts, mouse, Button::new(back, "RETOUR").accent(role::TEXT_MUTED)) {
         return Transition::Pop;
     }
@@ -235,9 +245,9 @@ fn draw_navigation(app: &App, level: &Level, index: &mut usize, mouse: Vec2) -> 
     // la toile, le rappel passait sous le bouton de retour.
     ui::text_centered(
         &app.fonts,
-        "FLECHES POUR CHANGER",
+        "SIGNE",
         (next.x + next.w + back.x) / 2.0,
-        Y + 4.0,
+        Y + 6.0,
         fonts::TEXT,
         role::TEXT_DISABLED,
     );

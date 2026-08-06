@@ -14,13 +14,13 @@ use crate::gfx::{Fonts, canvas, fonts};
 use crate::progress::{MAX_STARS, Progress};
 use crate::session::{Mode, Session};
 
-const GRID_X: f32 = 16.0;
-const GRID_Y: f32 = 32.0;
+const GRID_X: f32 = 12.0;
+const GRID_Y: f32 = 56.0;
 const CELL_WIDTH: f32 = 32.0;
-const CELL_HEIGHT: f32 = 26.0;
-const COLUMNS: usize = 11;
-const ROWS: usize = 3;
-const GLYPH_SIZE: u16 = 16;
+const CELL_HEIGHT: f32 = 30.0;
+const COLUMNS: usize = 6;
+const ROWS: usize = 6;
+const GLYPH_SIZE: u16 = 18;
 
 pub fn briefing_screen(
     app: &App,
@@ -56,26 +56,27 @@ pub fn briefing_screen(
     // Le pied de l'écran ne dit qu'une chose à la fois : ce qui bloque le mode
     // choisi, ou à défaut le rappel de ce qu'un signe cache.
     if !unlocked {
-        ui::text_centered(
+        ui::paragraph(
             &app.fonts,
             Progress::unlock_requirement(*mode),
             canvas::WIDTH / 2.0,
-            200.0,
+            340.0,
             fonts::TEXT,
             role::SHAKY,
+            canvas::WIDTH - 12.0,
         );
     } else {
         ui::text_centered(
             &app.fonts,
-            "CLIQUE UN SIGNE POUR SA FICHE",
+            "TOUCHE UN SIGNE",
             canvas::WIDTH / 2.0,
-            200.0,
+            340.0,
             fonts::TEXT,
             role::TEXT_DISABLED,
         );
     }
 
-    let start = Rect::new(((canvas::WIDTH - 120.0) / 2.0).floor(), 172.0, 120.0, 20.0);
+    let start = Rect::new(((canvas::WIDTH - 140.0) / 2.0).floor(), 356.0, 140.0, 22.0);
 
     // Le bouton reste dessiné même quand le mode est fermé : le retirer ferait
     // sauter la mise en page à chaque changement de mode.
@@ -110,11 +111,15 @@ pub fn briefing_screen(
 /// Les cacher priverait le joueur de la seule chose qui donne envie d'aller
 /// chercher les trois étoiles.
 fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
-    const Y: f32 = 152.0;
-    const WIDTH: f32 = 76.0;
+    const Y: f32 = 296.0;
+    const WIDTH: f32 = 96.0;
+    const HEIGHT: f32 = 16.0;
     const GAP: f32 = 4.0;
+    /// Deux modes par rangée : quatre côte à côte tomberaient à quarante-huit
+    /// pixels chacun, où « RAPIDE » ne tient pas.
+    const PER_ROW: usize = 2;
 
-    let total = WIDTH * Mode::ALL.len() as f32 + GAP * (Mode::ALL.len() - 1) as f32;
+    let total = WIDTH * PER_ROW as f32 + GAP * (PER_ROW - 1) as f32;
     let start_x = ((canvas::WIDTH - total) / 2.0).floor();
     let before = *mode;
 
@@ -134,7 +139,12 @@ fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
     }
 
     for (index, candidate) in Mode::ALL.iter().enumerate() {
-        let cell = Rect::new(start_x + index as f32 * (WIDTH + GAP), Y, WIDTH, 14.0);
+        let cell = Rect::new(
+            start_x + (index % PER_ROW) as f32 * (WIDTH + GAP),
+            Y + (index / PER_ROW) as f32 * (HEIGHT + GAP),
+            WIDTH,
+            HEIGHT,
+        );
         let unlocked = app.progress.mode_unlocked(level_id, *candidate);
         let chosen = *candidate == *mode;
 
@@ -170,7 +180,7 @@ fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
             &app.fonts,
             candidate.label(),
             cell.x + cell.w / 2.0,
-            cell.y + 3.0,
+            cell.y + (cell.h - fonts::TEXT as f32) / 2.0,
             fonts::TEXT,
             label_color,
         );
@@ -187,7 +197,7 @@ fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {
         fonts_set,
         &level.title,
         8.0,
-        6.0,
+        8.0,
         fonts::TEXT,
         role::TITLE,
         canvas::WIDTH - 16.0,
@@ -196,22 +206,21 @@ fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {
         fonts_set,
         &level.subtitle,
         8.0,
-        17.0,
+        19.0,
         fonts::TEXT,
         role::TEXT_MUTED,
         canvas::WIDTH - 16.0,
     );
 
     let count = format!("{} SIGNES", level.glyphs.len());
-    let width = ui::text_width(fonts_set, &count, fonts::TEXT);
-    ui::text(fonts_set, &count, canvas::WIDTH - 8.0 - width, 6.0, fonts::TEXT, role::TEXT_MUTED);
+    ui::text(fonts_set, &count, 8.0, 32.0, fonts::TEXT, role::TEXT_MUTED);
 
     // Le palmarès du niveau, juste sous le décompte des signes : on voit en
     // arrivant ce qui a été décroché et ce qui reste.
     let modes = progress.modes(&level.id);
     ui::level_stars(
         canvas::WIDTH - 8.0 - ui::level_stars_width(MAX_STARS),
-        18.0,
+        32.0,
         progress.stars(&level.id),
         MAX_STARS,
         modes.fast_perfect,
@@ -271,7 +280,7 @@ fn draw_glyphs(app: &App, language: &Language, level: &Level, mouse: Vec2) -> Op
             fonts_set,
             &format!("+{remaining} AUTRES"),
             GRID_X,
-            GRID_Y + ROWS as f32 * CELL_HEIGHT + 2.0,
+            GRID_Y + ROWS as f32 * CELL_HEIGHT + 4.0,
             fonts::TEXT,
             role::TEXT_DISABLED,
         );
@@ -281,7 +290,7 @@ fn draw_glyphs(app: &App, language: &Language, level: &Level, mouse: Vec2) -> Op
 }
 
 fn draw_rules(fonts_set: &Fonts, level: &Level) {
-    const Y: f32 = 112.0;
+    const Y: f32 = 250.0;
 
     let rules = &level.rules;
     let duration = if rules.is_timed() {
@@ -289,13 +298,13 @@ fn draw_rules(fonts_set: &Fonts, level: &Level) {
     } else {
         "SANS LIMITE".to_string()
     };
-    let summary = format!("{} VIES   {duration}   {} COLONNES", rules.lives, rules.columns);
+    let summary = format!("{} VIES   {duration}", rules.lives);
     ui::text_centered(fonts_set, &summary, canvas::WIDTH / 2.0, Y, fonts::TEXT, role::TEXT);
 
     // Les seuils, pour savoir ce qu'il faut viser avant de commencer.
-    const THRESHOLD_Y: f32 = 126.0;
+    const THRESHOLD_Y: f32 = 266.0;
     let thresholds = [level.stars.one, level.stars.two, level.stars.three];
-    let block_width = 100.0;
+    let block_width = 64.0;
     let start_x = (canvas::WIDTH - block_width * MAX_STARS as f32) / 2.0;
 
     for (index, threshold) in thresholds.iter().enumerate() {
