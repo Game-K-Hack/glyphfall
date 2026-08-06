@@ -13,7 +13,7 @@ use crate::gfx::{canvas, fonts};
 use crate::settings::{DAILY_GOALS, goal_label};
 
 /// La barre de choix, assez large pour que neuf crans restent distincts.
-const BAR: Rect = Rect { x: 42.0, y: 108.0, w: 300.0, h: 14.0 };
+const BAR: Rect = Rect { x: 20.0, y: 196.0, w: 176.0, h: 14.0 };
 
 pub fn daily_goal_screen(
     app: &mut App,
@@ -29,34 +29,38 @@ pub fn daily_goal_screen(
         &app.fonts,
         "TON OBJECTIF",
         canvas::WIDTH / 2.0,
-        26.0,
+        64.0,
         fonts::TITLE,
         role::TITLE,
     );
 
-    for (index, line) in [
+    // Une phrase par appel : réunies, le « ? » se retrouverait seul en tête de
+    // ligne, la coupure ne connaissant que les espaces.
+    let suite = ui::paragraph(
+        &app.fonts,
         "Combien de temps par jour ?",
+        canvas::WIDTH / 2.0,
+        100.0,
+        fonts::TEXT,
+        role::TEXT_MUTED,
+        canvas::WIDTH - 16.0,
+    );
+    ui::paragraph(
+        &app.fonts,
         "Le jeu te previendra quand tu y seras.",
-    ]
-    .iter()
-    .enumerate()
-    {
-        ui::text_centered(
-            &app.fonts,
-            line,
-            canvas::WIDTH / 2.0,
-            54.0 + index as f32 * 11.0,
-            fonts::TEXT,
-            role::TEXT_MUTED,
-        );
-    }
+        canvas::WIDTH / 2.0,
+        suite + 2.0,
+        fonts::TEXT,
+        role::TEXT_MUTED,
+        canvas::WIDTH - 16.0,
+    );
 
     // La valeur choisie, en gros au-dessus de la barre : c'est elle qu'on
     // regarde en déplaçant le curseur, pas le curseur lui-même.
     let minutes = DAILY_GOALS[*step];
     let (label, color) =
         if minutes == 0 { ("SANS ALERTE".to_string(), role::TEXT_MUTED) } else { (goal_label(minutes), role::ACCENT) };
-    ui::text_centered(&app.fonts, &label, canvas::WIDTH / 2.0, 84.0, fonts::TITLE, color);
+    ui::text_centered(&app.fonts, &label, canvas::WIDTH / 2.0, 156.0, fonts::TITLE, color);
 
     let before = *step;
     *step = pick(*step, dragging, BAR, mouse);
@@ -81,14 +85,14 @@ pub fn daily_goal_screen(
 
     ui::text_centered(
         &app.fonts,
-        "MODIFIABLE PLUS TARD DANS LES OPTIONS",
+        "MODIFIABLE PLUS TARD",
         canvas::WIDTH / 2.0,
-        158.0,
+        262.0,
         fonts::TEXT,
         role::TEXT_DISABLED,
     );
 
-    let confirm = Rect::new(((canvas::WIDTH - 140.0) / 2.0).floor(), 178.0, 140.0, 20.0);
+    let confirm = Rect::new(((canvas::WIDTH - 140.0) / 2.0).floor(), 296.0, 140.0, 20.0);
     let pressed = ui::button(&app.fonts, mouse, Button::new(confirm, "C'EST PARTI").focused(true));
 
     if pressed || is_key_pressed(KeyCode::Enter) {

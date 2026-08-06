@@ -1,4 +1,4 @@
-//! La toile virtuelle : tout le jeu est dessiné dans une image de 384×216,
+//! La toile virtuelle : tout le jeu est dessiné dans une image de 216×384,
 //! puis agrandie d'un facteur **entier** en filtrage « au plus proche ».
 //!
 //! C'est la seule façon d'obtenir de vrais pixels carrés. Dessiner directement
@@ -14,9 +14,18 @@ use macroquad::prelude::*;
 use super::palette;
 
 /// Largeur de la toile, en pixels virtuels.
-pub const WIDTH: f32 = 384.0;
-/// Hauteur de la toile, en pixels virtuels (16:9).
-pub const HEIGHT: f32 = 216.0;
+///
+/// La toile est **en portrait**, et l'était en paysage jusqu'à ce que le jeu
+/// arrive sur téléphone. Deux mises en page pour douze écrans auraient été deux
+/// fois plus de travail à chaque changement ; le format vertical convient par
+/// ailleurs mieux à des tuiles qui tombent, qui gagnent en hauteur de chute ce
+/// qu'elles perdent en largeur.
+///
+/// Conséquence à ne pas perdre de vue : une ligne ne porte plus que vingt-sept
+/// caractères de la police pixel, contre quarante-huit auparavant.
+pub const WIDTH: f32 = 216.0;
+/// Hauteur de la toile, en pixels virtuels (9:16).
+pub const HEIGHT: f32 = 384.0;
 
 pub struct Canvas {
     target: RenderTarget,

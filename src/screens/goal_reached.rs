@@ -14,7 +14,7 @@ use crate::gfx::fonts;
 use crate::settings::goal_label;
 
 /// Le panneau du message, centré sur la toile.
-const PANEL: Rect = Rect { x: 52.0, y: 56.0, w: 280.0, h: 104.0 };
+const PANEL: Rect = Rect { x: 16.0, y: 120.0, w: 184.0, h: 128.0 };
 
 pub fn goal_reached_screen(app: &App, mouse: Vec2) -> Transition {
     // La pile ne dessine que son sommet : laisser le fond intact ne montrerait
@@ -42,13 +42,14 @@ pub fn goal_reached_screen(app: &App, mouse: Vec2) -> Transition {
         fonts::TEXT,
         role::TEXT,
     );
-    ui::text_centered(
+    ui::paragraph(
         &app.fonts,
         "Rien ne t'empeche de continuer.",
         center,
         PANEL.y + 58.0,
         fonts::TEXT,
         role::TEXT_MUTED,
+        PANEL.w - 12.0,
     );
 
     let close = Rect::new((center - 60.0).floor(), PANEL.y + PANEL.h - 28.0, 120.0, 20.0);

@@ -251,6 +251,32 @@ pub fn wrap(fonts: &Fonts, content: &str, size: u16, max_width: f32) -> Vec<Stri
     lines
 }
 
+/// Écrit un texte sur plusieurs lignes centrées, et renvoie l'ordonnée de la
+/// suivante.
+///
+/// En portrait, une ligne ne porte plus que vingt-sept caractères : découper les
+/// phrases à la main dans chaque écran obligerait à recompter à chaque
+/// retouche, et un mot ajouté sortirait de l'écran sans prévenir.
+pub fn paragraph(
+    fonts: &Fonts,
+    content: &str,
+    center_x: f32,
+    top: f32,
+    size: u16,
+    color: Color,
+    max_width: f32,
+) -> f32 {
+    let step = size as f32 + 3.0;
+    let mut y = top;
+
+    for line in wrap(fonts, content, size, max_width) {
+        text_centered(fonts, &line, center_x, y, size, color);
+        y += step;
+    }
+
+    y
+}
+
 // --- Panneaux et boutons ---------------------------------------------------
 
 /// Un panneau : fond, contour sombre, et arête claire en haut à gauche qui

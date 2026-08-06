@@ -19,6 +19,9 @@ use crate::gfx::{canvas, fonts};
 const SAMPLE_LANGUAGE: &str = "ko";
 const SAMPLE_GLYPH: &str = "ㅎ";
 
+/// Largeur laissée aux paragraphes, marges comprises.
+const TEXTE: f32 = canvas::WIDTH - 16.0;
+
 pub fn font_choice_screen(app: &mut App, mouse: Vec2) -> Transition {
     clear_background(role::BACKGROUND);
 
@@ -26,59 +29,44 @@ pub fn font_choice_screen(app: &mut App, mouse: Vec2) -> Transition {
         &app.fonts,
         "TRACES VARIES",
         canvas::WIDTH / 2.0,
-        22.0,
+        56.0,
         fonts::TITLE,
         role::TITLE,
     );
 
-    for (index, line) in [
-        "Un signe change de dessin selon la police,",
-        "comme nos lettres imprimees ou manuscrites.",
-    ]
-    .iter()
-    .enumerate()
-    {
-        ui::text_centered(
-            &app.fonts,
-            line,
-            canvas::WIDTH / 2.0,
-            48.0 + index as f32 * 11.0,
-            fonts::TEXT,
-            role::TEXT_MUTED,
-        );
-    }
+    ui::paragraph(
+        &app.fonts,
+        "Un signe change de dessin selon la police, comme nos lettres imprimees ou manuscrites.",
+        canvas::WIDTH / 2.0,
+        88.0,
+        fonts::TEXT,
+        role::TEXT_MUTED,
+        TEXTE,
+    );
 
     draw_samples(app);
 
-    ui::text_centered(
+    ui::paragraph(
         &app.fonts,
-        "Les varier rend l'apprentissage plus solide,",
+        "Les varier rend l'apprentissage plus solide, mais les parties plus difficiles.",
         canvas::WIDTH / 2.0,
-        144.0,
+        256.0,
         fonts::TEXT,
         role::TEXT,
-    );
-    ui::text_centered(
-        &app.fonts,
-        "mais les parties plus difficiles.",
-        canvas::WIDTH / 2.0,
-        155.0,
-        fonts::TEXT,
-        role::TEXT,
+        TEXTE,
     );
 
-    const WIDTH: f32 = 130.0;
-    const GAP: f32 = 12.0;
-    let x = ((canvas::WIDTH - (WIDTH * 2.0 + GAP)) / 2.0).floor();
+    const WIDTH: f32 = 160.0;
+    let x = ((canvas::WIDTH - WIDTH) / 2.0).floor();
 
-    let vary = Rect::new(x, 180.0, WIDTH, 20.0);
+    let vary = Rect::new(x, 310.0, WIDTH, 20.0);
     if ui::button(&app.fonts, mouse, Button::new(vary, "VARIER").focused(true))
         || is_key_pressed(KeyCode::Enter)
     {
         return chosen(app, true);
     }
 
-    let single = Rect::new(x + WIDTH + GAP, 180.0, WIDTH, 20.0);
+    let single = Rect::new(x, 338.0, WIDTH, 20.0);
     if ui::button(&app.fonts, mouse, Button::new(single, "UN SEUL").accent(role::TEXT_MUTED)) {
         return chosen(app, false);
     }
@@ -88,24 +76,35 @@ pub fn font_choice_screen(app: &mut App, mouse: Vec2) -> Transition {
 
 /// Le même signe dans chacun des tracés disponibles, côte à côte.
 fn draw_samples(app: &App) {
-    const Y: f32 = 74.0;
+    const Y: f32 = 146.0;
     const GAP: f32 = 6.0;
-    /// Largeur laissée à la rangée, marges comprises.
-    const BAND: f32 = 344.0;
-    /// Au-delà, une seule écriture remplirait l'écran de démonstration.
-    const MAX_SIZE: f32 = 58.0;
+    /// Largeur laissée aux rangées, marges comprises.
+    const BAND: f32 = 196.0;
+    /// Au-delà de quatre par rangée, les cases deviennent trop petites pour que
+    /// l'on distingue ce que la question demande de comparer.
+    const PER_ROW: usize = 4;
 
     let count = app.fonts.script_count(SAMPLE_LANGUAGE).max(1);
+    let columns = count.min(PER_ROW);
+    let size = ((BAND - GAP * (columns - 1) as f32) / columns as f32).floor();
 
-    // Les cases se serrent pour tenir en une rangée : les faire déborder ou les
-    // replier sur deux lignes casserait la lecture d'un coup d'oeil, qui est
-    // tout ce que cet écran a à offrir.
-    let size = ((BAND - GAP * (count - 1) as f32) / count as f32).min(MAX_SIZE).floor();
-    let total = size * count as f32 + GAP * (count - 1) as f32;
-    let start_x = ((canvas::WIDTH - total) / 2.0).floor();
-
+    // Plusieurs rangées plutôt qu'une seule rétrécie : la démonstration ne vaut
+    // que si l'on voit les tracés, et sept cases en largeur les réduiraient à
+    // des taches.
     for index in 0..count {
-        let cell = Rect::new(start_x + index as f32 * (size + GAP), Y, size, size);
+        let row = index / PER_ROW;
+        let in_row = index % PER_ROW;
+        let of_row = (count - row * PER_ROW).min(PER_ROW);
+
+        let total = size * of_row as f32 + GAP * (of_row - 1) as f32;
+        let start_x = ((canvas::WIDTH - total) / 2.0).floor();
+
+        let cell = Rect::new(
+            start_x + in_row as f32 * (size + GAP),
+            Y + row as f32 * (size + GAP),
+            size,
+            size,
+        );
         ui::panel(cell, role::PANEL);
         ui::glyph_fitted(
             app.fonts.script_variant(SAMPLE_LANGUAGE, index),
