@@ -15,13 +15,13 @@ use crate::gfx::{Fonts, canvas, fonts};
 use crate::progress::{MAX_STARS, Progress};
 use crate::session::{Mode, Session};
 
-const VIEWPORT_TOP: f32 = 24.0;
-const VIEWPORT_BOTTOM: f32 = 192.0;
+const VIEWPORT_TOP: f32 = 26.0;
+const VIEWPORT_BOTTOM: f32 = 336.0;
 
-const NODE_X: f32 = 20.0;
+const NODE_X: f32 = 14.0;
 const NODE_SIZE: f32 = 22.0;
-const ROW_HEIGHT: f32 = 24.0;
-const ROW_STEP: f32 = 34.0;
+const ROW_HEIGHT: f32 = 26.0;
+const ROW_STEP: f32 = 36.0;
 const TEXT_X: f32 = NODE_X + NODE_SIZE + 10.0;
 
 /// Hauteur utile du cadre, marges déduites.
@@ -38,6 +38,17 @@ const WHEEL_STEP: f32 = 20.0;
 /// pour un clic. En dessous, c'est la main qui tremble.
 const DRAG_SLOP: f32 = 4.0;
 
+/// Ce qu'il reste de l'élan après une seconde, entre 0 et 1.
+///
+/// Au doigt, une liste qui s'arrête pile où on la lâche paraît collée au verre.
+/// Elle doit filer puis ralentir, comme une page web — c'est à ce détail que le
+/// défilement paraît fluide ou non.
+const GLIDE_FRICTION: f32 = 0.02;
+
+/// En dessous de cette vitesse, en pixels par seconde, l'élan s'arrête. Sans ce
+/// seuil, la liste dériverait indéfiniment d'un pixel de temps en temps.
+const GLIDE_STOP: f32 = 6.0;
+
 /// L'état de l'écran, conservé d'une frame à l'autre.
 pub struct PathView {
     /// `None` tant que l'écran ne s'est pas placé sur l'étape en cours.
@@ -46,6 +57,8 @@ pub struct PathView {
     scroll: f32,
     /// Appui en cours, à la souris ou au doigt.
     drag: Option<Drag>,
+    /// Élan restant après un lâcher, en pixels par seconde.
+    velocity: f32,
 }
 
 /// Un appui maintenu, qui fait défiler tant qu'il se déplace.
@@ -57,7 +70,7 @@ struct Drag {
 
 impl PathView {
     pub fn new() -> Self {
-        Self { selected: None, scroll: 0.0, drag: None }
+        Self { selected: None, scroll: 0.0, drag: None, velocity: 0.0 }
     }
 }
 
@@ -111,6 +124,9 @@ pub fn learning_path_screen(
     let wheel = mouse_wheel().1;
     if wheel != 0.0 {
         view.scroll -= wheel.signum() * WHEEL_STEP;
+        // Un cran de molette est un saut voulu, pas un lancer : il coupe l'élan
+        // en cours au lieu de s'y ajouter.
+        view.velocity = 0.0;
     }
 
     // Maintenir et tirer fait défiler. macroquad traduit les touchers en
@@ -118,13 +134,22 @@ pub fn learning_path_screen(
     // défiler sur un téléphone, où il n'y a ni molette ni flèches.
     if is_mouse_button_pressed(MouseButton::Left) {
         view.drag = Some(Drag { last_y: mouse.y, travelled: 0.0 });
+        // Poser le doigt arrête la liste : c'est ainsi qu'on rattrape un
+        // défilement lancé trop fort.
+        view.velocity = 0.0;
     }
+    let frame = get_frame_time().max(0.001);
     if is_mouse_button_down(MouseButton::Left) {
         if let Some(drag) = &mut view.drag {
             let delta = mouse.y - drag.last_y;
             view.scroll -= delta;
             drag.travelled += delta.abs();
             drag.last_y = mouse.y;
+
+            // La vitesse du lancer est lissée : prise sur la seule dernière
+            // frame, un tremblement au moment du lâcher enverrait la liste à
+            // l'autre bout.
+            view.velocity = view.velocity * 0.7 - delta / frame * 0.3;
         }
     }
 
@@ -135,7 +160,23 @@ pub fn learning_path_screen(
         tapped = view.drag.take().is_some_and(|drag| drag.travelled <= DRAG_SLOP);
     }
 
+    // L'élan continue seul une fois le doigt levé, puis s'éteint.
+    if view.drag.is_none() && view.velocity != 0.0 {
+        view.scroll += view.velocity * frame;
+        view.velocity *= GLIDE_FRICTION.powf(frame);
+
+        if view.velocity.abs() < GLIDE_STOP {
+            view.velocity = 0.0;
+        }
+    }
+
+    let before_clamp = view.scroll;
     view.scroll = view.scroll.clamp(0.0, limit);
+    // Buter en haut ou en bas coupe l'élan : sans cela, la liste resterait
+    // collée au bord le temps que la vitesse retombe.
+    if view.scroll != before_clamp {
+        view.velocity = 0.0;
+    }
 
     // --- Rendu ------------------------------------------------------------
     // Le survol est cherché avant de dessiner : sans cela, les lignes situées
@@ -187,7 +228,7 @@ pub fn learning_path_screen(
     // revoir un alphabet auquel on n'a jamais touché n'aurait aucun sens.
     let can_revise = !app.progress.learned_signs(language_id).is_empty();
     if can_revise {
-        let revise = Rect::new(canvas::WIDTH - 16.0 - 82.0, 194.0, 82.0, 16.0);
+        let revise = Rect::new(canvas::WIDTH - 14.0 - 82.0, 344.0, 82.0, 18.0);
         if ui::button(&app.fonts, mouse, Button::new(revise, "REVISION").accent(role::SUCCESS)) {
             let tracings = app.tracings(language_id);
             if let Some(session) =
@@ -288,7 +329,7 @@ fn draw_scrollbar(scroll: f32, limit: f32) {
 }
 
 fn draw_header(fonts_set: &Fonts, language: &Language, progress: &Progress) {
-    ui::text(fonts_set, &language.name, 8.0, 8.0, fonts::TEXT, role::TITLE);
+    ui::text_truncated(fonts_set, &language.name, 8.0, 8.0, fonts::TEXT, role::TITLE, 130.0);
 
     let (earned, total) = progress.language_stars(language);
     let label = format!("{earned}/{total}");
@@ -298,7 +339,7 @@ fn draw_header(fonts_set: &Fonts, language: &Language, progress: &Progress) {
     ui::text(fonts_set, &label, x, 8.0, fonts::TEXT, role::TEXT_MUTED);
     ui::star(x - ui::STAR_WIDTH - 3.0, 8.0, earned > 0);
 
-    draw_rectangle(8.0, 20.0, canvas::WIDTH - 16.0, 1.0, role::HIGHLIGHT);
+    draw_rectangle(8.0, 22.0, canvas::WIDTH - 16.0, 1.0, role::HIGHLIGHT);
 }
 
 fn draw_row(
@@ -341,31 +382,42 @@ fn draw_row(
         (role::TEXT_DISABLED, role::TEXT_DISABLED)
     };
 
-    let stars_x = canvas::WIDTH - NODE_X - ui::level_stars_width(MAX_STARS);
-    // Le titre s'arrête avant les étoiles, le sous-titre peut courir dessous.
-    let title_width = stars_x - TEXT_X - 6.0;
-    let subtitle_width = canvas::WIDTH - NODE_X - TEXT_X;
-
-    ui::text_truncated(fonts_set, &level.title, TEXT_X, row.y + 2.0, fonts::TEXT, title_color, title_width);
+    // Le titre prend toute la largeur, les étoiles passent en dessous. Côte à
+    // côte, il ne resterait que quatorze caractères au titre, et « Revision :
+    // les 10 voyelles » se lirait « Revision :... » — soit le contraire de ce
+    // qu'une liste d'étapes doit annoncer.
+    let title_width = canvas::WIDTH - NODE_X - TEXT_X;
     ui::text_truncated(
         fonts_set,
-        &level.subtitle,
+        &level.title,
         TEXT_X,
-        row.y + 13.0,
+        row.y + 2.0,
         fonts::TEXT,
-        subtitle_color,
-        subtitle_width,
+        title_color,
+        title_width,
     );
 
     if unlocked {
         let modes = progress.modes(&level.id);
         ui::level_stars(
-            stars_x,
-            row.y + 2.0,
+            TEXT_X,
+            row.y + 14.0,
             stars,
             MAX_STARS,
             modes.fast_perfect,
             modes.ultra_perfect,
+        );
+    } else {
+        // Une étape fermée n'a pas d'étoiles à montrer : le sous-titre dit à sa
+        // place ce qu'elle contient.
+        ui::text_truncated(
+            fonts_set,
+            &level.subtitle,
+            TEXT_X,
+            row.y + 14.0,
+            fonts::TEXT,
+            subtitle_color,
+            title_width,
         );
     }
 }
@@ -382,13 +434,13 @@ fn draw_footer(
     let hint = match (progress.is_unlocked(level), crowded) {
         // Le bouton de révision occupe la droite : le rappel raccourcit pour ne
         // pas passer dessous.
-        (true, true) => "ENTREE JOUER",
-        (true, false) => "ENTREE JOUER   ECHAP RETOUR",
-        (false, _) => "TERMINE LES ETAPES PRECEDENTES",
+        (true, true) => "TOUCHE",
+        (true, false) => "TOUCHE UNE ETAPE",
+        (false, _) => "FINIS LES ETAPES D'AVANT",
     };
 
-    let center = if crowded { 150.0 } else { canvas::WIDTH / 2.0 };
-    ui::text_centered(fonts_set, hint, center, 198.0, fonts::TEXT, role::TEXT_DISABLED);
+    let center = if crowded { 58.0 } else { canvas::WIDTH / 2.0 };
+    ui::text_centered(fonts_set, hint, center, 368.0, fonts::TEXT, role::TEXT_DISABLED);
 }
 
 #[cfg(test)]
@@ -403,8 +455,11 @@ mod tests {
         // Une étape déjà visible ne doit rien faire bouger.
         assert_eq!(scrolled_into_view(0.0, 2), 0.0);
 
-        // Juste en dessous du cadre : il descend du strict nécessaire.
-        let just_below = scrolled_into_view(0.0, 5);
+        // Juste en dessous du cadre : il descend du strict nécessaire. L'étape
+        // est calculée et non écrite en dur, sans quoi le test cesserait de
+        // vérifier quoi que ce soit dès que le cadre change de hauteur.
+        let first_below = ((VIEW_HEIGHT - ROW_HEIGHT) / ROW_STEP).floor() as usize + 1;
+        let just_below = scrolled_into_view(0.0, first_below);
         assert!(just_below > 0.0 && just_below < ROW_STEP * 2.0, "décalage : {just_below}");
 
         // Au-dessus : il remonte pile sur l'étape choisie.

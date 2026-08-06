@@ -12,15 +12,15 @@ use crate::gfx::ui;
 use crate::gfx::{Fonts, canvas, fonts};
 use crate::screens::learning_path::PathView;
 
-const CARD_X: f32 = 32.0;
-const CARD_WIDTH: f32 = 320.0;
-const CARD_HEIGHT: f32 = 28.0;
-const CARD_GAP: f32 = 6.0;
-const FIRST_CARD_Y: f32 = 30.0;
+const CARD_X: f32 = 12.0;
+const CARD_WIDTH: f32 = canvas::WIDTH - CARD_X * 2.0;
+const CARD_HEIGHT: f32 = 38.0;
+const CARD_GAP: f32 = 8.0;
+const FIRST_CARD_Y: f32 = 60.0;
 
 /// Le pavé qui affiche le nom natif, à gauche de chaque carte.
 const BADGE_WIDTH: f32 = 44.0;
-const BADGE_HEIGHT: f32 = 20.0;
+const BADGE_HEIGHT: f32 = 26.0;
 const BADGE_FONT: u16 = 14;
 
 pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> Transition {
@@ -50,7 +50,7 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
         &app.fonts,
         "CHOISIS TON ALPHABET",
         canvas::WIDTH / 2.0,
-        10.0,
+        28.0,
         fonts::TEXT,
         role::TITLE,
     );
@@ -76,9 +76,9 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
 
     ui::text_centered(
         &app.fonts,
-        "ENTREE VALIDER   ECHAP RETOUR",
+        "TOUCHE UN ALPHABET",
         canvas::WIDTH / 2.0,
-        200.0,
+        360.0,
         fonts::TEXT,
         role::TEXT_DISABLED,
     );
@@ -130,7 +130,7 @@ fn draw_card(fonts_set: &Fonts, language: &Language, card: Rect, selected: bool)
 
     ui::panel(card, background);
 
-    let badge = Rect::new(card.x + 4.0, card.y + 4.0, BADGE_WIDTH, BADGE_HEIGHT);
+    let badge = Rect::new(card.x + 5.0, card.y + 6.0, BADGE_WIDTH, BADGE_HEIGHT);
     ui::fill(badge, role::BACKGROUND);
     ui::glyph_fitted(
         fonts_set.script(&language.id),
@@ -140,8 +140,24 @@ fn draw_card(fonts_set: &Fonts, language: &Language, card: Rect, selected: bool)
         role::TEXT,
     );
 
+    // Le nom passe sur deux lignes plutôt que d'être coupé : « Japonais —
+    // Hiragana » tronqué perdrait justement le mot qui distingue une écriture
+    // de sa voisine, et il ne reste que dix-sept caractères par ligne à côté du
+    // pavé du nom natif.
     let text_x = badge.x + BADGE_WIDTH + 8.0;
-    ui::text(fonts_set, &language.name, text_x, card.y + 5.0, fonts::TEXT, title_color);
+    let text_width = card.x + card.w - text_x - 5.0;
+    for (line, content) in
+        ui::wrap(fonts_set, &language.name, fonts::TEXT, text_width).iter().take(2).enumerate()
+    {
+        ui::text(
+            fonts_set,
+            content,
+            text_x,
+            card.y + 5.0 + line as f32 * 10.0,
+            fonts::TEXT,
+            title_color,
+        );
+    }
 
     let count = language.levels.len();
     let plural = if count > 1 { "NIVEAUX" } else { "NIVEAU" };
@@ -149,7 +165,7 @@ fn draw_card(fonts_set: &Fonts, language: &Language, card: Rect, selected: bool)
         fonts_set,
         &format!("{count} {plural}"),
         text_x,
-        card.y + 16.0,
+        card.y + 25.0,
         fonts::TEXT,
         detail_color,
     );
@@ -157,12 +173,12 @@ fn draw_card(fonts_set: &Fonts, language: &Language, card: Rect, selected: bool)
 
 /// La description de la langue survolée, en bas de l'écran.
 fn draw_description(fonts_set: &Fonts, language: &Language) {
-    const PANEL_Y: f32 = 166.0;
-    const PANEL_HEIGHT: f32 = 26.0;
+    const PANEL_Y: f32 = 300.0;
+    const PANEL_HEIGHT: f32 = 46.0;
     const PADDING: f32 = 5.0;
     /// Au-delà, le texte déborderait du panneau : la description est tronquée
     /// plutôt que d'écrire par-dessus le reste de l'écran.
-    const MAX_LINES: usize = 2;
+    const MAX_LINES: usize = 4;
 
     let panel = Rect::new(CARD_X, PANEL_Y, CARD_WIDTH, PANEL_HEIGHT);
     ui::panel(panel, role::PANEL);
