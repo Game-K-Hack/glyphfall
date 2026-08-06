@@ -1,0 +1,41 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'fr.socodep.glyphfall'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'fr.socodep.glyphfall'
+        // API 26 : la version que vise la bibliothèque native, et le plancher
+        // en dessous duquel OpenGL ES 2 et le son deviennent capricieux.
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0'
+    }
+
+    sourceSets {
+        main {
+            // Les bibliothèques natives sont posées par tools/android.py, qui
+            // les compile pour chaque architecture avant d'appeler Gradle.
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+
+    buildTypes {
+        release {
+            // Rien à réduire : tout le code est natif, le Java se limite à
+            // l'activité de miniquad.
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // Les .so sont déjà compressées de leur contenu embarqué ; les stocker
+    // telles quelles permet à Android de les charger sans les recopier.
+    packagingOptions { jniLibs { useLegacyPackaging false } }
+}

@@ -3,6 +3,14 @@ name = "glyphfall"
 version = "0.1.0"
 edition = "2024"
 
+# Android charge une bibliothèque partagée, le bureau un exécutable : les deux
+# sortent du même code.
+[lib]
+# Un nom distinct de l'exécutable : sur Windows, deux cibles homonymes se
+# disputeraient le même fichier de symboles.
+name = "glyphfall_core"
+crate-type = ["lib", "cdylib"]
+
 [dependencies]
 include_dir = "0.7.4"
 macroquad = { version = "0.4", features = ["audio"] }

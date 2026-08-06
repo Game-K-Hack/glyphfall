@@ -1,2 +1,10 @@
 /target
 /web/glyphfall.wasm
+
+# Les bibliothèques natives et les APK sont fabriqués par tools/android.py ;
+# une seule pèse soixante mégaoctets, tout le contenu du jeu y étant embarqué.
+/android/app/src/main/jniLibs/
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/local.properties
