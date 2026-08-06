@@ -12,15 +12,15 @@ use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 use crate::screens::learning_path::PathView;
 
-const CARD_X: f32 = 12.0;
+const CARD_X: f32 = canvas::pick(12.0, 32.0);
 const CARD_WIDTH: f32 = canvas::WIDTH - CARD_X * 2.0;
-const CARD_HEIGHT: f32 = 38.0;
-const CARD_GAP: f32 = 8.0;
-const FIRST_CARD_Y: f32 = 60.0;
+const CARD_HEIGHT: f32 = canvas::pick(38.0, 28.0);
+const CARD_GAP: f32 = canvas::pick(8.0, 6.0);
+const FIRST_CARD_Y: f32 = canvas::pick(60.0, 30.0);
 
 /// Le pavé qui affiche le nom natif, à gauche de chaque carte.
 const BADGE_WIDTH: f32 = 44.0;
-const BADGE_HEIGHT: f32 = 26.0;
+const BADGE_HEIGHT: f32 = canvas::pick(26.0, 20.0);
 const BADGE_FONT: u16 = 14;
 
 pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> Transition {
@@ -50,18 +50,21 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
         &app.fonts,
         "CHOISIS TON ALPHABET",
         canvas::WIDTH / 2.0,
-        28.0,
+        canvas::pick(28.0, 10.0),
         fonts::TEXT,
         role::TITLE,
     );
 
-    // Un téléphone n'a pas d'Échap : chaque écran d'où l'on peut repartir
-    // porte son propre retour, la touche d'Android n'étant qu'un raccourci.
-    if ui::button(
-        &app.fonts,
-        mouse,
-        Button::new(Rect::new(8.0, 18.0, 26.0, 20.0), "<").accent(role::TEXT_MUTED),
-    ) {
+    // Un téléphone n'a pas d'Échap : les écrans d'où l'on peut repartir portent
+    // leur propre retour, en haut à gauche. Couché, la touche suffit et le coin
+    // appartient au titre.
+    if canvas::PORTRAIT
+        && ui::button(
+            &app.fonts,
+            mouse,
+            Button::new(Rect::new(6.0, 4.0, 26.0, 16.0), "<").accent(role::TEXT_MUTED),
+        )
+    {
         return Transition::Pop;
     }
 
@@ -86,9 +89,9 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
 
     ui::text_centered(
         &app.fonts,
-        "TOUCHE UN ALPHABET",
+        canvas::label("TOUCHE UN ALPHABET", "ENTREE VALIDER   ECHAP RETOUR"),
         canvas::WIDTH / 2.0,
-        360.0,
+        canvas::pick(360.0, 200.0),
         fonts::TEXT,
         role::TEXT_DISABLED,
     );
@@ -163,7 +166,7 @@ fn draw_card(fonts_set: &Fonts, language: &Language, card: Rect, selected: bool)
             fonts_set,
             content,
             text_x,
-            card.y + 5.0 + line as f32 * 10.0,
+            card.y + canvas::pick(5.0, 4.0) + line as f32 * 10.0,
             fonts::TEXT,
             title_color,
         );
@@ -175,7 +178,7 @@ fn draw_card(fonts_set: &Fonts, language: &Language, card: Rect, selected: bool)
         fonts_set,
         &format!("{count} {plural}"),
         text_x,
-        card.y + 25.0,
+        card.y + canvas::pick(25.0, 16.0),
         fonts::TEXT,
         detail_color,
     );
@@ -183,12 +186,12 @@ fn draw_card(fonts_set: &Fonts, language: &Language, card: Rect, selected: bool)
 
 /// La description de la langue survolée, en bas de l'écran.
 fn draw_description(fonts_set: &Fonts, language: &Language) {
-    const PANEL_Y: f32 = 300.0;
-    const PANEL_HEIGHT: f32 = 46.0;
+    const PANEL_Y: f32 = canvas::pick(300.0, 166.0);
+    const PANEL_HEIGHT: f32 = canvas::pick(46.0, 26.0);
     const PADDING: f32 = 5.0;
     /// Au-delà, le texte déborderait du panneau : la description est tronquée
     /// plutôt que d'écrire par-dessus le reste de l'écran.
-    const MAX_LINES: usize = 4;
+    const MAX_LINES: usize = if canvas::PORTRAIT { 4 } else { 2 };
 
     let panel = Rect::new(CARD_X, PANEL_Y, CARD_WIDTH, PANEL_HEIGHT);
     ui::panel(panel, role::PANEL);

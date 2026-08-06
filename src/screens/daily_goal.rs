@@ -13,7 +13,12 @@ use crate::gfx::{canvas, fonts};
 use crate::settings::{DAILY_GOALS, goal_label};
 
 /// La barre de choix, assez large pour que neuf crans restent distincts.
-const BAR: Rect = Rect { x: 20.0, y: 196.0, w: 176.0, h: 14.0 };
+const BAR: Rect = Rect {
+    x: canvas::pick(20.0, 42.0),
+    y: canvas::pick(196.0, 108.0),
+    w: canvas::pick(176.0, 300.0),
+    h: 14.0,
+};
 
 pub fn daily_goal_screen(
     app: &mut App,
@@ -29,7 +34,7 @@ pub fn daily_goal_screen(
         &app.fonts,
         "TON OBJECTIF",
         canvas::WIDTH / 2.0,
-        64.0,
+        canvas::pick(64.0, 26.0),
         fonts::TITLE,
         role::TITLE,
     );
@@ -40,7 +45,7 @@ pub fn daily_goal_screen(
         &app.fonts,
         "Combien de temps par jour ?",
         canvas::WIDTH / 2.0,
-        100.0,
+        canvas::pick(100.0, 54.0),
         fonts::TEXT,
         role::TEXT_MUTED,
         canvas::WIDTH - 16.0,
@@ -60,7 +65,7 @@ pub fn daily_goal_screen(
     let minutes = DAILY_GOALS[*step];
     let (label, color) =
         if minutes == 0 { ("SANS ALERTE".to_string(), role::TEXT_MUTED) } else { (goal_label(minutes), role::ACCENT) };
-    ui::text_centered(&app.fonts, &label, canvas::WIDTH / 2.0, 156.0, fonts::TITLE, color);
+    ui::text_centered(&app.fonts, &label, canvas::WIDTH / 2.0, canvas::pick(156.0, 84.0), fonts::TITLE, color);
 
     let before = *step;
     *step = pick(*step, dragging, BAR, mouse);
@@ -87,12 +92,13 @@ pub fn daily_goal_screen(
         &app.fonts,
         "MODIFIABLE PLUS TARD",
         canvas::WIDTH / 2.0,
-        262.0,
+        canvas::pick(262.0, 158.0),
         fonts::TEXT,
         role::TEXT_DISABLED,
     );
 
-    let confirm = Rect::new(((canvas::WIDTH - 140.0) / 2.0).floor(), 296.0, 140.0, 20.0);
+    let confirm =
+        Rect::new(((canvas::WIDTH - 140.0) / 2.0).floor(), canvas::pick(296.0, 178.0), 140.0, 20.0);
     let pressed = ui::button(&app.fonts, mouse, Button::new(confirm, "C'EST PARTI").focused(true));
 
     if pressed || is_key_pressed(KeyCode::Enter) {

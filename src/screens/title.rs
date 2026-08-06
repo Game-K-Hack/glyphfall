@@ -32,7 +32,7 @@ pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
         fonts_set,
         "GLYPHFALL",
         canvas::WIDTH / 2.0,
-        96.0,
+        canvas::pick(96.0, 48.0),
         fonts::TITLE,
         role::TITLE,
     );
@@ -40,7 +40,7 @@ pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
         fonts_set,
         "hangeul  kana  kanji",
         canvas::WIDTH / 2.0,
-        122.0,
+        canvas::pick(122.0, 72.0),
         fonts::TEXT,
         role::TEXT_MUTED,
     );
@@ -49,7 +49,7 @@ pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
     const BUTTON_HEIGHT: f32 = 20.0;
     let x = ((canvas::WIDTH - BUTTON_WIDTH) / 2.0).floor();
 
-    let play = Rect::new(x, 190.0, BUTTON_WIDTH, BUTTON_HEIGHT);
+    let play = Rect::new(x, canvas::pick(190.0, 116.0), BUTTON_WIDTH, BUTTON_HEIGHT);
     if ui::button(fonts_set, mouse, Button::new(play, "JOUER")) || is_key_pressed(KeyCode::Enter) {
         app.sfx.confirm();
 
@@ -58,13 +58,13 @@ pub fn title_screen(app: &App, mouse: Vec2) -> Transition {
         return Transition::Push(first_question(app));
     }
 
-    let options = Rect::new(x, 226.0, BUTTON_WIDTH, BUTTON_HEIGHT);
+    let options = Rect::new(x, canvas::pick(226.0, 144.0), BUTTON_WIDTH, BUTTON_HEIGHT);
     if ui::button(fonts_set, mouse, Button::new(options, "OPTIONS")) {
         app.sfx.confirm();
         return Transition::Push(Screen::Options { selected: 0, dragging: None });
     }
 
-    let quit = Rect::new(x, 262.0, BUTTON_WIDTH, BUTTON_HEIGHT);
+    let quit = Rect::new(x, canvas::pick(262.0, 172.0), BUTTON_WIDTH, BUTTON_HEIGHT);
     if ui::button(fonts_set, mouse, Button::new(quit, "QUITTER").accent(role::DANGER)) {
         return Transition::Quit;
     }

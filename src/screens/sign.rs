@@ -13,27 +13,35 @@ use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 
-/// Le pavé qui porte le signe, centré en haut.
-const CARD: Rect = Rect { x: 60.0, y: 32.0, w: 96.0, h: 96.0 };
+/// Le pavé qui porte le signe : centré en haut debout, à gauche couché.
+const CARD: Rect = Rect { x: canvas::pick(60.0, 16.0), y: canvas::pick(32.0, 34.0), w: 96.0, h: 96.0 };
 /// Taille du signe dans son pavé.
 const GLYPH_SIZE: u16 = 64;
 
-/// La bande des tracés, sous les lectures.
-const TRACINGS_Y: f32 = 190.0;
+/// La bande des tracés : sous les lectures debout, sous les deux colonnes
+/// couché.
+const TRACINGS_Y: f32 = canvas::pick(190.0, 166.0);
 
 /// La colonne de texte.
 ///
 /// En portrait la fiche s'empile au lieu de se lire en deux colonnes, qui
 /// feraient huit caractères chacune : le pavé et les lectures en haut, les
 /// moyens de retenir dessous, sur toute la largeur.
-const TEXT_X: f32 = 10.0;
-const TEXT_WIDTH: f32 = canvas::WIDTH - TEXT_X * 2.0;
+const TEXT_X: f32 = canvas::pick(10.0, CARD.x + CARD.w + 14.0);
+const TEXT_WIDTH: f32 = canvas::WIDTH - TEXT_X - canvas::pick(10.0, 16.0);
+
+/// Distance à parcourir du doigt pour changer de signe, en pixels virtuels.
+///
+/// Un quart de la largeur : plus court, un appui un peu traînant ferait changer
+/// de fiche ; plus long, le geste ne tiendrait pas sur un petit écran.
+const SWIPE: f32 = canvas::WIDTH / 4.0;
 
 pub fn sign_screen(
     app: &App,
     language_id: &str,
     level_id: &str,
     index: &mut usize,
+    swipe: &mut Option<f32>,
     mouse: Vec2,
 ) -> Transition {
     clear_background(role::BACKGROUND);
@@ -54,6 +62,30 @@ pub fn sign_screen(
     }
     if is_key_pressed(KeyCode::Left) {
         *index = (*index + level.glyphs.len() - 1) % level.glyphs.len();
+    }
+
+    // Le glissement horizontal feuillette les fiches, comme on tourne une page.
+    // Seul le point de départ est retenu : suivre le doigt en continu ferait
+    // défiler plusieurs signes d'un seul geste un peu long.
+    if is_mouse_button_pressed(MouseButton::Left) {
+        *swipe = Some(mouse.x);
+    }
+    if let Some(start) = *swipe {
+        let travelled = mouse.x - start;
+
+        if travelled.abs() >= SWIPE {
+            *index = if travelled < 0.0 {
+                (*index + 1) % level.glyphs.len()
+            } else {
+                (*index + level.glyphs.len() - 1) % level.glyphs.len()
+            };
+            // Le geste est consommé : on repart de la position courante, ce qui
+            // permet d'enchaîner sans lever le doigt.
+            *swipe = Some(mouse.x);
+        }
+    }
+    if is_mouse_button_released(MouseButton::Left) {
+        *swipe = None;
     }
 
     let glyph = &level.glyphs[*index];
@@ -82,7 +114,7 @@ fn draw_header(fonts_set: &Fonts, level: &Level, index: usize) {
         8.0,
         fonts::TEXT,
         role::TITLE,
-        canvas::WIDTH - 62.0,
+        canvas::WIDTH - canvas::pick(62.0, 90.0),
     );
 
     let position = format!("{} / {}", index + 1, level.glyphs.len());
@@ -131,7 +163,7 @@ fn draw_card(app: &App, language: &Language, glyph: &Glyph) {
 /// les comparer, ce qui est justement ce que la manche ne permet pas.
 fn draw_tracings(app: &App, language: &Language, glyph: &Glyph) {
     const Y: f32 = TRACINGS_Y;
-    const SIZE: f32 = 24.0;
+    const SIZE: f32 = canvas::pick(24.0, 22.0);
     const GAP: f32 = 3.0;
 
     let count = app.fonts.script_count(&language.id);
@@ -146,8 +178,14 @@ fn draw_tracings(app: &App, language: &Language, glyph: &Glyph) {
     // Le tracé de référence figure dans la rangée avec les autres : une case
     // isolée ne dirait pas ce qu'elle montre, alors qu'une rangée du même signe
     // se lit d'elle-même comme une comparaison.
+    // Couché, la bande laisse sa gauche à l'intitulé ; debout elle est centrée.
     let total = SIZE * count as f32 + GAP * (count - 1) as f32;
-    let start_x = ((canvas::WIDTH - total) / 2.0).floor();
+    let start_x = if canvas::PORTRAIT {
+        ((canvas::WIDTH - total) / 2.0).floor()
+    } else {
+        ui::text(&app.fonts, "TRACES", 16.0, Y + 8.0, fonts::TEXT, role::TEXT_DISABLED);
+        100.0
+    };
 
     for variant in 0..count {
         let cell = Rect::new(start_x + variant as f32 * (SIZE + GAP), Y, SIZE, SIZE);
@@ -164,37 +202,57 @@ fn draw_tracings(app: &App, language: &Language, glyph: &Glyph) {
 
 /// Les romanisations acceptées, la principale en évidence.
 fn draw_readings(fonts_set: &Fonts, glyph: &Glyph) {
-    ui::text_centered(
-        fonts_set,
-        glyph.primary_answer(),
-        canvas::WIDTH / 2.0,
-        148.0,
-        fonts::TITLE,
-        role::ACCENT,
-    );
+    // Debout, les lectures sont centrées sous le pavé ; couché elles ouvrent la
+    // colonne de droite.
+    if canvas::PORTRAIT {
+        ui::text_centered(
+            fonts_set,
+            glyph.primary_answer(),
+            canvas::WIDTH / 2.0,
+            148.0,
+            fonts::TITLE,
+            role::ACCENT,
+        );
+    } else {
+        ui::text(fonts_set, glyph.primary_answer(), TEXT_X, 34.0, fonts::TITLE, role::ACCENT);
+    }
 
     if glyph.answers.len() > 1 {
         // Les variantes tolérées : les taire ferait croire à une seule bonne
         // réponse, alors que le jeu en accepte plusieurs.
         let others = glyph.answers[1..].join("  ");
-        ui::text_centered(
-            fonts_set,
-            &format!("aussi : {others}"),
-            canvas::WIDTH / 2.0,
-            170.0,
-            fonts::TEXT,
-            role::TEXT_MUTED,
-        );
+        let label = format!("aussi : {others}");
+
+        if canvas::PORTRAIT {
+            ui::text_centered(
+                fonts_set,
+                &label,
+                canvas::WIDTH / 2.0,
+                170.0,
+                fonts::TEXT,
+                role::TEXT_MUTED,
+            );
+        } else {
+            ui::text_truncated(
+                fonts_set,
+                &label,
+                TEXT_X,
+                54.0,
+                fonts::TEXT,
+                role::TEXT_MUTED,
+                TEXT_WIDTH,
+            );
+        }
     }
 }
 
 fn draw_mnemonics(fonts_set: &Fonts, glyph: &Glyph) {
-    const TOP: f32 = 226.0;
+    const TOP: f32 = canvas::pick(226.0, 72.0);
     const LINE: f32 = 10.0;
     /// Au-delà, la fiche déborderait sur les boutons du bas. Le portrait laisse
     /// moins de largeur mais plus de hauteur : dix lignes de vingt-cinq
     /// caractères, contre sept de vingt-neuf auparavant.
-    const MAX_LINES: usize = 10;
+    const MAX_LINES: usize = if canvas::PORTRAIT { 10 } else { 7 };
 
     ui::text(fonts_set, "POUR LE RETENIR", TEXT_X, TOP, fonts::TEXT, role::TEXT_MUTED);
 
@@ -223,20 +281,21 @@ fn draw_mnemonics(fonts_set: &Fonts, glyph: &Glyph) {
 }
 
 fn draw_navigation(app: &App, level: &Level, index: &mut usize, mouse: Vec2) -> Transition {
-    const Y: f32 = 356.0;
-    const ARROW: f32 = 30.0;
+    const Y: f32 = canvas::pick(356.0, 194.0);
+    const ARROW: f32 = canvas::pick(30.0, 22.0);
+    const HEIGHT: f32 = canvas::pick(20.0, 16.0);
 
-    let previous = Rect::new(10.0, Y, ARROW, 20.0);
+    let previous = Rect::new(10.0, Y, ARROW, HEIGHT);
     if ui::button(&app.fonts, mouse, Button::new(previous, "<")) {
         *index = (*index + level.glyphs.len() - 1) % level.glyphs.len();
     }
 
-    let next = Rect::new(10.0 + ARROW + 4.0, Y, ARROW, 20.0);
+    let next = Rect::new(10.0 + ARROW + 4.0, Y, ARROW, HEIGHT);
     if ui::button(&app.fonts, mouse, Button::new(next, ">")) {
         *index = (*index + 1) % level.glyphs.len();
     }
 
-    let back = Rect::new(canvas::WIDTH - 10.0 - 76.0, Y, 76.0, 20.0);
+    let back = Rect::new(canvas::WIDTH - 10.0 - 76.0, Y, 76.0, HEIGHT);
     if ui::button(&app.fonts, mouse, Button::new(back, "RETOUR").accent(role::TEXT_MUTED)) {
         return Transition::Pop;
     }
@@ -245,9 +304,9 @@ fn draw_navigation(app: &App, level: &Level, index: &mut usize, mouse: Vec2) -> 
     // la toile, le rappel passait sous le bouton de retour.
     ui::text_centered(
         &app.fonts,
-        "SIGNE",
+        canvas::label("GLISSE", "FLECHES POUR CHANGER"),
         (next.x + next.w + back.x) / 2.0,
-        Y + 6.0,
+        Y + canvas::pick(6.0, 4.0),
         fonts::TEXT,
         role::TEXT_DISABLED,
     );

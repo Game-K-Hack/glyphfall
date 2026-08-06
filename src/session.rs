@@ -23,7 +23,7 @@ pub const PLAYFIELD_WIDTH: f32 = 192.0;
 /// Le portrait a rendu la chute plus longue qu'en paysage, malgré le clavier
 /// qui occupe le bas : une tuile a désormais plus de temps pour descendre, ce
 /// qui compense la lenteur de la saisie au doigt.
-pub const TARGET_Y: f32 = 256.0;
+pub const TARGET_Y: f32 = crate::gfx::canvas::pick(248.0, 160.0);
 
 /// Points gagnés par glyphe reconnu.
 const POINTS_PER_HIT: u32 = 10;

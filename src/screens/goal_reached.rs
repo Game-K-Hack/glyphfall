@@ -10,11 +10,16 @@ use macroquad::prelude::*;
 use crate::app::{App, Transition};
 use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
-use crate::gfx::fonts;
+use crate::gfx::{canvas, fonts};
 use crate::settings::goal_label;
 
 /// Le panneau du message, centré sur la toile.
-const PANEL: Rect = Rect { x: 16.0, y: 120.0, w: 184.0, h: 128.0 };
+const PANEL: Rect = Rect {
+    x: canvas::pick(16.0, 52.0),
+    y: canvas::pick(120.0, 56.0),
+    w: canvas::pick(184.0, 280.0),
+    h: canvas::pick(128.0, 104.0),
+};
 
 pub fn goal_reached_screen(app: &App, mouse: Vec2) -> Transition {
     // La pile ne dessine que son sommet : laisser le fond intact ne montrerait

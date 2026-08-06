@@ -84,6 +84,8 @@ pub enum Screen {
         language: String,
         level: String,
         index: usize,
+        /// Abscisse où le doigt s'est posé, tant qu'il n'est pas relevé.
+        swipe: Option<f32>,
     },
     /// Les manches et leurs bilans sont volumineux : les mettre en boite
     /// garde l'enumeration compacte, elle qui est copiee a chaque transition.

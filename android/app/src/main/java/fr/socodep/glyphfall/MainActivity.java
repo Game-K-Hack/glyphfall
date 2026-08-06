@@ -150,6 +150,15 @@ class QuadSurface
     @SuppressWarnings("deprecation")
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
+        // Le volume et la coupure du son appartiennent au systeme. Les avaler
+        // comme le reste empechait de regler le son du telephone tant que le
+        // jeu etait ouvert, ce que rien ne justifie.
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP
+                || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+                || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE) {
+            return false;
+        }
+
         if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode != 0) {
             QuadNative.surfaceOnKeyDown(keyCode);
         }

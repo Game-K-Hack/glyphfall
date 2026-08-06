@@ -15,13 +15,13 @@ use crate::gfx::{Fonts, canvas, fonts};
 use crate::progress::{MAX_STARS, Progress};
 use crate::session::{Mode, Session};
 
-const VIEWPORT_TOP: f32 = 26.0;
-const VIEWPORT_BOTTOM: f32 = 336.0;
+const VIEWPORT_TOP: f32 = canvas::pick(26.0, 24.0);
+const VIEWPORT_BOTTOM: f32 = canvas::pick(336.0, 192.0);
 
-const NODE_X: f32 = 14.0;
+const NODE_X: f32 = canvas::pick(14.0, 20.0);
 const NODE_SIZE: f32 = 22.0;
-const ROW_HEIGHT: f32 = 26.0;
-const ROW_STEP: f32 = 36.0;
+const ROW_HEIGHT: f32 = canvas::pick(26.0, 24.0);
+const ROW_STEP: f32 = canvas::pick(36.0, 34.0);
 const TEXT_X: f32 = NODE_X + NODE_SIZE + 10.0;
 
 /// Hauteur utile du cadre, marges déduites.
@@ -228,7 +228,8 @@ pub fn learning_path_screen(
     // revoir un alphabet auquel on n'a jamais touché n'aurait aucun sens.
     let can_revise = !app.progress.learned_signs(language_id).is_empty();
     if can_revise {
-        let revise = Rect::new(canvas::WIDTH - 14.0 - 82.0, 344.0, 82.0, 18.0);
+        let revise =
+            Rect::new(canvas::WIDTH - 14.0 - 82.0, canvas::pick(344.0, 194.0), 82.0, 18.0);
         if ui::button(&app.fonts, mouse, Button::new(revise, "REVISION").accent(role::SUCCESS)) {
             let tracings = app.tracings(language_id);
             if let Some(session) =
@@ -240,11 +241,16 @@ pub fn learning_path_screen(
         }
     }
 
-    if ui::button(
-        &app.fonts,
-        mouse,
-        Button::new(Rect::new(14.0, 344.0, 30.0, 18.0), "<").accent(role::TEXT_MUTED),
-    ) {
+    // Un téléphone n'a pas d'Échap : les écrans d'où l'on peut repartir portent
+    // leur propre retour, en haut à gauche. Couché, la touche suffit et le coin
+    // appartient au titre.
+    if canvas::PORTRAIT
+        && ui::button(
+            &app.fonts,
+            mouse,
+            Button::new(Rect::new(6.0, 4.0, 26.0, 16.0), "<").accent(role::TEXT_MUTED),
+        )
+    {
         return Transition::Pop;
     }
 
@@ -337,17 +343,28 @@ fn draw_scrollbar(scroll: f32, limit: f32) {
 }
 
 fn draw_header(fonts_set: &Fonts, language: &Language, progress: &Progress) {
-    ui::text_truncated(fonts_set, &language.name, 8.0, 8.0, fonts::TEXT, role::TITLE, 130.0);
+    // Le titre laisse la place au retour, à sa gauche, et au compte d'étoiles,
+    // à sa droite.
+    let left = canvas::pick(38.0, 8.0);
+    ui::text_truncated(
+        fonts_set,
+        &language.name,
+        left,
+        6.0,
+        fonts::TEXT,
+        role::TITLE,
+        canvas::WIDTH - left - 56.0,
+    );
 
     let (earned, total) = progress.language_stars(language);
     let label = format!("{earned}/{total}");
     let width = ui::text_width(fonts_set, &label, fonts::TEXT);
 
     let x = canvas::WIDTH - 8.0 - width;
-    ui::text(fonts_set, &label, x, 8.0, fonts::TEXT, role::TEXT_MUTED);
-    ui::star(x - ui::STAR_WIDTH - 3.0, 8.0, earned > 0);
+    ui::text(fonts_set, &label, x, 6.0, fonts::TEXT, role::TEXT_MUTED);
+    ui::star(x - ui::STAR_WIDTH - 3.0, 6.0, earned > 0);
 
-    draw_rectangle(8.0, 22.0, canvas::WIDTH - 16.0, 1.0, role::HIGHLIGHT);
+    draw_rectangle(8.0, canvas::pick(22.0, 20.0), canvas::WIDTH - 16.0, 1.0, role::HIGHLIGHT);
 }
 
 fn draw_row(
@@ -442,13 +459,20 @@ fn draw_footer(
     let hint = match (progress.is_unlocked(level), crowded) {
         // Le bouton de révision occupe la droite : le rappel raccourcit pour ne
         // pas passer dessous.
-        (true, true) => "TOUCHE",
-        (true, false) => "TOUCHE UNE ETAPE",
-        (false, _) => "FINIS LES ETAPES D'AVANT",
+        (true, true) => canvas::label("TOUCHE", "ENTREE JOUER"),
+        (true, false) => canvas::label("TOUCHE UNE ETAPE", "ENTREE JOUER   ECHAP RETOUR"),
+        (false, _) => canvas::label("FINIS LES ETAPES D'AVANT", "TERMINE LES ETAPES PRECEDENTES"),
     };
 
-    let center = if crowded { 58.0 } else { canvas::WIDTH / 2.0 };
-    ui::text_centered(fonts_set, hint, center, 368.0, fonts::TEXT, role::TEXT_DISABLED);
+    let center = if crowded { canvas::pick(58.0, 150.0) } else { canvas::WIDTH / 2.0 };
+    ui::text_centered(
+        fonts_set,
+        hint,
+        center,
+        canvas::pick(368.0, 198.0),
+        fonts::TEXT,
+        role::TEXT_DISABLED,
+    );
 }
 
 #[cfg(test)]

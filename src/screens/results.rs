@@ -51,13 +51,13 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
     draw_figures(&app.fonts, outcome);
     draw_missed(app, outcome);
 
-    const BUTTON_WIDTH: f32 = 96.0;
-    const GAP: f32 = 8.0;
+    const BUTTON_WIDTH: f32 = canvas::pick(96.0, 110.0);
+    const GAP: f32 = canvas::pick(8.0, 12.0);
     let x = ((canvas::WIDTH - (BUTTON_WIDTH * 2.0 + GAP)) / 2.0).floor();
 
     // Pendant le délai, le bouton reste dessiné mais éteint : le montrer déjà
     // en avant alors qu'il ne répond pas serait pire que de le griser.
-    let retry = Rect::new(x, 348.0, BUTTON_WIDTH, 22.0);
+    let retry = Rect::new(x, canvas::pick(348.0, 184.0), BUTTON_WIDTH, 22.0);
     let restart = ui::button(&app.fonts, mouse, Button::new(retry, "REJOUER").focused(ready))
         || is_key_pressed(KeyCode::Enter);
 
@@ -83,7 +83,7 @@ pub fn results_screen(app: &App, outcome: &Outcome, elapsed: &mut f32, mouse: Ve
         };
     }
 
-    let path = Rect::new(x + BUTTON_WIDTH + GAP, 348.0, BUTTON_WIDTH, 22.0);
+    let path = Rect::new(x + BUTTON_WIDTH + GAP, canvas::pick(348.0, 184.0), BUTTON_WIDTH, 22.0);
     if ui::button(&app.fonts, mouse, Button::new(path, "CHEMIN").accent(role::TEXT_MUTED)) && ready {
         // Le briefing est juste en dessous : il faut deux crans pour revenir
         // au chemin, sinon le bouton ne tient pas ce que son nom promet.
@@ -103,7 +103,7 @@ fn draw_verdict(fonts_set: &Fonts, outcome: &Outcome) {
             fonts_set,
             subtitle,
             canvas::WIDTH / 2.0,
-            48.0,
+            canvas::pick(48.0, 32.0),
             fonts::TEXT,
             role::TEXT_MUTED,
         );
@@ -123,7 +123,7 @@ fn draw_verdict(fonts_set: &Fonts, outcome: &Outcome) {
         _ => ("TERMINE", role::TITLE),
     };
 
-    ui::text_centered(fonts_set, verdict, canvas::WIDTH / 2.0, 20.0, fonts::TITLE, color);
+    ui::text_centered(fonts_set, verdict, canvas::WIDTH / 2.0, canvas::pick(20.0, 10.0), fonts::TITLE, color);
 }
 
 /// Les trois étoiles, dessinées pixel par pixel puis agrandies : les redessiner
@@ -132,7 +132,7 @@ fn draw_verdict(fonts_set: &Fonts, outcome: &Outcome) {
 /// Elles apparaissent une à une — l'attente entre deux étoiles est ce qui rend
 /// la troisième satisfaisante.
 fn draw_stars(earned: u8, elapsed: f32) {
-    const Y: f32 = 74.0;
+    const Y: f32 = canvas::pick(74.0, 46.0);
     let size = ui::STAR_WIDTH * STAR_SCALE;
     let gap = 12.0;
     let total = size * MAX_STARS as f32 + gap * (MAX_STARS - 1) as f32;
@@ -163,7 +163,7 @@ fn draw_stars(earned: u8, elapsed: f32) {
 
 /// L'étoile du mode joué, seule au milieu : il n'y en a qu'une à gagner.
 fn draw_mode_star(app: &App, outcome: &Outcome, mode: Mode, elapsed: f32) {
-    const Y: f32 = 74.0;
+    const Y: f32 = canvas::pick(74.0, 46.0);
 
     let color = if mode == Mode::Fast { role::STAR_FAST } else { role::STAR_ULTRA };
     let size = ui::STAR_WIDTH * STAR_SCALE;
@@ -187,7 +187,7 @@ fn draw_mode_star(app: &App, outcome: &Outcome, mode: Mode, elapsed: f32) {
 /// Le mode infini ne rapporte pas d'étoile : il n'y a qu'un score, et le
 /// meilleur à battre.
 fn draw_endless(app: &App, outcome: &Outcome) {
-    const Y: f32 = 74.0;
+    const Y: f32 = canvas::pick(74.0, 46.0);
 
     ui::text_centered(
         &app.fonts,
@@ -211,7 +211,7 @@ fn draw_figures(fonts_set: &Fonts, outcome: &Outcome) {
     // Le mode infini affiche déjà son score en grand, et le record dessous :
     // les chiffres descendent pour ne pas s'y cogner.
     let endless = outcome.mode == Mode::Endless;
-    let y = if endless { 108.0 } else { 118.0 };
+    let y = if endless { canvas::pick(108.0, 92.0) } else { canvas::pick(118.0, 76.0) };
 
     let accuracy = format!("{}% DE REUSSITE", (outcome.accuracy * 100.0).round() as u32);
     ui::text_centered(fonts_set, &accuracy, canvas::WIDTH / 2.0, y, fonts::TEXT, role::TEXT);
@@ -243,8 +243,8 @@ fn draw_figures(fonts_set: &Fonts, outcome: &Outcome) {
 /// Les glyphes tombés sans être reconnus : la seule partie vraiment utile du
 /// bilan pour apprendre, plus que le score.
 fn draw_missed(app: &App, outcome: &Outcome) {
-    const Y: f32 = 180.0;
-    const CELL_WIDTH: f32 = 34.0;
+    const Y: f32 = canvas::pick(180.0, 118.0);
+    const CELL_WIDTH: f32 = canvas::pick(34.0, 36.0);
 
     if outcome.missed_glyphs.is_empty() {
         if outcome.hits > 0 {

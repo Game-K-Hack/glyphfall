@@ -18,17 +18,25 @@ use crate::gfx::ui;
 use crate::gfx::{Fonts, canvas, fonts};
 
 /// Le haut du clavier. Ce qui tombe doit s'arrêter au-dessus.
-pub const TOP: f32 = 292.0;
+pub const TOP: f32 = 276.0;
 
-const KEY_HEIGHT: f32 = 28.0;
+/// Hauteur de la rangée des chiffres, plus basse que celle des lettres : on y
+/// tape moins souvent, et la place gagnée revient à la zone de chute.
+const DIGIT_HEIGHT: f32 = 20.0;
+const KEY_HEIGHT: f32 = 26.0;
 const GAP: f32 = 2.0;
-/// Largeur d'une touche de lettre. Dix par rangée, marges comprises.
+/// Largeur d'une touche. Dix par rangée, marges comprises.
 const KEY_WIDTH: f32 = 19.0;
 const MARGIN: f32 = 4.0;
 
+/// Les chiffres, sur leur propre rangée.
+///
+/// Les kanji des nombres se répondent par « 1 » ou « 10 » : sans eux, quatre
+/// niveaux du chemin japonais restaient injouables au doigt.
+const DIGITS: &str = "1234567890";
+
 /// Disposition française : le joueur retrouve sur le verre les lettres qu'il a
-/// sous les doigts ailleurs. La romanisation ne demande que des lettres — les
-/// kanji se répondent par leur lecture, jamais par un chiffre.
+/// sous les doigts ailleurs.
 const ROWS: [&str; 3] = ["azertyuiop", "qsdfghjklm", "wxcvbn"];
 
 /// Ce que le joueur vient de demander.
@@ -46,8 +54,24 @@ pub fn draw(fonts_set: &Fonts, mouse: Vec2) -> Option<Key> {
     let pressed = is_mouse_button_pressed(MouseButton::Left);
     let mut hit = None;
 
+    for digit in DIGITS.chars() {
+        let column = DIGITS.chars().position(|other| other == digit).unwrap_or(0);
+        let key = Rect::new(
+            MARGIN + column as f32 * (KEY_WIDTH + GAP),
+            TOP,
+            KEY_WIDTH,
+            DIGIT_HEIGHT,
+        );
+        let touched = ui::hit(key, mouse);
+
+        draw_key(fonts_set, key, &digit.to_string(), touched, role::PANEL);
+        if touched && pressed {
+            hit = Some(Key::Letter(digit));
+        }
+    }
+
     for (index, row) in ROWS.iter().enumerate() {
-        let y = TOP + index as f32 * (KEY_HEIGHT + GAP);
+        let y = letters_top() + index as f32 * (KEY_HEIGHT + GAP);
         // Toutes les rangées partent de la même marge : centrer les plus
         // courtes décalerait leurs lettres de celles du dessus, alors que
         // l'oeil cherche une lettre à la place qu'il lui connaît.
@@ -68,7 +92,7 @@ pub fn draw(fonts_set: &Fonts, mouse: Vec2) -> Option<Key> {
 
     // La troisième rangée n'a que six lettres : la place gagnée revient aux deux
     // touches que l'on cherche dans l'urgence, quand une tuile arrive.
-    let y = TOP + 2.0 * (KEY_HEIGHT + GAP);
+    let y = letters_top() + 2.0 * (KEY_HEIGHT + GAP);
     let letters_width = 6.0 * KEY_WIDTH + 5.0 * GAP;
     let x = MARGIN + letters_width + GAP;
 
@@ -87,6 +111,11 @@ pub fn draw(fonts_set: &Fonts, mouse: Vec2) -> Option<Key> {
     }
 
     hit
+}
+
+/// Ordonnée de la première rangée de lettres, sous les chiffres.
+fn letters_top() -> f32 {
+    TOP + DIGIT_HEIGHT + GAP
 }
 
 fn draw_key(fonts_set: &Fonts, key: Rect, label: &str, touched: bool, accent: Color) {
@@ -109,14 +138,30 @@ mod tests {
 
     #[test]
     fn the_keyboard_stays_inside_the_canvas() {
+        // Le clavier n'existe qu'en portrait : couché, le jeu se joue au
+        // clavier physique et l'écran n'a pas la hauteur de l'accueillir.
+        if !canvas::PORTRAIT {
+            return;
+        }
+
         // Une touche hors de la toile serait invisible et injouable.
         let widest = ROWS[0].chars().count() as f32;
         let width = widest * KEY_WIDTH + (widest - 1.0) * GAP;
 
         assert!(MARGIN + width <= canvas::WIDTH, "largeur : {width}");
+        assert_eq!(DIGITS.chars().count(), ROWS[0].chars().count(), "rangées alignées");
 
-        let bottom = TOP + 3.0 * KEY_HEIGHT + 2.0 * GAP;
+        let bottom = letters_top() + 3.0 * KEY_HEIGHT + 2.0 * GAP;
         assert!(bottom <= canvas::HEIGHT, "bas du clavier : {bottom}");
+    }
+
+    #[test]
+    fn every_digit_can_be_typed() {
+        // Les kanji des nombres se repondent par un chiffre : sans eux, quatre
+        // niveaux du chemin japonais restent injouables au doigt.
+        for digit in '0'..='9' {
+            assert!(DIGITS.contains(digit), "« {digit} » n'est sur aucune rangée");
+        }
     }
 
     #[test]

@@ -14,13 +14,13 @@ use crate::gfx::{Fonts, canvas, fonts};
 use crate::progress::{MAX_STARS, Progress};
 use crate::session::{Mode, Session};
 
-const GRID_X: f32 = 12.0;
-const GRID_Y: f32 = 56.0;
+const GRID_X: f32 = canvas::pick(12.0, 16.0);
+const GRID_Y: f32 = canvas::pick(56.0, 32.0);
 const CELL_WIDTH: f32 = 32.0;
-const CELL_HEIGHT: f32 = 30.0;
-const COLUMNS: usize = 6;
-const ROWS: usize = 6;
-const GLYPH_SIZE: u16 = 18;
+const CELL_HEIGHT: f32 = canvas::pick(30.0, 26.0);
+const COLUMNS: usize = if canvas::PORTRAIT { 6 } else { 11 };
+const ROWS: usize = if canvas::PORTRAIT { 6 } else { 3 };
+const GLYPH_SIZE: u16 = if canvas::PORTRAIT { 18 } else { 16 };
 
 pub fn briefing_screen(
     app: &App,
@@ -46,6 +46,7 @@ pub fn briefing_screen(
             language: language_id.to_string(),
             level: level_id.to_string(),
             index,
+            swipe: None,
         });
     }
 
@@ -60,7 +61,7 @@ pub fn briefing_screen(
             &app.fonts,
             Progress::unlock_requirement(*mode),
             canvas::WIDTH / 2.0,
-            340.0,
+            canvas::pick(340.0, 200.0),
             fonts::TEXT,
             role::SHAKY,
             canvas::WIDTH - 12.0,
@@ -68,23 +69,33 @@ pub fn briefing_screen(
     } else {
         ui::text_centered(
             &app.fonts,
-            "TOUCHE UN SIGNE",
+            canvas::label("TOUCHE UN SIGNE", "CLIQUE UN SIGNE POUR SA FICHE"),
             canvas::WIDTH / 2.0,
-            340.0,
+            canvas::pick(340.0, 200.0),
             fonts::TEXT,
             role::TEXT_DISABLED,
         );
     }
 
-    if ui::button(
-        &app.fonts,
-        mouse,
-        Button::new(Rect::new(8.0, 356.0, 26.0, 22.0), "<").accent(role::TEXT_MUTED),
-    ) {
+    // Un téléphone n'a pas d'Échap : les écrans d'où l'on peut repartir portent
+    // leur propre retour, en haut à gauche. Couché, la touche suffit et le coin
+    // appartient au titre.
+    if canvas::PORTRAIT
+        && ui::button(
+            &app.fonts,
+            mouse,
+            Button::new(Rect::new(6.0, 4.0, 26.0, 16.0), "<").accent(role::TEXT_MUTED),
+        )
+    {
         return Transition::Pop;
     }
 
-    let start = Rect::new(((canvas::WIDTH - 140.0) / 2.0).floor(), 356.0, 140.0, 22.0);
+    let start = Rect::new(
+        ((canvas::WIDTH - 140.0) / 2.0).floor(),
+        canvas::pick(356.0, 172.0),
+        140.0,
+        canvas::pick(22.0, 20.0),
+    );
 
     // Le bouton reste dessiné même quand le mode est fermé : le retirer ferait
     // sauter la mise en page à chaque changement de mode.
@@ -119,13 +130,13 @@ pub fn briefing_screen(
 /// Les cacher priverait le joueur de la seule chose qui donne envie d'aller
 /// chercher les trois étoiles.
 fn draw_modes(app: &App, level_id: &str, mode: &mut Mode, mouse: Vec2) {
-    const Y: f32 = 296.0;
-    const WIDTH: f32 = 96.0;
-    const HEIGHT: f32 = 16.0;
+    const Y: f32 = canvas::pick(296.0, 152.0);
+    const WIDTH: f32 = canvas::pick(96.0, 76.0);
+    const HEIGHT: f32 = canvas::pick(16.0, 14.0);
     const GAP: f32 = 4.0;
-    /// Deux modes par rangée : quatre côte à côte tomberaient à quarante-huit
-    /// pixels chacun, où « RAPIDE » ne tient pas.
-    const PER_ROW: usize = 2;
+    /// Deux modes par rangée en portrait : quatre côte à côte y tomberaient à
+    /// quarante-huit pixels chacun, où « RAPIDE » ne tient pas.
+    const PER_ROW: usize = if canvas::PORTRAIT { 2 } else { 4 };
 
     let total = WIDTH * PER_ROW as f32 + GAP * (PER_ROW - 1) as f32;
     let start_x = ((canvas::WIDTH - total) / 2.0).floor();
@@ -204,8 +215,8 @@ fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {
     ui::text_truncated(
         fonts_set,
         &level.title,
-        8.0,
-        8.0,
+        canvas::pick(38.0, 8.0),
+        canvas::pick(6.0, 6.0),
         fonts::TEXT,
         role::TITLE,
         canvas::WIDTH - 16.0,
@@ -214,21 +225,26 @@ fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {
         fonts_set,
         &level.subtitle,
         8.0,
-        19.0,
+        canvas::pick(19.0, 17.0),
         fonts::TEXT,
         role::TEXT_MUTED,
         canvas::WIDTH - 16.0,
     );
 
+    // En paysage le décompte tient à droite du titre ; en portrait la largeur
+    // manque, il passe sur sa propre ligne.
     let count = format!("{} SIGNES", level.glyphs.len());
-    ui::text(fonts_set, &count, 8.0, 32.0, fonts::TEXT, role::TEXT_MUTED);
+    let width = ui::text_width(fonts_set, &count, fonts::TEXT);
+    let (count_x, count_y) =
+        if canvas::PORTRAIT { (8.0, 32.0) } else { (canvas::WIDTH - 8.0 - width, 6.0) };
+    ui::text(fonts_set, &count, count_x, count_y, fonts::TEXT, role::TEXT_MUTED);
 
     // Le palmarès du niveau, juste sous le décompte des signes : on voit en
     // arrivant ce qui a été décroché et ce qui reste.
     let modes = progress.modes(&level.id);
     ui::level_stars(
         canvas::WIDTH - 8.0 - ui::level_stars_width(MAX_STARS),
-        32.0,
+        canvas::pick(32.0, 18.0),
         progress.stars(&level.id),
         MAX_STARS,
         modes.fast_perfect,
@@ -298,7 +314,7 @@ fn draw_glyphs(app: &App, language: &Language, level: &Level, mouse: Vec2) -> Op
 }
 
 fn draw_rules(fonts_set: &Fonts, level: &Level) {
-    const Y: f32 = 250.0;
+    const Y: f32 = canvas::pick(250.0, 112.0);
 
     let rules = &level.rules;
     let duration = if rules.is_timed() {
@@ -306,13 +322,17 @@ fn draw_rules(fonts_set: &Fonts, level: &Level) {
     } else {
         "SANS LIMITE".to_string()
     };
-    let summary = format!("{} VIES   {duration}", rules.lives);
+    let summary = if canvas::PORTRAIT {
+        format!("{} VIES   {duration}", rules.lives)
+    } else {
+        format!("{} VIES   {duration}   {} COLONNES", rules.lives, rules.columns)
+    };
     ui::text_centered(fonts_set, &summary, canvas::WIDTH / 2.0, Y, fonts::TEXT, role::TEXT);
 
     // Les seuils, pour savoir ce qu'il faut viser avant de commencer.
-    const THRESHOLD_Y: f32 = 266.0;
+    const THRESHOLD_Y: f32 = canvas::pick(266.0, 126.0);
     let thresholds = [level.stars.one, level.stars.two, level.stars.three];
-    let block_width = 64.0;
+    let block_width = canvas::pick(64.0, 100.0);
     let start_x = (canvas::WIDTH - block_width * MAX_STARS as f32) / 2.0;
 
     for (index, threshold) in thresholds.iter().enumerate() {

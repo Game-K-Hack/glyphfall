@@ -1,4 +1,5 @@
-//! La toile virtuelle : tout le jeu est dessiné dans une image de 216×384,
+//! La toile virtuelle : tout le jeu est dessiné dans une image de 384×216 —
+//! ou de 216×384 sur téléphone —,
 //! puis agrandie d'un facteur **entier** en filtrage « au plus proche ».
 //!
 //! C'est la seule façon d'obtenir de vrais pixels carrés. Dessiner directement
@@ -13,19 +14,44 @@ use macroquad::prelude::*;
 
 use super::palette;
 
+/// La toile est-elle debout ?
+///
+/// Un téléphone se tient dans la hauteur, un écran de bureau dans la largeur :
+/// le jeu suit, et les écrans portent leurs coordonnées en paires.
+///
+/// C'est une **constante de compilation** et non un réglage : le compilateur
+/// efface la branche inutile, si bien que les deux mises en page ne coûtent
+/// rien à l'exécution et que les dimensions restent utilisables là où seule une
+/// constante est admise.
+///
+/// L'option `portrait` force la mise en page téléphone sur un bureau, seul
+/// moyen de la regarder sans passer par un APK.
+pub const PORTRAIT: bool = cfg!(target_os = "android") || cfg!(feature = "portrait");
+
 /// Largeur de la toile, en pixels virtuels.
 ///
-/// La toile est **en portrait**, et l'était en paysage jusqu'à ce que le jeu
-/// arrive sur téléphone. Deux mises en page pour douze écrans auraient été deux
-/// fois plus de travail à chaque changement ; le format vertical convient par
-/// ailleurs mieux à des tuiles qui tombent, qui gagnent en hauteur de chute ce
-/// qu'elles perdent en largeur.
+/// Conséquence à ne pas perdre de vue en portrait : une ligne n'y porte que
+/// vingt-sept caractères de la police pixel, contre quarante-huit en paysage.
+pub const WIDTH: f32 = if PORTRAIT { 216.0 } else { 384.0 };
+/// Hauteur de la toile, en pixels virtuels. 9:16 debout, 16:9 couché.
+pub const HEIGHT: f32 = if PORTRAIT { 384.0 } else { 216.0 };
+
+/// Choisit entre deux mesures selon l'orientation.
 ///
-/// Conséquence à ne pas perdre de vue : une ligne ne porte plus que vingt-sept
-/// caractères de la police pixel, contre quarante-huit auparavant.
-pub const WIDTH: f32 = 216.0;
-/// Hauteur de la toile, en pixels virtuels (9:16).
-pub const HEIGHT: f32 = 384.0;
+/// Les écrans s'en servent pour poser leurs coordonnées en paires, sur une
+/// seule ligne et sans `#[cfg]` : `const Y: f32 = canvas::pick(60.0, 30.0);`
+pub const fn pick(portrait: f32, landscape: f32) -> f32 {
+    if PORTRAIT { portrait } else { landscape }
+}
+
+/// Choisit entre deux textes selon l'orientation.
+///
+/// Vingt-sept caractères par ligne en portrait : les rappels qui tiennent en
+/// paysage y débordent, et raccourcir les deux ferait perdre au bureau une
+/// information qu'il a la place d'afficher.
+pub const fn label(portrait: &'static str, landscape: &'static str) -> &'static str {
+    if PORTRAIT { portrait } else { landscape }
+}
 
 pub struct Canvas {
     target: RenderTarget,

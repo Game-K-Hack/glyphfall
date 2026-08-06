@@ -1,5 +1,8 @@
 use macroquad::prelude::*;
 
+/// Agrandissement de la fenêtre à l'ouverture.
+const ZOOM: i32 = if crate::gfx::canvas::PORTRAIT { 2 } else { 3 };
+
 pub fn window_conf() -> Conf {
     // 1. On charge tes fichiers (qu'ils soient en PNG, RAW ou autre)
     let icon16_bytes = include_bytes!("assets/icons/icon16.rgba");
@@ -30,12 +33,12 @@ pub fn window_conf() -> Conf {
 
     Conf {
         window_title: "Glyphfall".to_string(),
-        // Deux fois la toile virtuelle : la fenêtre s'ouvre pile sur un
-        // facteur d'agrandissement entier, sans bandes de letterbox. Trois fois
-        // dépasserait la hauteur d'un écran de bureau, la toile étant en
-        // portrait depuis que le jeu tourne sur téléphone.
-        window_width: crate::gfx::canvas::WIDTH as i32 * 2,
-        window_height: crate::gfx::canvas::HEIGHT as i32 * 2,
+        // Un multiple entier de la toile : la fenêtre s'ouvre pile sur un
+        // facteur d'agrandissement, sans bandes de letterbox. Le portrait se
+        // contente de deux, trois fois trois cent quatre-vingt-quatre pixels
+        // dépassant la hauteur d'un écran de bureau.
+        window_width: crate::gfx::canvas::WIDTH as i32 * ZOOM,
+        window_height: crate::gfx::canvas::HEIGHT as i32 * ZOOM,
         fullscreen: false,
         // Le high-DPI ferait rendre macroquad à une résolution non entière et
         // reviendrait à flouter ce que l'agrandissement au pixel garantit.

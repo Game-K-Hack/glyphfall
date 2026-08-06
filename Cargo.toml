@@ -18,6 +18,10 @@ serde = { version = "1.0.229", features = ["derive"] }
 symphonia = { version = "0.5", default-features = false, features = ["mp3", "ogg", "pcm", "vorbis", "wav"] }
 toml = "1.1.4"
 
+[features]
+# Force la mise en page téléphone sur un bureau, pour la regarder sans APK.
+portrait = []
+
 [dev-dependencies]
 fontdue = "0.9"
 

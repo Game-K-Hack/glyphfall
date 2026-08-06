@@ -133,6 +133,7 @@ async fn run() {
                 language: language.to_string(),
                 level: level.to_string(),
                 index: 0,
+                swipe: None,
             }),
             Some(("play", target)) => target.split_once('/').and_then(|(language, level)| {
                 let tracings = app.tracings(language);
@@ -192,8 +193,8 @@ async fn run() {
             Screen::Briefing { language, level, mode } => {
                 briefing_screen(&app, language, level, mode, mouse)
             }
-            Screen::Sign { language, level, index } => {
-                sign_screen(&app, language, level, index, mouse)
+            Screen::Sign { language, level, index, swipe } => {
+                sign_screen(&app, language, level, index, swipe, mouse)
             }
             Screen::Playing(session) => game_screen(&app, session, mouse),
             Screen::Results { outcome, elapsed } => {
@@ -266,6 +267,13 @@ async fn run() {
         capture.tick();
 
         if !navigator.apply(transition) {
+            // Sortir de la boucle suffit sur un bureau : la fenêtre se ferme et
+            // le processus s'arrête. Sur Android l'activité, elle, reste en vie
+            // et n'affiche plus qu'un écran noir — il faut la terminer.
+            #[cfg(target_os = "android")]
+            std::process::exit(0);
+
+            #[cfg(not(target_os = "android"))]
             return;
         }
         next_frame().await;

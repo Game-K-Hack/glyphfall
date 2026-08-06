@@ -7,9 +7,14 @@ avant qu'ils ne franchissent la ligne rouge. Interface entièrement en 8-bit.
 Écrit en Rust avec [macroquad](https://macroquad.rs), donc le même code tourne
 sur Windows, macOS, Linux, Android et dans un navigateur.
 
-L'écran est **en portrait** partout : le jeu se tient comme un téléphone, et
-des tuiles qui tombent gagnent en hauteur de chute ce qu'elles perdent en
-largeur.
+L'écran suit la machine : **couché** sur un bureau, **debout** sur un
+téléphone. C'est une constante de compilation, `canvas::PORTRAIT`, et les
+écrans posent leurs coordonnées en paires — `canvas::pick(debout, couché)`. Le
+compilateur efface la branche inutile : les deux mises en page ne coûtent rien
+à l'exécution.
+
+Pour regarder la mise en page téléphone depuis un bureau :
+`cargo run --features portrait`.
 
 ## Le parcours
 
@@ -81,11 +86,11 @@ qu'on puisse lire ce qu'ils demandent — seul le bouton START s'éteint. Une
 | `←` `→` | Changer de mode, régler un volume |
 | `Échap` | Revenir en arrière |
 
-Au doigt, tout se touche. La manche affiche **son propre clavier** — celui du
-système couvrirait la moitié de l'écran et sa hauteur dépend de celui qu'a
-installé le joueur, ce qui interdirait de placer quoi que ce soit en dessous.
-Les listes défilent avec l'élan, et la touche retour d'Android remonte d'un
-écran comme `Échap`.
+Au doigt, tout se touche. La manche affiche **son propre clavier**, chiffres
+compris — celui du système couvrirait la moitié de l'écran et sa hauteur dépend
+de celui qu'a installé le joueur, ce qui interdirait de placer quoi que ce soit
+en dessous. Les listes défilent avec l'élan, la fiche d'un signe se feuillette
+au glissement, et la touche retour d'Android remonte d'un écran comme `Échap`.
 
 La souris fonctionne partout où le clavier fonctionne, et s'entend pareil :
 le blip de déplacement suit **ce qui est désigné**, pas la touche appuyée.

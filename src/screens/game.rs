@@ -17,10 +17,19 @@ use crate::session::{Event, Session, TARGET_Y, TILE_HEIGHT};
 const GLYPH_SIZE: u16 = 24;
 
 /// Hauteur du bandeau du haut : score, vies, chronomètre.
-const HUD_HEIGHT: f32 = 38.0;
+///
+/// Nulle en paysage, où le tableau de bord tient dans les gouttières de part et
+/// d'autre de la zone de chute — un écran couché a de la largeur à revendre et
+/// de la hauteur à économiser.
+const HUD_HEIGHT: f32 = canvas::pick(38.0, 0.0);
 
 /// La barre qui montre ce que le joueur est en train de taper.
-const INPUT_BAR: Rect = Rect { x: 8.0, y: 264.0, w: canvas::WIDTH - 16.0, h: 20.0 };
+const INPUT_BAR: Rect = Rect {
+    x: canvas::pick(8.0, 112.0),
+    y: canvas::pick(256.0, 192.0),
+    w: canvas::pick(canvas::WIDTH - 16.0, 160.0),
+    h: canvas::pick(18.0, 16.0),
+};
 
 pub fn game_screen(app: &App, session: &mut Session, mouse: Vec2) -> Transition {
     let outcome = session.update(get_frame_time());
@@ -39,20 +48,23 @@ pub fn game_screen(app: &App, session: &mut Session, mouse: Vec2) -> Transition 
 
     // Abandonner une manche : loin des doigts, qui vivent sur le clavier en
     // bas. Une partie qu'on ne peut pas quitter enferme le joueur, mais un
-    // bouton à portée de pouce la ferait perdre par accident.
-    let quit = Rect::new(canvas::WIDTH - 26.0, 26.0, 20.0, 12.0);
-    if ui::button(&app.fonts, mouse, Button::new(quit, "X").accent(role::DANGER)) {
-        return Transition::Pop;
-    }
+    // bouton à portée de pouce la ferait perdre par accident. Couché, Échap
+    // suffit et l'écran n'a pas de place à donner.
+    if canvas::PORTRAIT {
+        let quit = Rect::new(canvas::WIDTH - 26.0, 26.0, 20.0, 12.0);
+        if ui::button(&app.fonts, mouse, Button::new(quit, "X").accent(role::DANGER)) {
+            return Transition::Pop;
+        }
 
-    // Le clavier est traité après le rendu de la manche : l'appui porte ainsi
-    // sur ce qui est à l'écran, et non sur la disposition de la frame d'avant.
-    if let Some(key) = keyboard::draw(&app.fonts, mouse) {
-        app.sfx.navigate();
-        match key {
-            Key::Letter(letter) => session.type_letter(letter),
-            Key::Erase => session.erase(),
-            Key::Submit => session.submit(),
+        // Le clavier est traité après le rendu de la manche : l'appui porte
+        // ainsi sur ce qui est à l'écran, et non sur la frame d'avant.
+        if let Some(key) = keyboard::draw(&app.fonts, mouse) {
+            app.sfx.navigate();
+            match key {
+                Key::Letter(letter) => session.type_letter(letter),
+                Key::Erase => session.erase(),
+                Key::Submit => session.submit(),
+            }
         }
     }
 
@@ -116,17 +128,35 @@ fn draw_hud(fonts_set: &Fonts, session: &Session) {
     ui::text(fonts_set, &format!("{:05}", session.score), 6.0, 6.0, fonts::TEXT, role::TEXT);
     ui::hearts_row(6.0, 18.0, session.lives, session.rules.lives);
 
-    // Le titre du niveau sous le score, en discret : on sait ce que l'on joue,
-    // il n'est là que pour se repérer entre deux manches.
-    ui::text_truncated(
-        fonts_set,
-        &session.level_title,
-        6.0,
-        29.0,
-        fonts::TEXT,
-        role::TEXT_DISABLED,
-        canvas::WIDTH - 12.0,
-    );
+    // Debout, le titre passe sous le score sur une ligne ; couché, la gouttière
+    // est étroite et il s'y replie sur trois.
+    if canvas::PORTRAIT {
+        ui::text_truncated(
+            fonts_set,
+            &session.level_title,
+            6.0,
+            29.0,
+            fonts::TEXT,
+            role::TEXT_DISABLED,
+            canvas::WIDTH - 12.0,
+        );
+    } else {
+        let gutter = session.playfield_x() - 12.0;
+        for (index, line) in ui::wrap(fonts_set, &session.level_title, fonts::TEXT, gutter)
+            .iter()
+            .take(3)
+            .enumerate()
+        {
+            ui::text(
+                fonts_set,
+                line,
+                6.0,
+                34.0 + index as f32 * 10.0,
+                fonts::TEXT,
+                role::TEXT_DISABLED,
+            );
+        }
+    }
 
     if session.rules.is_timed() {
         draw_timer(fonts_set, session);
@@ -144,7 +174,14 @@ fn draw_timer(fonts_set: &Fonts, session: &Session) {
     // on a les yeux sur les tuiles.
     let ratio = session.time_ratio();
     let color = if ratio < 0.2 { role::DANGER } else { role::ACCENT };
-    ui::progress_bar(Rect::new(canvas::WIDTH - 76.0, 18.0, 70.0, 8.0), ratio, color);
+    // Couché, la jauge occupe la gouttière de droite, sous le chiffre.
+    let gauge = if canvas::PORTRAIT {
+        Rect::new(canvas::WIDTH - 76.0, 18.0, 70.0, 8.0)
+    } else {
+        let x = session.playfield_x() + session.rules.columns as f32 * session.tile_width() + 12.0;
+        Rect::new(x, 18.0, canvas::WIDTH - x - 6.0, 8.0)
+    };
+    ui::progress_bar(gauge, ratio, color);
 }
 
 fn draw_input_bar(fonts_set: &Fonts, session: &Session) {
@@ -174,6 +211,8 @@ mod tests {
         // La barre de saisie se glisse entre les deux : si le clavier remontait,
         // elle passerait dessous et le joueur ne verrait plus ce qu'il tape.
         assert!(TARGET_Y < INPUT_BAR.y, "la ligne rouge est au-dessus de la saisie");
-        assert!(INPUT_BAR.y + INPUT_BAR.h <= keyboard::TOP, "la saisie finit avant le clavier");
+        if canvas::PORTRAIT {
+            assert!(INPUT_BAR.y + INPUT_BAR.h <= keyboard::TOP, "la saisie finit avant le clavier");
+        }
     }
 }
