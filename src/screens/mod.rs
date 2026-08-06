@@ -3,6 +3,7 @@ pub mod daily_goal;
 pub mod font_choice;
 pub mod game;
 pub mod goal_reached;
+pub mod keyboard;
 pub mod results;
 pub mod sign;
 pub mod language_select;

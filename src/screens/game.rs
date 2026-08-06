@@ -1,17 +1,28 @@
 //! La manche : les tuiles tombent, le joueur tape la lecture avant la ligne.
+//!
+//! En portrait, l'écran se lit de haut en bas : le bandeau, la zone de chute,
+//! la saisie, puis le clavier. Les gouttières latérales du paysage n'ont plus
+//! lieu d'être — la largeur revient entièrement aux tuiles.
 
 use macroquad::prelude::*;
 
 use crate::app::{App, Screen, Transition};
 use crate::gfx::palette::role;
-use crate::gfx::ui;
+use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
-use crate::session::{Event, PLAYFIELD_WIDTH, Session, TARGET_Y, TILE_HEIGHT};
+use crate::screens::keyboard::{self, Key};
+use crate::session::{Event, Session, TARGET_Y, TILE_HEIGHT};
 
 /// Taille des glyphes sur les tuiles.
 const GLYPH_SIZE: u16 = 24;
 
-pub fn game_screen(app: &App, session: &mut Session) -> Transition {
+/// Hauteur du bandeau du haut : score, vies, chronomètre.
+const HUD_HEIGHT: f32 = 38.0;
+
+/// La barre qui montre ce que le joueur est en train de taper.
+const INPUT_BAR: Rect = Rect { x: 8.0, y: 264.0, w: canvas::WIDTH - 16.0, h: 20.0 };
+
+pub fn game_screen(app: &App, session: &mut Session, mouse: Vec2) -> Transition {
     let outcome = session.update(get_frame_time());
 
     // La manche remonte ce qui vient de se produire ; c'est l'ecran qui decide
@@ -25,6 +36,25 @@ pub fn game_screen(app: &App, session: &mut Session) -> Transition {
     }
 
     draw(app, session);
+
+    // Abandonner une manche : loin des doigts, qui vivent sur le clavier en
+    // bas. Une partie qu'on ne peut pas quitter enferme le joueur, mais un
+    // bouton à portée de pouce la ferait perdre par accident.
+    let quit = Rect::new(canvas::WIDTH - 26.0, 26.0, 20.0, 12.0);
+    if ui::button(&app.fonts, mouse, Button::new(quit, "X").accent(role::DANGER)) {
+        return Transition::Pop;
+    }
+
+    // Le clavier est traité après le rendu de la manche : l'appui porte ainsi
+    // sur ce qui est à l'écran, et non sur la disposition de la frame d'avant.
+    if let Some(key) = keyboard::draw(&app.fonts, mouse) {
+        app.sfx.navigate();
+        match key {
+            Key::Letter(letter) => session.type_letter(letter),
+            Key::Erase => session.erase(),
+            Key::Submit => session.submit(),
+        }
+    }
 
     match outcome {
         // `Replace` et non `Push` : l'écran de résultats prend la place de la
@@ -41,14 +71,15 @@ fn draw(app: &App, session: &Session) {
     clear_background(role::BACKGROUND);
 
     let tile_width = session.tile_width();
-    // Seule la zone de jeu tremble : un HUD qui bouge se lit mal.
+    // Seule la zone de jeu tremble : un bandeau qui bouge se lit mal.
     let playfield_x = session.playfield_x() + session.shake_offset().x;
     let playfield_width = tile_width * session.rules.columns as f32;
+    let field = Rect::new(playfield_x, HUD_HEIGHT, playfield_width, TARGET_Y - HUD_HEIGHT);
 
-    ui::fill(Rect::new(playfield_x, 0.0, playfield_width, canvas::HEIGHT), role::PANEL);
+    ui::fill(field, role::PANEL);
     for column in 0..=session.rules.columns {
         let x = playfield_x + column as f32 * tile_width;
-        draw_rectangle(x, 0.0, 1.0, canvas::HEIGHT, role::BORDER);
+        draw_rectangle(x, field.y, 1.0, field.h, role::BORDER);
     }
 
     // Sous la ligne, tout est perdu : elle est dessinée avant les tuiles pour
@@ -74,6 +105,9 @@ fn draw(app: &App, session: &Session) {
         );
     }
 
+    // Le bandeau est dessiné après les tuiles : une tuile qui apparaît glisse
+    // ainsi derrière lui, au lieu de surgir d'un bord net.
+    ui::fill(Rect::new(0.0, 0.0, canvas::WIDTH, HUD_HEIGHT), role::BACKGROUND);
     draw_hud(&app.fonts, session);
     draw_input_bar(&app.fonts, session);
 }
@@ -82,27 +116,25 @@ fn draw_hud(fonts_set: &Fonts, session: &Session) {
     ui::text(fonts_set, &format!("{:05}", session.score), 6.0, 6.0, fonts::TEXT, role::TEXT);
     ui::hearts_row(6.0, 18.0, session.lives, session.rules.lives);
 
-    // La gouttière est étroite : le titre y passe sur plusieurs lignes plutôt
-    // que d'être coupé au troisième mot.
-    let gutter = session.playfield_x() - 12.0;
-    for (index, line) in ui::wrap(fonts_set, &session.level_title, fonts::TEXT, gutter)
-        .iter()
-        .take(3)
-        .enumerate()
-    {
-        ui::text(fonts_set, line, 6.0, 34.0 + index as f32 * 10.0, fonts::TEXT, role::TEXT_DISABLED);
-    }
+    // Le titre du niveau sous le score, en discret : on sait ce que l'on joue,
+    // il n'est là que pour se repérer entre deux manches.
+    ui::text_truncated(
+        fonts_set,
+        &session.level_title,
+        6.0,
+        29.0,
+        fonts::TEXT,
+        role::TEXT_DISABLED,
+        canvas::WIDTH - 12.0,
+    );
 
     if session.rules.is_timed() {
         draw_timer(fonts_set, session);
     }
 }
 
-/// Le temps restant, en jauge et en chiffres, à droite de la zone de jeu.
+/// Le temps restant, en jauge et en chiffres, à droite du bandeau.
 fn draw_timer(fonts_set: &Fonts, session: &Session) {
-    let x = session.playfield_x() + PLAYFIELD_WIDTH + 12.0;
-    let width = canvas::WIDTH - x - 6.0;
-
     let remaining = session.time_left.ceil() as u32;
     let label = format!("{remaining}S");
     let label_width = ui::text_width(fonts_set, &label, fonts::TEXT);
@@ -112,18 +144,36 @@ fn draw_timer(fonts_set: &Fonts, session: &Session) {
     // on a les yeux sur les tuiles.
     let ratio = session.time_ratio();
     let color = if ratio < 0.2 { role::DANGER } else { role::ACCENT };
-    ui::progress_bar(Rect::new(x, 18.0, width, 8.0), ratio, color);
+    ui::progress_bar(Rect::new(canvas::WIDTH - 76.0, 18.0, 70.0, 8.0), ratio, color);
 }
 
 fn draw_input_bar(fonts_set: &Fonts, session: &Session) {
-    const WIDTH: f32 = 160.0;
-    let bar = Rect::new(((canvas::WIDTH - WIDTH) / 2.0).floor(), 192.0, WIDTH, 16.0);
-    ui::panel(bar, role::BORDER);
+    ui::panel(INPUT_BAR, role::BORDER);
 
     let (content, color) = if session.input.is_empty() {
-        ("tapez la lecture", role::TEXT_DISABLED)
+        ("tape la lecture", role::TEXT_DISABLED)
     } else {
         (session.input.as_str(), role::STAR)
     };
-    ui::text_truncated(fonts_set, content, bar.x + 5.0, bar.y + 4.0, fonts::TEXT, color, WIDTH - 10.0);
+    ui::text_centered(
+        fonts_set,
+        content,
+        INPUT_BAR.x + INPUT_BAR.w / 2.0,
+        INPUT_BAR.y + (INPUT_BAR.h - fonts::TEXT as f32) / 2.0,
+        fonts::TEXT,
+        color,
+    );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn nothing_overlaps_between_the_line_and_the_keyboard() {
+        // La barre de saisie se glisse entre les deux : si le clavier remontait,
+        // elle passerait dessous et le joueur ne verrait plus ce qu'il tape.
+        assert!(TARGET_Y < INPUT_BAR.y, "la ligne rouge est au-dessus de la saisie");
+        assert!(INPUT_BAR.y + INPUT_BAR.h <= keyboard::TOP, "la saisie finit avant le clavier");
+    }
 }

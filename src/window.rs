@@ -30,10 +30,12 @@ pub fn window_conf() -> Conf {
 
     Conf {
         window_title: "Glyphfall".to_string(),
-        // Trois fois la toile virtuelle : la fenêtre s'ouvre pile sur un
-        // facteur d'agrandissement entier, sans bandes de letterbox.
-        window_width: crate::gfx::canvas::WIDTH as i32 * 3,
-        window_height: crate::gfx::canvas::HEIGHT as i32 * 3,
+        // Deux fois la toile virtuelle : la fenêtre s'ouvre pile sur un
+        // facteur d'agrandissement entier, sans bandes de letterbox. Trois fois
+        // dépasserait la hauteur d'un écran de bureau, la toile étant en
+        // portrait depuis que le jeu tourne sur téléphone.
+        window_width: crate::gfx::canvas::WIDTH as i32 * 2,
+        window_height: crate::gfx::canvas::HEIGHT as i32 * 2,
         fullscreen: false,
         // Le high-DPI ferait rendre macroquad à une résolution non entière et
         // reviendrait à flouter ce que l'agrandissement au pixel garantit.

@@ -195,7 +195,7 @@ async fn run() {
             Screen::Sign { language, level, index } => {
                 sign_screen(&app, language, level, index, mouse)
             }
-            Screen::Playing(session) => game_screen(&app, session),
+            Screen::Playing(session) => game_screen(&app, session, mouse),
             Screen::Results { outcome, elapsed } => {
                 results_screen(&app, outcome, elapsed, mouse)
             }
@@ -240,10 +240,13 @@ async fn run() {
 
         // Échap revient en arrière partout, sauf sur l'écran-titre où il n'y a
         // rien en dessous. Les écrans n'ont donc pas à s'en préoccuper.
+        //
+        // `Back` est la touche retour d'Android, que miniquad remonte comme
+        // n'importe quelle autre : un téléphone n'a pas d'Échap, et sans elle
+        // il faudrait un bouton dessiné sur chacun des douze écrans.
+        let going_back = is_key_pressed(KeyCode::Escape) || is_key_pressed(KeyCode::Back);
         let transition = match transition {
-            Transition::Stay if is_key_pressed(KeyCode::Escape) && navigator.can_go_back() => {
-                Transition::Pop
-            }
+            Transition::Stay if going_back && navigator.can_go_back() => Transition::Pop,
             other => other,
         };
 

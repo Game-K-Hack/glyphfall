@@ -5,7 +5,11 @@ hangeul, hiragana, katakana, kanji. Les signes tombent, vous tapez leur lecture
 avant qu'ils ne franchissent la ligne rouge. Interface entièrement en 8-bit.
 
 Écrit en Rust avec [macroquad](https://macroquad.rs), donc le même code tourne
-sur Windows, macOS, Linux et dans un navigateur.
+sur Windows, macOS, Linux, Android et dans un navigateur.
+
+L'écran est **en portrait** partout : le jeu se tient comme un téléphone, et
+des tuiles qui tombent gagnent en hauteur de chute ce qu'elles perdent en
+largeur.
 
 ## Le parcours
 
@@ -77,6 +81,12 @@ qu'on puisse lire ce qu'ils demandent — seul le bouton START s'éteint. Une
 | `←` `→` | Changer de mode, régler un volume |
 | `Échap` | Revenir en arrière |
 
+Au doigt, tout se touche. La manche affiche **son propre clavier** — celui du
+système couvrirait la moitié de l'écran et sa hauteur dépend de celui qu'a
+installé le joueur, ce qui interdirait de placer quoi que ce soit en dessous.
+Les listes défilent avec l'élan, et la touche retour d'Android remonte d'un
+écran comme `Échap`.
+
 La souris fonctionne partout où le clavier fonctionne, et s'entend pareil :
 le blip de déplacement suit **ce qui est désigné**, pas la touche appuyée.
 Survoler une autre étape, une autre carte ou un autre bouton sonne donc
@@ -87,6 +97,21 @@ comme une flèche.
 ```sh
 cargo run --release
 ```
+
+Pour Android — SDK, NDK et Java 17 requis, ni Gradle ni Docker :
+
+```sh
+python tools/android.py              # arm64, le plus courant
+python tools/android.py --toutes     # les quatre architectures
+python tools/android.py --abi x86_64 # pour l'émulateur
+adb install -r target/android/glyphfall.apk
+```
+
+L'APK sort signé d'une clé de débogage : il s'installe par sideload mais ne se
+publie pas. Le dossier `android/` est un projet Gradle ouvrable dans Android
+Studio, pour signer de votre propre clé. Les deux se partagent le manifeste, le
+script y ajoutant à la volée ce que Gradle refuse d'y voir — le paquet, les
+versions, les niveaux d'API.
 
 Pour le navigateur :
 
@@ -319,6 +344,7 @@ pyftsubset NotoSerifJP-Regular.ttf --text-file=signes.txt --output-file=...
 |---|---|
 | `src/data/` | Lecture et validation des fichiers de langue |
 | `src/gfx/` | Toile virtuelle, palette, polices, briques d'interface |
+| `src/screens/keyboard.rs` | Le clavier dessiné, pour jouer sans clavier |
 | `src/screens/` | Un fichier par écran |
 | `src/session.rs` | Une manche : règles, tuiles, score, bilan |
 | `src/progress.rs` | Étoiles gagnées, déverrouillage |

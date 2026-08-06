@@ -8,7 +8,7 @@ use macroquad::prelude::*;
 use crate::app::{App, Screen, Transition};
 use crate::data::Language;
 use crate::gfx::palette::role;
-use crate::gfx::ui;
+use crate::gfx::ui::{self, Button};
 use crate::gfx::{Fonts, canvas, fonts};
 use crate::screens::learning_path::PathView;
 
@@ -54,6 +54,16 @@ pub fn language_select_screen(app: &App, selected: &mut usize, mouse: Vec2) -> T
         fonts::TEXT,
         role::TITLE,
     );
+
+    // Un téléphone n'a pas d'Échap : chaque écran d'où l'on peut repartir
+    // porte son propre retour, la touche d'Android n'étant qu'un raccourci.
+    if ui::button(
+        &app.fonts,
+        mouse,
+        Button::new(Rect::new(8.0, 18.0, 26.0, 20.0), "<").accent(role::TEXT_MUTED),
+    ) {
+        return Transition::Pop;
+    }
 
     let mut chosen = None;
 

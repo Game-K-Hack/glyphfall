@@ -240,6 +240,14 @@ pub fn learning_path_screen(
         }
     }
 
+    if ui::button(
+        &app.fonts,
+        mouse,
+        Button::new(Rect::new(14.0, 344.0, 30.0, 18.0), "<").accent(role::TEXT_MUTED),
+    ) {
+        return Transition::Pop;
+    }
+
     draw_footer(&app.fonts, language, selected, &app.progress, can_revise);
 
     if is_key_pressed(KeyCode::Enter) {

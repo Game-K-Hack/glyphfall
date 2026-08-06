@@ -76,6 +76,14 @@ pub fn briefing_screen(
         );
     }
 
+    if ui::button(
+        &app.fonts,
+        mouse,
+        Button::new(Rect::new(8.0, 356.0, 26.0, 22.0), "<").accent(role::TEXT_MUTED),
+    ) {
+        return Transition::Pop;
+    }
+
     let start = Rect::new(((canvas::WIDTH - 140.0) / 2.0).floor(), 356.0, 140.0, 22.0);
 
     // Le bouton reste dessiné même quand le mode est fermé : le retirer ferait

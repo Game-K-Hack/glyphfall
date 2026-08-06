@@ -13,14 +13,13 @@ use crate::gfx::{Fonts, canvas, fonts};
 use crate::music::Ambience;
 use crate::settings::{DAILY_GOALS, MAX_LEVEL, goal_label};
 
-const ROW_X: f32 = 40.0;
+const ROW_X: f32 = 8.0;
 const ROW_WIDTH: f32 = canvas::WIDTH - ROW_X * 2.0;
-const ROW_HEIGHT: f32 = 24.0;
-const FIRST_ROW_Y: f32 = 40.0;
-const ROW_STEP: f32 = 28.0;
-
-/// Largeur du libellé, avant la jauge. « MUSIQUE MENUS » est le plus long.
-const LABEL_WIDTH: f32 = 122.0;
+/// Deux étages par ligne : le libellé, puis la jauge. Côte à côte, deux cent
+/// seize pixels ne porteraient ni « MUSIQUE MENUS » ni ses dix crans.
+const ROW_HEIGHT: f32 = 40.0;
+const FIRST_ROW_Y: f32 = 52.0;
+const ROW_STEP: f32 = 46.0;
 /// Un cran de la jauge.
 const SEGMENT_WIDTH: f32 = 11.0;
 const SEGMENT_GAP: f32 = 2.0;
@@ -57,7 +56,7 @@ pub fn options_screen(
         &app.fonts,
         "OPTIONS",
         canvas::WIDTH / 2.0,
-        16.0,
+        24.0,
         fonts::TITLE,
         role::TITLE,
     );
@@ -128,14 +127,14 @@ pub fn options_screen(
 
     ui::text_centered(
         &app.fonts,
-        "GAUCHE ET DROITE POUR REGLER",
+        "TOUCHE UNE JAUGE",
         canvas::WIDTH / 2.0,
-        182.0,
+        314.0,
         fonts::TEXT,
         role::TEXT_DISABLED,
     );
 
-    let back = Rect::new(((canvas::WIDTH - 120.0) / 2.0).floor(), 194.0, 120.0, 20.0);
+    let back = Rect::new(((canvas::WIDTH - 140.0) / 2.0).floor(), 340.0, 140.0, 22.0);
     if ui::button(&app.fonts, mouse, Button::new(back, "RETOUR").accent(role::TEXT_MUTED)) {
         return Transition::Pop;
     }
@@ -150,7 +149,7 @@ fn row_rect(index: usize) -> Rect {
 /// La jauge, à droite du libellé.
 fn gauge_rect(bounds: Rect) -> Rect {
     let width = MAX_LEVEL as f32 * (SEGMENT_WIDTH + SEGMENT_GAP) - SEGMENT_GAP;
-    Rect::new(bounds.x + LABEL_WIDTH, bounds.y + 7.0, width, 12.0)
+    Rect::new(bounds.x + 6.0, bounds.y + 20.0, width, 14.0)
 }
 
 /// La barre de l'objectif, plus courte que les jauges de volume.
@@ -159,7 +158,7 @@ fn gauge_rect(bounds: Rect) -> Rect {
 /// viendrait mordre sur le curseur. Le dessin et le clic passent tous deux par
 /// cette fonction, faute de quoi on cliquerait à côté de ce que l'on voit.
 fn goal_bar(bounds: Rect) -> Rect {
-    const VALUE_ROOM: f32 = 26.0;
+    const VALUE_ROOM: f32 = 4.0;
 
     let gauge = gauge_rect(bounds);
     Rect::new(gauge.x, gauge.y, gauge.w - VALUE_ROOM, gauge.h)
@@ -270,7 +269,7 @@ fn draw_row(fonts_set: &Fonts, bounds: Rect, row: Row, level: u8, selected: bool
         fonts_set,
         label,
         bounds.x + 6.0,
-        bounds.y + (ROW_HEIGHT - fonts::TEXT as f32) / 2.0,
+        bounds.y + 5.0,
         fonts::TEXT,
         if selected { role::TEXT } else { role::TEXT_MUTED },
     );
@@ -328,7 +327,7 @@ fn draw_value(fonts_set: &Fonts, bounds: Rect, value: &str, muted: bool) {
         fonts_set,
         value,
         bounds.x + bounds.w - 6.0 - width,
-        bounds.y + (ROW_HEIGHT - fonts::TEXT as f32) / 2.0,
+        bounds.y + 22.0,
         fonts::TEXT,
         if muted { role::DANGER } else { role::TEXT },
     );

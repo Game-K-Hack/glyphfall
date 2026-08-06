@@ -19,7 +19,11 @@ pub const TILE_HEIGHT: f32 = 40.0;
 /// Largeur totale de la zone de jeu, partagée entre les colonnes.
 pub const PLAYFIELD_WIDTH: f32 = 192.0;
 /// La ligne de validation : une tuile qui la franchit est perdue.
-pub const TARGET_Y: f32 = 160.0;
+///
+/// Le portrait a rendu la chute plus longue qu'en paysage, malgré le clavier
+/// qui occupe le bas : une tuile a désormais plus de temps pour descendre, ce
+/// qui compense la lenteur de la saisie au doigt.
+pub const TARGET_Y: f32 = 256.0;
 
 /// Points gagnés par glyphe reconnu.
 const POINTS_PER_HIT: u32 = 10;
@@ -452,6 +456,25 @@ impl Session {
         }
 
         None
+    }
+
+    /// Ajoute une lettre à la saisie, quelle qu'en soit la provenance.
+    ///
+    /// Le clavier dessiné à l'écran passe par ici, comme le clavier physique :
+    /// la manche ne sait pas lequel des deux a servi, et n'a pas à le savoir.
+    pub fn type_letter(&mut self, letter: char) {
+        if letter.is_alphanumeric() {
+            self.input.push(letter.to_lowercase().next().unwrap_or(letter));
+        }
+    }
+
+    pub fn erase(&mut self) {
+        self.input.pop();
+    }
+
+    /// Soumet la saisie en cours.
+    pub fn submit(&mut self) {
+        self.validate();
     }
 
     fn read_input(&mut self) {
