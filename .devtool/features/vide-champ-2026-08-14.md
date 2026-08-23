@@ -1,15 +1,15 @@
 ---
 id: "vide-champ-2026-08-14"
-status: "in-progress"
+status: "review"
 priority: "critical"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-14T09:41:53.191Z"
-modified: "2026-08-23T14:16:46.229Z"
+modified: "2026-08-23T14:25:03.714Z"
 completedAt: null
 labels: []
-order: "a0"
+order: "a1"
 ---
 # Vide champ
 
