@@ -25,6 +25,21 @@ pub const PLAYFIELD_WIDTH: f32 = 192.0;
 /// qui compense la lenteur de la saisie au doigt.
 pub const TARGET_Y: f32 = crate::gfx::canvas::pick(248.0, 160.0);
 
+/// Cadence maximale d'apparition, en secondes.
+///
+/// Une réponse par seconde est déjà un rythme soutenu : reconnaître le signe,
+/// taper deux ou trois lettres, valider. En demander davantage ne rend pas un
+/// mode difficile, il le ferme — d'autant que le rapide et l'ultra exigent le
+/// sans-faute, donc ce rythme **sans une seule erreur** d'un bout à l'autre.
+const FASTEST_SPAWN: f32 = 0.95;
+
+/// Temps de chute minimal d'une tuile, en secondes.
+///
+/// Sert de plafond de vitesse aux modes accélérés. Exprimé en temps et non en
+/// pixels par seconde : la zone de chute est plus haute debout que couchée, et
+/// c'est le temps pour répondre qui doit être le même, pas la vitesse.
+const SLOWEST_FALL: f32 = 1.3;
+
 /// Points gagnés par glyphe reconnu.
 const POINTS_PER_HIT: u32 = 10;
 /// Durée du flash vert d'une tuile validée, en secondes.
@@ -166,14 +181,8 @@ impl Mode {
 
         match self {
             Mode::Normal => {}
-            Mode::Fast => {
-                rules.speed = scaled(rules.speed, 1.5);
-                rules.spawn_interval *= 0.72;
-            }
-            Mode::Ultra => {
-                rules.speed = scaled(rules.speed, 2.1);
-                rules.spawn_interval *= 0.55;
-            }
+            Mode::Fast => hurry(&mut rules, 1.35, 0.85),
+            Mode::Ultra => hurry(&mut rules, 1.70, 0.72),
             Mode::Endless => {
                 // On repart doucement — plus doucement que le normal — mais
                 // rien n'arrête plus l'accélération. C'est elle qui finit la
@@ -193,12 +202,32 @@ impl Mode {
 }
 
 /// Multiplie une vitesse sans toucher à sa montée en difficulté relative.
-fn scaled(speed: Speed, factor: f32) -> Speed {
-    Speed {
-        start: speed.start * factor,
-        ramp: speed.ramp * factor,
-        max: speed.max * factor,
-    }
+/// Durcit des règles pour un mode accéléré, sans jamais les rendre injouables.
+///
+/// Trois précautions, chacune contre une façon différente de fermer le mode :
+///
+/// - **la rampe monte moins que le départ.** Multipliée à l'identique, elle
+///   rendait la fin de manche impossible alors même que le début passait, et
+///   d'autant plus que le chemin avance : une étape tardive part déjà vite.
+/// - **la vitesse est plafonnée en temps de chute**, pas en pixels : moins de
+///   `SLOWEST_FALL` secondes pour lire un signe et le taper, personne n'y
+///   arrive. Le plafond cède néanmoins devant la vitesse du mode normal, qu'un
+///   mode accéléré ne saurait descendre en dessous.
+/// - **la cadence a un plancher.** C'est elle, et non la vitesse, qui étrangle
+///   vraiment : si les tuiles arrivent plus vite qu'on ne peut répondre, la
+///   file s'allonge sans retour possible.
+fn hurry(rules: &mut Rules, factor: f32, spawn: f32) {
+    // Le plafond ne descend jamais sous ce que le niveau fait déjà en normal :
+    // un mode accéléré plus lent que celui qu'il durcit n'aurait aucun sens, et
+    // les étapes tardives dépassent ce plafond dès le mode normal.
+    let ceiling = (TARGET_Y / SLOWEST_FALL).max(rules.speed.max);
+
+    rules.speed = Speed {
+        start: (rules.speed.start * factor).min(ceiling),
+        ramp: rules.speed.ramp * factor.sqrt(),
+        max: (rules.speed.max * factor).min(ceiling),
+    };
+    rules.spawn_interval = (rules.spawn_interval * spawn).max(FASTEST_SPAWN);
 }
 
 /// Les règles d'une révision libre.
@@ -1207,6 +1236,82 @@ mod tests {
 
         assert!(!session.start(), "les suivantes ne touchent a rien");
         assert_eq!(session.input, "ta");
+    }
+
+    #[test]
+    fn no_level_ever_asks_for_more_than_one_answer_per_second() {
+        // Le mode ne se ferme pas par la vitesse mais par la cadence : si les
+        // tuiles arrivent plus vite qu'on ne peut repondre, la file s'allonge
+        // sans retour possible, et le sans-faute qu'exigent le rapide et
+        // l'ultra devient hors d'atteinte. Le test porte sur tout le catalogue,
+        // ce sont les etapes tardives — deja rapides — qui basculaient les
+        // premieres.
+        let catalog = crate::data::load_catalog().expect("catalogue valide");
+
+        for language in &catalog.languages {
+            for level in &language.levels {
+                for mode in [Mode::Fast, Mode::Ultra] {
+                    let rules = mode.apply(&level.rules);
+
+                    assert!(
+                        rules.spawn_interval >= FASTEST_SPAWN,
+                        "{} en {} : une tuile toutes les {:.2} s",
+                        level.id,
+                        mode.label(),
+                        rules.spawn_interval,
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn a_hurried_mode_is_never_gentler_than_the_one_it_hardens() {
+        // Le plafond de vitesse pourrait retourner l'ordre des modes : les
+        // etapes tardives le depassent des le mode normal, et le brider sans
+        // precaution rendrait l'ultra plus lent que ce qu'il durcit.
+        let catalog = crate::data::load_catalog().expect("catalogue valide");
+
+        for language in &catalog.languages {
+            for level in &language.levels {
+                let normal = Mode::Normal.apply(&level.rules);
+                let fast = Mode::Fast.apply(&level.rules);
+                let ultra = Mode::Ultra.apply(&level.rules);
+
+                for (harder, softer, names) in
+                    [(&fast, &normal, "rapide/normal"), (&ultra, &fast, "ultra/rapide")]
+                {
+                    assert!(harder.speed.start >= softer.speed.start, "{} : {names}", level.id);
+                    assert!(harder.speed.max >= softer.speed.max, "{} : {names}", level.id);
+                    assert!(
+                        harder.spawn_interval <= softer.spawn_interval,
+                        "{} : {names}",
+                        level.id
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn a_hurried_mode_never_outruns_the_eye() {
+        // Deux plafonds, exprimes en temps : ils protegent les etapes que
+        // personne n'a encore ecrites autant que celles du catalogue.
+        let brutal = Rules {
+            spawn_interval: 0.5,
+            // Le plafond ne cède que devant le mode normal : ce niveau de
+            // référence reste donc en dessous pour que la borne s'applique.
+            speed: Speed { start: 400.0, ramp: 40.0, max: TARGET_Y / SLOWEST_FALL },
+            ..Rules::default()
+        };
+
+        for mode in [Mode::Fast, Mode::Ultra] {
+            let rules = mode.apply(&brutal);
+
+            assert!(rules.spawn_interval >= FASTEST_SPAWN);
+            assert!(TARGET_Y / rules.speed.max >= SLOWEST_FALL - 0.001);
+            assert!(TARGET_Y / rules.speed.start >= SLOWEST_FALL - 0.001);
+        }
     }
 
     #[test]
