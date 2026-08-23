@@ -118,6 +118,10 @@ pub struct Session {
     pub mode: Mode,
     /// Nombre de tracés à faire tourner. `1` quand le joueur n'en veut qu'un.
     tracings: usize,
+    /// La manche a-t-elle déjà connu une frame ?
+    ///
+    /// Sert à faire le vide au tout début : voir `update`.
+    started: bool,
 }
 
 /// Comment un niveau se joue.
@@ -329,6 +333,7 @@ impl Session {
             is_revision: true,
             mode: Mode::Normal,
             tracings: tracings.max(1),
+            started: false,
         })
     }
 
@@ -395,6 +400,7 @@ impl Session {
             is_revision: false,
             mode,
             tracings: tracings.max(1),
+            started: false,
         })
     }
 
@@ -438,6 +444,12 @@ impl Session {
 
     /// Avance la manche d'une frame. Renvoie le bilan quand elle se termine.
     pub fn update(&mut self, dt: f32) -> Option<Outcome> {
+        // Les frappes en attente ne peuvent être jetées qu'avec une fenêtre
+        // ouverte : le vidage du champ, lui, est vérifiable sans.
+        if self.start() {
+            while get_char_pressed().is_some() {}
+        }
+
         self.shake = (self.shake - dt).max(0.0);
         self.read_input();
         self.spawn(dt);
@@ -475,6 +487,27 @@ impl Session {
     /// Soumet la saisie en cours.
     pub fn submit(&mut self) {
         self.validate();
+    }
+
+    /// Marque le début de la manche, et fait le vide. Ne renvoie `true` qu'une
+    /// fois : à l'appelant de jeter alors les frappes en attente.
+    ///
+    /// Celles-ci s'accumulent dans une file tant que personne ne les lit, et
+    /// seule une manche en cours les lit. Tout ce qui a été tapé pendant le
+    /// bilan, le briefing ou le délai d'avant-partie attendait donc son tour et
+    /// arrivait d'un bloc dans la manche suivante, qui démarrait avec la
+    /// réponse inachevée de la précédente déjà inscrite.
+    ///
+    /// Une seule fois, et c'est l'essentiel : vider à chaque frame rendrait
+    /// toute saisie impossible, la réponse s'effaçant à mesure qu'on la tape.
+    fn start(&mut self) -> bool {
+        if self.started {
+            return false;
+        }
+
+        self.started = true;
+        self.input.clear();
+        true
     }
 
     fn read_input(&mut self) {
@@ -1155,6 +1188,25 @@ mod tests {
 
         assert!(session.tiles.iter().any(|tile| tile.font == 0));
         assert!(session.tiles.iter().any(|tile| tile.font == 1));
+    }
+
+    #[test]
+    fn a_round_wipes_the_field_once_and_only_once() {
+        // Une reponse laissee inachevee reapparaissait a la manche suivante :
+        // les frappes s'accumulent tant que personne ne les lit, et la manche
+        // les recevait toutes d'un bloc en demarrant.
+        let mut session = session(vec![level("ko-01", &[], vec![glyph("\u{3131}", "g")])], "ko-01");
+        session.input = "ka".into();
+
+        assert!(session.start(), "la premiere frame fait le vide");
+        assert!(session.input.is_empty());
+
+        // Mais une seule fois : effacer a chaque frame rendrait toute saisie
+        // impossible, la reponse disparaissant au fur et a mesure.
+        session.input = "ta".into();
+
+        assert!(!session.start(), "les suivantes ne touchent a rien");
+        assert_eq!(session.input, "ta");
     }
 
     #[test]
