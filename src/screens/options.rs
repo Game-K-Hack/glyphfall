@@ -78,12 +78,20 @@ pub fn options_screen(
         if ui::hit(bounds, mouse) {
             *selected = index;
 
-            // Un appui sur la barre l'attrape : on peut ensuite la balayer sans
-            // rester dessus, ce qui est le seul geste tenable au doigt.
-            if is_mouse_button_pressed(MouseButton::Left)
-                && value_at(*row, bounds, mouse).is_some()
-            {
-                *dragging = Some(index);
+            if is_mouse_button_pressed(MouseButton::Left) {
+                if is_switch(*row) {
+                    // Un interrupteur bascule à l'appui et ne se traîne pas :
+                    // l'attraper le ferait basculer à chaque frame tant que le
+                    // doigt reste posé.
+                    if ui::hit(ui::grab_area(switch_rect(bounds)), mouse) {
+                        let level = level_of(app, *row);
+                        change = Some((*row, if level == 0 { 1 } else { -1 }));
+                    }
+                } else if value_at(*row, bounds, mouse).is_some() {
+                    // Un appui sur la barre l'attrape : on peut ensuite la
+                    // balayer sans rester dessus, seul geste tenable au doigt.
+                    *dragging = Some(index);
+                }
             }
         }
 
@@ -189,6 +197,22 @@ fn level_of(app: &App, row: Row) -> u8 {
     }
 }
 
+/// Cette ligne se règle-t-elle par un interrupteur ?
+///
+/// Un « oui ou non » n'est pas une quantité que l'on dose : il bascule d'un
+/// appui, sans qu'on ait à viser une position sur un rail.
+fn is_switch(row: Row) -> bool {
+    matches!(row, Row::RandomFonts)
+}
+
+/// L'interrupteur d'une ligne, à la place qu'occuperait sa jauge.
+fn switch_rect(bounds: Rect) -> Rect {
+    const WIDTH: f32 = 30.0;
+
+    let gauge = gauge_rect(bounds);
+    Rect::new(gauge.x, gauge.y, WIDTH, gauge.h)
+}
+
 /// Le nombre de crans d'une ligne. Les volumes en ont dix, l'objectif neuf.
 fn steps_of(row: Row) -> u8 {
     match row {
@@ -292,10 +316,10 @@ fn draw_row(fonts_set: &Fonts, bounds: Rect, row: Row, level: u8, selected: bool
 
     // L'objectif n'est pas une quantité que l'on remplit mais une valeur que
     // l'on désigne : une jauge pleine à gauche du curseur mentirait.
-    if row == Row::RandomFonts {
-        let bar = goal_bar(bounds);
-        ui::slider(bar, 2, level as usize, if selected { role::ACCENT } else { role::TEXT_MUTED });
-        draw_value(fonts_set, bounds, if level == 1 { "OUI" } else { "NON" }, level == 0);
+    if is_switch(row) {
+        let on = level == 1;
+        ui::switch(switch_rect(bounds), on, if selected { role::ACCENT } else { role::TEXT_MUTED });
+        draw_value(fonts_set, bounds, if on { "OUI" } else { "NON" }, !on);
         return;
     }
 
@@ -345,4 +369,32 @@ fn draw_value(fonts_set: &Fonts, bounds: Rect, value: &str, muted: bool) {
         fonts::TEXT,
         if muted { role::DANGER } else { role::TEXT },
     );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_switch_stays_inside_its_row() {
+        // Deborder mordrait sur la valeur ecrite a droite, et une partie de
+        // l'interrupteur deviendrait intouchable.
+        let bounds = row_rect(0);
+        let switch = switch_rect(bounds);
+
+        assert!(switch.x >= bounds.x);
+        assert!(switch.x + switch.w < bounds.x + bounds.w - 30.0, "la place de OUI/NON reste libre");
+        assert!(switch.y + switch.h <= bounds.y + bounds.h);
+    }
+
+    #[test]
+    fn only_the_yes_or_no_setting_is_a_switch() {
+        // Un volume se dose : lui donner deux positions perdrait huit crans.
+        assert!(is_switch(Row::RandomFonts));
+        assert_eq!(steps_of(Row::RandomFonts), 1, "deux positions, donc un seul pas");
+
+        for row in [Row::Music, Row::MusicGame, Row::Sfx, Row::DailyGoal] {
+            assert!(!is_switch(row));
+        }
+    }
 }

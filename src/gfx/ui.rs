@@ -382,6 +382,30 @@ pub fn slider(rect: Rect, steps: usize, step: usize, accent: Color) {
     panel(cursor, accent);
 }
 
+/// Un interrupteur à deux positions : le bouton bouge, la couleur suit.
+///
+/// Un « oui ou non » n'est pas une quantité que l'on dose : lui donner un rail
+/// et deux crans laissait croire qu'il y avait quelque chose entre les deux, et
+/// demandait de viser une position là où un simple appui suffit.
+///
+/// La couleur seule ne dirait rien à qui la distingue mal ; c'est la **place**
+/// du bouton qui porte l'état, la teinte ne fait que la confirmer.
+pub fn switch(rect: Rect, on: bool, accent: Color) {
+    let track = if on { accent } else { role::PANEL };
+    fill(rect, track);
+    stroke(rect, role::BORDER);
+
+    // Le bouton occupe une moitié de la piste, collé à un bord ou à l'autre.
+    let width = (rect.w / 2.0).floor();
+    let knob = Rect::new(
+        if on { rect.x + rect.w - width } else { rect.x },
+        rect.y,
+        width,
+        rect.h,
+    );
+    panel(knob, if on { role::TEXT } else { role::BORDER });
+}
+
 /// Le cran désigné par le curseur, s'il est sur la barre.
 ///
 /// Sert à *attraper* le curseur. Une fois attrapé, c'est `slider_step_from_x`
