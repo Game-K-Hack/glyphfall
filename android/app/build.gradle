@@ -1,11 +1,11 @@
 plugins { id 'com.android.application' }
 
 android {
-    namespace 'fr.socodep.glyphfall'
+    namespace 'fr.kmaindron.glyphfall'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'fr.socodep.glyphfall'
+        applicationId 'fr.kmaindron.glyphfall'
         // API 26 : la version que vise la bibliothèque native, et le plancher
         // en dessous duquel OpenGL ES 2 et le son deviennent capricieux.
         minSdk 26

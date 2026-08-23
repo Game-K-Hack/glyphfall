@@ -26,7 +26,7 @@ mod backend {
     #[cfg(target_os = "android")]
     fn save_dir() -> Option<PathBuf> {
         // Doit correspondre à `applicationId` dans android/app/build.gradle.
-        const PAQUET: &str = "fr.socodep.glyphfall";
+        const PAQUET: &str = "fr.kmaindron.glyphfall";
 
         // `/data/user/0` est la forme moderne, `/data/data` son ancien alias.
         // Les deux mènent au même endroit sur un téléphone à un seul profil,

@@ -25,7 +25,7 @@ RACINE = Path(__file__).resolve().parent.parent
 PROJET = RACINE / "android"
 SORTIE = RACINE / "target" / "android"
 
-PAQUET = "fr.socodep.glyphfall"
+PAQUET = "fr.kmaindron.glyphfall"
 NOM_LIB = "libglyphfall_core.so"
 
 # Le niveau d'API visé par la bibliothèque native, et le plancher
