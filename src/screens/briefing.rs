@@ -216,16 +216,21 @@ fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {
         fonts_set,
         &level.title,
         canvas::pick(38.0, 8.0),
-        canvas::pick(6.0, 6.0),
+        6.0,
         fonts::TEXT,
         role::TITLE,
-        canvas::WIDTH - 16.0,
+        // Debout, le titre commence après le bouton de retour : sa largeur
+        // utile en est diminuée d'autant.
+        canvas::WIDTH - canvas::pick(46.0, 16.0),
     );
     ui::text_truncated(
         fonts_set,
         &level.subtitle,
         8.0,
-        canvas::pick(19.0, 17.0),
+        // Debout, le sous-titre passe sous le bouton de retour, qui descend
+        // jusqu'à vingt : le coller à dix-neuf lui faisait manger sa première
+        // ligne de pixels.
+        canvas::pick(24.0, 17.0),
         fonts::TEXT,
         role::TEXT_MUTED,
         canvas::WIDTH - 16.0,
@@ -236,7 +241,7 @@ fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {
     let count = format!("{} SIGNES", level.glyphs.len());
     let width = ui::text_width(fonts_set, &count, fonts::TEXT);
     let (count_x, count_y) =
-        if canvas::PORTRAIT { (8.0, 32.0) } else { (canvas::WIDTH - 8.0 - width, 6.0) };
+        if canvas::PORTRAIT { (8.0, 38.0) } else { (canvas::WIDTH - 8.0 - width, 6.0) };
     ui::text(fonts_set, &count, count_x, count_y, fonts::TEXT, role::TEXT_MUTED);
 
     // Le palmarès du niveau, juste sous le décompte des signes : on voit en
@@ -244,7 +249,7 @@ fn draw_header(fonts_set: &Fonts, level: &Level, progress: &Progress) {
     let modes = progress.modes(&level.id);
     ui::level_stars(
         canvas::WIDTH - 8.0 - ui::level_stars_width(MAX_STARS),
-        canvas::pick(32.0, 18.0),
+        canvas::pick(38.0, 18.0),
         progress.stars(&level.id),
         MAX_STARS,
         modes.fast_perfect,

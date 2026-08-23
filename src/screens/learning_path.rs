@@ -456,6 +456,11 @@ fn draw_footer(
 ) {
     let level = &language.levels[selected];
 
+    // Couché, le bouton de révision partage la ligne du rappel et le pousse
+    // vers la gauche. Debout, il est sur la ligne du dessus : il n'y a rien à
+    // décaler, et décaler quand même faisait sortir le texte par la gauche.
+    let crowded = crowded && !canvas::PORTRAIT;
+
     let hint = match (progress.is_unlocked(level), crowded) {
         // Le bouton de révision occupe la droite : le rappel raccourcit pour ne
         // pas passer dessous.
