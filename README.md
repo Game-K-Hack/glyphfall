@@ -117,6 +117,24 @@ joueur, `libasound2`, `libX11`, `libXi`, `libGL` et `libxkbcommon`. Seule la
 première est inscrite dans le fichier : miniquad ouvre les autres à
 l'exécution, si bien que leur absence ne se voit qu'au lancement.
 
+Et son paquet Debian, qu'`apt` installe avec ses dépendances :
+
+```sh
+python tools/deb.py
+sudo apt install ./target/deb/glyphfall_0.1.0_amd64.deb
+```
+
+Le jeu se lance ensuite depuis le menu des applications, ou par `glyphfall`
+dans un terminal — `/usr/games` est sur le chemin d'un bureau Debian ou Ubuntu.
+Le paquet est fabriqué à la main, un `.deb` n'étant qu'une archive `ar` de
+trois membres : aucun outil Debian n'est donc nécessaire pour le produire, ce
+qui permet de le construire depuis Windows.
+
+Pour un `apt install glyphfall` sans chemin de fichier, il faudrait un **dépôt**
+— une arborescence de fichiers statiques, un index `Packages`, un `Release`
+signé par une clé GPG, et un hébergement. Rien de difficile, mais rien
+d'utile non plus tant que le jeu n'est pas publié quelque part.
+
 Pour Android — SDK, NDK et Java 17 requis, ni Gradle ni Docker :
 
 ```sh
