@@ -103,6 +103,20 @@ comme une flèche.
 cargo run --release
 ```
 
+Pour Linux, depuis n'importe quel système — Zig fournit la chaîne croisée, ni
+machine virtuelle ni conteneur :
+
+```sh
+pip install ziglang && cargo install cargo-zigbuild
+python tools/linux.py
+```
+
+Il en sort un binaire et son archive dans `target/linux/`. Le jeu demande une
+glibc 2.31 ou plus récente — Ubuntu 20.04 et au-delà — et, sur la machine du
+joueur, `libasound2`, `libX11`, `libXi`, `libGL` et `libxkbcommon`. Seule la
+première est inscrite dans le fichier : miniquad ouvre les autres à
+l'exécution, si bien que leur absence ne se voit qu'au lancement.
+
 Pour Android — SDK, NDK et Java 17 requis, ni Gradle ni Docker :
 
 ```sh
