@@ -64,7 +64,32 @@ def zig():
     return Path(ziglang.__file__).parent
 
 
-def bouchon_alsa(cible_zig):
+def sources_de(paquet, cible):
+    """Le dossier source d'une dépendance, téléchargée au besoin.
+
+    Le registre n'est pas toujours à côté du dossier personnel : `CARGO_HOME`
+    peut le déplacer, et une machine d'intégration continue le fait. Il peut
+    surtout être vide — une machine propre n'a rien téléchargé —, d'où le
+    `cargo fetch`, visant explicitement la cible : `quad-alsa-sys` n'est une
+    dépendance que sous Linux, et un hôte Windows ne la prendrait pas autrement.
+    """
+    registre = Path(os.environ.get("CARGO_HOME") or Path.home() / ".cargo") / "registry/src"
+
+    def chercher():
+        return glob.glob(str(registre / "*" / f"{paquet}-*" / "src"))
+
+    if trouve := chercher():
+        return trouve[0]
+
+    print(f"  téléchargement des dépendances ({paquet} manque)")
+    executer(["cargo", "fetch", "--target", cible], cwd=RACINE)
+
+    if trouve := chercher():
+        return trouve[0]
+    sys.exit(f"{paquet} introuvable dans {registre} même après `cargo fetch`.")
+
+
+def bouchon_alsa(cible, cible_zig):
     """Fabrique une fausse `libasound.so`, pour l'édition de liens seulement.
 
     `quad-alsa-sys` réclame ALSA au lieur, alors que le son n'est ouvert qu'à
@@ -73,12 +98,10 @@ def bouchon_alsa(cible_zig):
     faire. Le nom interne annoncé — `libasound.so.2` — est celui que le binaire
     ira chercher chez le joueur, où la vraie répondra.
     """
-    sources = glob.glob(os.path.expanduser("~/.cargo/registry/src/*/quad-alsa-sys-*/src"))
-    if not sources:
-        sys.exit("quad-alsa-sys introuvable : lancez d'abord `cargo fetch`.")
+    sources = sources_de("quad-alsa-sys", cible)
 
     noms = set()
-    for fichier in glob.glob(sources[0] + "/*.rs"):
+    for fichier in glob.glob(sources + "/*.rs"):
         contenu = Path(fichier).read_text(encoding="utf-8")
         noms |= set(re.findall(r"pub fn (snd_[A-Za-z_0-9]+)", contenu))
 
@@ -139,7 +162,7 @@ def main():
 
     print(f"Glyphfall pour Linux ({arch})")
     SORTIE.mkdir(parents=True, exist_ok=True)
-    dossier = bouchon_alsa(cible_zig)
+    dossier = bouchon_alsa(cible, cible_zig)
 
     environnement = dict(os.environ)
     environnement["PATH"] = f"{zig()}{os.pathsep}{environnement['PATH']}"
