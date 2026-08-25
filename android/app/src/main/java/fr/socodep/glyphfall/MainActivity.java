@@ -1,4 +1,4 @@
-package fr.kmaindron.glyphfall;
+package fr.harlock.glyphfall;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
