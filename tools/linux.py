@@ -18,6 +18,7 @@ puis `libX11`, `libXi`, `libGL` et `libxkbcommon`, que miniquad ouvre à
 l'exécution — elles n'apparaissent donc pas dans la liste des dépendances, et
 leur absence ne se voit qu'au lancement.
 """
+import argparse
 import glob
 import os
 import re
@@ -31,7 +32,13 @@ from pathlib import Path
 RACINE = Path(__file__).resolve().parent.parent
 SORTIE = RACINE / "target" / "linux"
 
-CIBLE = "x86_64-unknown-linux-gnu"
+# Les architectures visées : le triplet Rust, celui de Zig, et le nom que
+# Debian leur donne.
+ARCHITECTURES = {
+    "x86_64": ("x86_64-unknown-linux-gnu", "x86_64-linux-gnu", "amd64"),
+    "arm64": ("aarch64-unknown-linux-gnu", "aarch64-linux-gnu", "arm64"),
+}
+
 # La glibc la plus ancienne acceptée. Zig fabrique les symboles de cette
 # version-là, ce qui fait tourner le binaire sur tout ce qui est plus récent.
 GLIBC = "2.31"
@@ -57,7 +64,7 @@ def zig():
     return Path(ziglang.__file__).parent
 
 
-def bouchon_alsa():
+def bouchon_alsa(cible_zig):
     """Fabrique une fausse `libasound.so`, pour l'édition de liens seulement.
 
     `quad-alsa-sys` réclame ALSA au lieur, alors que le son n'est ouvert qu'à
@@ -75,14 +82,14 @@ def bouchon_alsa():
         contenu = Path(fichier).read_text(encoding="utf-8")
         noms |= set(re.findall(r"pub fn (snd_[A-Za-z_0-9]+)", contenu))
 
-    dossier = SORTIE / "alsa"
+    dossier = SORTIE / "alsa" / cible_zig
     dossier.mkdir(parents=True, exist_ok=True)
     source = dossier / "bouchon.c"
     source.write_text("\n".join(f"void {nom}(void) {{}}" for nom in sorted(noms)) + "\n")
 
     print(f"  bouchon ALSA ({len(noms)} symboles)")
     executer([
-        zig() / "zig", "cc", "-target", "x86_64-linux-gnu",
+        zig() / "zig", "cc", "-target", cible_zig,
         "-shared", "-fPIC", "-Wl,-soname,libasound.so.2",
         "-o", dossier / "libasound.so", source,
     ])
@@ -120,26 +127,37 @@ def dependances(binaire):
 
 
 def main():
-    print("Glyphfall pour Linux")
+    arguments = argparse.ArgumentParser(description="Construit l'exécutable Linux.")
+    arguments.add_argument(
+        "--arch",
+        choices=sorted(ARCHITECTURES),
+        default="x86_64",
+        help="architecture visée (x86_64 par défaut)",
+    )
+    arch = arguments.parse_args().arch
+    cible, cible_zig, _ = ARCHITECTURES[arch]
+
+    print(f"Glyphfall pour Linux ({arch})")
     SORTIE.mkdir(parents=True, exist_ok=True)
-    dossier = bouchon_alsa()
+    dossier = bouchon_alsa(cible_zig)
 
     environnement = dict(os.environ)
     environnement["PATH"] = f"{zig()}{os.pathsep}{environnement['PATH']}"
     environnement["RUSTFLAGS"] = f"{environnement.get('RUSTFLAGS', '')} -L {dossier}".strip()
 
-    print(f"  compilation {CIBLE} (glibc {GLIBC})")
+    print(f"  compilation {cible} (glibc {GLIBC})")
     executer(
-        ["cargo", "zigbuild", "--release", "--target", f"{CIBLE}.{GLIBC}"],
+        ["cargo", "zigbuild", "--release", "--target", f"{cible}.{GLIBC}"],
         cwd=RACINE,
         env=environnement,
     )
 
-    produit = RACINE / "target" / CIBLE / "release" / "glyphfall"
-    binaire = SORTIE / "glyphfall"
+    produit = RACINE / "target" / cible / "release" / "glyphfall"
+    binaire = SORTIE / arch / "glyphfall"
+    binaire.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(produit, binaire)
 
-    archive = SORTIE / "glyphfall-linux-x86_64.tar.gz"
+    archive = SORTIE / f"glyphfall-linux-{arch}.tar.gz"
     with tarfile.open(archive, "w:gz") as tar:
         info = tar.gettarinfo(binaire, arcname="glyphfall")
         info.mode = 0o755                                    # exécutable après extraction

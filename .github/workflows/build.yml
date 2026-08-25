@@ -1,0 +1,180 @@
+# Fabrique Glyphfall pour toutes ses cibles.
+#
+# À chaque poussée, chaque plateforme sort son fichier et l'attache à
+# l'exécution ; sur une étiquette de version — `v0.1.0` —, tout est en plus
+# rassemblé dans une publication GitHub.
+#
+# Les recettes elles-mêmes vivent dans `tools/`, en Python, et tournent aussi
+# bien sur une machine que sur un coureur : ce fichier ne fait que les appeler.
+# Une chaîne de compilation qui n'existe que dans l'intégration continue finit
+# toujours par diverger de celle qu'on utilise pour de vrai.
+
+name: Construction
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Les tests d'abord, dans les deux orientations : rien ne sert de fabriquer
+  # sept paquets d'un jeu cassé.
+  verification:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Bibliothèques de compilation
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+      - name: Tests, écran couché
+        run: cargo test --release
+      - name: Tests, écran debout
+        run: cargo test --release --features portrait
+      # `-D warnings` posé sur nos deux cibles seulement : dans RUSTFLAGS, il
+      # s'appliquerait aussi aux dépendances, dont les avertissements ne nous
+      # regardent pas et casseraient la construction sans rien nous apprendre.
+      - name: Aucun avertissement
+        run: |
+          cargo rustc --release --lib -- -D warnings
+          cargo rustc --release --bin glyphfall -- -D warnings
+
+  windows:
+    name: Windows x86_64
+    needs: verification
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glyphfall-windows-x86_64
+          path: target/release/glyphfall.exe
+
+  linux:
+    name: Linux ${{ matrix.arch }}
+    needs: verification
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            cible: x86_64-unknown-linux-gnu
+            debian: amd64
+          - arch: arm64
+            cible: aarch64-unknown-linux-gnu
+            debian: arm64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.cible }}
+      - uses: Swatinem/rust-cache@v2
+      # Zig fournit la chaîne croisée : le même chemin sert aux deux
+      # architectures, et il est identique à celui d'une machine de bureau.
+      - run: pip install ziglang pillow
+      - run: cargo install cargo-zigbuild
+      - run: python tools/linux.py --arch ${{ matrix.arch }}
+      - run: python tools/deb.py --arch ${{ matrix.debian }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glyphfall-linux-${{ matrix.arch }}
+          path: |
+            target/linux/glyphfall-linux-${{ matrix.arch }}.tar.gz
+            target/deb/glyphfall_*_${{ matrix.debian }}.deb
+
+  macos:
+    name: macOS ${{ matrix.arch }}
+    needs: verification
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            cible: aarch64-apple-darwin
+          - arch: x86_64
+            cible: x86_64-apple-darwin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.cible }}
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --target ${{ matrix.cible }}
+      - name: Archive
+        run: tar czf glyphfall-macos-${{ matrix.arch }}.tar.gz -C target/${{ matrix.cible }}/release glyphfall
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glyphfall-macos-${{ matrix.arch }}
+          path: glyphfall-macos-${{ matrix.arch }}.tar.gz
+
+  android:
+    name: Android
+    needs: verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android, armv7-linux-androideabi, x86_64-linux-android, i686-linux-android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: Swatinem/rust-cache@v2
+      # Le coureur fournit déjà SDK et NDK ; le script les trouve par
+      # `ANDROID_HOME` et `ANDROID_NDK_HOME`, comme sur une machine de bureau.
+      # arm64 seulement : les quatre architectures dans un même APK le
+      # porteraient à deux cent soixante mégaoctets, quand chaque téléphone
+      # n'en utilise qu'un quart. Tout appareil vendu depuis dix ans est arm64.
+      - name: APK
+        run: python tools/android.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glyphfall-android
+          path: target/android/glyphfall.apk
+
+  web:
+    name: Navigateur
+    needs: verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --target wasm32-unknown-unknown
+      - name: Assemblage du dossier web
+        run: cp target/wasm32-unknown-unknown/release/glyphfall.wasm web/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glyphfall-web
+          path: web/
+
+  # Sur une étiquette seulement : tout ce qui précède devient une publication.
+  publication:
+    name: Publication
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, linux, macos, android, web]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: fichiers
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: fichiers/**/*
+          generate_release_notes: true

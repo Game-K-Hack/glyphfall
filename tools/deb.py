@@ -14,6 +14,7 @@ qui tire au passage les bibliothèques manquantes. Pour un vrai `apt install
 glyphfall`, sans chemin de fichier, il faudrait un dépôt signé et hébergé :
 voir le README.
 """
+import argparse
 import gzip
 import hashlib
 import io
@@ -30,7 +31,10 @@ SORTIE = RACINE / "target" / "deb"
 
 PAQUET = "glyphfall"
 VERSION = "0.1.0"
-ARCHITECTURE = "amd64"
+
+# Le nom que Debian donne aux architectures, et le dossier où `tools/linux.py`
+# dépose le binaire correspondant.
+ARCHITECTURES = {"amd64": "x86_64", "arm64": "arm64"}
 
 # Les bibliothèques que le jeu ouvre lui-même, à l'exécution : `dpkg-shlibdeps`
 # ne saurait pas les deviner, elles ne figurent pas dans l'exécutable. Sans
@@ -149,11 +153,21 @@ def archive_ar(membres, destination):
 
 
 def main():
-    binaire = LINUX / "glyphfall"
-    if not binaire.exists():
-        sys.exit("binaire absent : lancez d'abord `python tools/linux.py`.")
+    arguments = argparse.ArgumentParser(description="Empaquette Glyphfall pour Debian.")
+    arguments.add_argument(
+        "--arch",
+        choices=sorted(ARCHITECTURES),
+        default="amd64",
+        help="architecture du paquet (amd64 par défaut)",
+    )
+    architecture = arguments.parse_args().arch
+    dossier = ARCHITECTURES[architecture]
 
-    print("Glyphfall pour Debian")
+    binaire = LINUX / dossier / "glyphfall"
+    if not binaire.exists():
+        sys.exit(f"binaire absent : lancez `python tools/linux.py --arch {dossier}`.")
+
+    print(f"Glyphfall pour Debian ({architecture})")
     SORTIE.mkdir(parents=True, exist_ok=True)
 
     executable = binaire.read_bytes()
@@ -176,7 +190,7 @@ def main():
     controle = (
         f"Package: {PAQUET}\n"
         f"Version: {VERSION}\n"
-        f"Architecture: {ARCHITECTURE}\n"
+        f"Architecture: {architecture}\n"
         "Maintainer: Glyphfall <informatique@socodep.fr>\n"
         f"Installed-Size: {poids}\n"
         f"Depends: {', '.join(DEPENDANCES)}\n"
@@ -196,7 +210,7 @@ def main():
         ("./md5sums", sommes.encode(), 0o644),
     ])
 
-    paquet = SORTIE / f"{PAQUET}_{VERSION}_{ARCHITECTURE}.deb"
+    paquet = SORTIE / f"{PAQUET}_{VERSION}_{architecture}.deb"
     # L'ordre des trois membres est impose par le format.
     archive_ar([
         ("debian-binary", b"2.0\n"),

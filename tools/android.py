@@ -45,13 +45,37 @@ ARCHITECTURES = {
 }
 
 
+def outil(nom, script=False):
+    """Le nom d'un outil du SDK selon le système.
+
+    Le SDK livre ses outils en deux exemplaires : un exécutable et un script
+    d'enrobage. Sous Windows le premier prend `.exe` et le second `.bat` ;
+    ailleurs, tous deux sont sans extension.
+    """
+    if sys.platform != "win32":
+        return nom
+    return nom + (".bat" if script else ".exe")
+
+
+def hote():
+    """Le nom que le NDK donne au système qui compile."""
+    return {
+        "win32": "windows-x86_64",
+        "darwin": "darwin-x86_64",
+    }.get(sys.platform, "linux-x86_64")
+
+
 def sdk():
     for variable in ("ANDROID_HOME", "ANDROID_SDK_ROOT"):
         if chemin := os.environ.get(variable):
             return Path(chemin)
-    defaut = Path.home() / "AppData/Local/Android/Sdk"
-    if defaut.exists():
-        return defaut
+    for defaut in (
+        Path.home() / "AppData/Local/Android/Sdk",
+        Path.home() / "Android/Sdk",
+        Path.home() / "Library/Android/sdk",
+    ):
+        if defaut.exists():
+            return defaut
     sys.exit("SDK Android introuvable : posez ANDROID_HOME.")
 
 
@@ -73,18 +97,25 @@ def outils():
     plateforme = plus_recent(
         racine / "platforms", lambda c: (c / "android.jar").exists()
     )
-    ndk = plus_recent(racine / "ndk")
-    clang = ndk / "toolchains/llvm/prebuilt/windows-x86_64/bin"
+    # Le NDK vit d'ordinaire dans le SDK, mais une machine d'intégration
+    # continue l'installe souvent à côté et l'annonce par une variable.
+    ndk = None
+    for variable in ("ANDROID_NDK_HOME", "ANDROID_NDK_ROOT", "ANDROID_NDK"):
+        if chemin := os.environ.get(variable):
+            ndk = Path(chemin)
+            break
+    if ndk is None or not ndk.exists():
+        ndk = plus_recent(racine / "ndk")
+    # Le NDK range ses compilateurs par système hôte.
+    clang = ndk / "toolchains/llvm/prebuilt" / hote() / "bin"
     if not clang.exists():
-        # Le NDK range ses compilateurs par système hôte.
-        clang = plus_recent(ndk / "toolchains/llvm/prebuilt", lambda _: True)
-        clang = clang / "bin"
+        clang = plus_recent(ndk / "toolchains/llvm/prebuilt", lambda _: True) / "bin"
 
     return {
-        "aapt2": build_tools / "aapt2.exe",
-        "d8": build_tools / "d8.bat",
-        "zipalign": build_tools / "zipalign.exe",
-        "apksigner": build_tools / "apksigner.bat",
+        "aapt2": build_tools / outil("aapt2"),
+        "d8": build_tools / outil("d8", script=True),
+        "zipalign": build_tools / outil("zipalign"),
+        "apksigner": build_tools / outil("apksigner", script=True),
         "android_jar": plateforme / "android.jar",
         "clang": clang,
     }
@@ -226,7 +257,7 @@ def assembler(abis, o):
     aligne.unlink(missing_ok=True)
     executer([o["zipalign"], "-p", "-f", "4", brut, aligne])
 
-    keytool = Path(shutil.which("keytool") or "keytool")
+    keytool = Path(shutil.which("keytool") or outil("keytool"))
     executer([
         o["apksigner"], "sign",
         "--ks", cle_de_debogage(keytool),

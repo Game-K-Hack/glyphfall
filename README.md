@@ -97,6 +97,18 @@ le blip de déplacement suit **ce qui est désigné**, pas la touche appuyée.
 Survoler une autre étape, une autre carte ou un autre bouton sonne donc
 comme une flèche.
 
+## Construction automatique
+
+`.github/workflows/build.yml` fabrique tout à chaque poussée : Windows, Linux
+x86_64 et ARM avec leurs paquets Debian, macOS Intel et Apple Silicon, l'APK
+Android et la version navigateur. Sur une étiquette de version — `v0.1.0` —,
+les fichiers sont rassemblés dans une publication GitHub.
+
+Les recettes vivent dans `tools/`, en Python, et tournent aussi bien sur une
+machine que sur un coureur : le workflow ne fait que les appeler. Une chaîne de
+compilation qui n'existerait que dans l'intégration continue finirait par
+diverger de celle qu'on utilise pour de vrai.
+
 ## Lancer et construire
 
 ```sh
