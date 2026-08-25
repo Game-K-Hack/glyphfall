@@ -1,6 +1,6 @@
 [package]
 name = "glyphfall"
-version = "0.1.0"
+version = "0.1.3"
 edition = "2024"
 
 # Android charge une bibliothèque partagée, le bureau un exécutable : les deux

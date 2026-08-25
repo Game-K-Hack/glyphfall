@@ -9,7 +9,7 @@ la version du format, les métadonnées, les fichiers. Aucun outil Debian n'est
 donc nécessaire pour en produire un — ce que ce script fait à la main, faute de
 `dpkg-deb` sur une machine Windows.
 
-Le paquet s'installe avec `sudo apt install ./glyphfall_0.1.0_amd64.deb`, ce
+Le paquet s'installe avec `sudo apt install ./glyphfall_<version>_amd64.deb`, ce
 qui tire au passage les bibliothèques manquantes. Pour un vrai `apt install
 glyphfall`, sans chemin de fichier, il faudrait un dépôt signé et hébergé :
 voir le README.
@@ -25,12 +25,13 @@ import tarfile
 import time
 from pathlib import Path
 
+from version import version as numero_de_version
+
 RACINE = Path(__file__).resolve().parent.parent
 LINUX = RACINE / "target" / "linux"
 SORTIE = RACINE / "target" / "deb"
 
 PAQUET = "glyphfall"
-VERSION = "0.1.0"
 
 # Le nom que Debian donne aux architectures, et le dossier où `tools/linux.py`
 # dépose le binaire correspondant.
@@ -160,7 +161,10 @@ def main():
         default="amd64",
         help="architecture du paquet (amd64 par défaut)",
     )
-    architecture = arguments.parse_args().arch
+    arguments.add_argument("--version", help="numéro à graver ; celui de Cargo.toml sinon")
+    choix = arguments.parse_args()
+    architecture = choix.arch
+    version = numero_de_version(choix.version)
     dossier = ARCHITECTURES[architecture]
 
     binaire = LINUX / dossier / "glyphfall"
@@ -189,7 +193,7 @@ def main():
     poids = sum(len(contenu) for _, contenu, _ in fichiers) // 1024
     controle = (
         f"Package: {PAQUET}\n"
-        f"Version: {VERSION}\n"
+        f"Version: {version}\n"
         f"Architecture: {architecture}\n"
         "Maintainer: Glyphfall <informatique@socodep.fr>\n"
         f"Installed-Size: {poids}\n"
@@ -210,7 +214,7 @@ def main():
         ("./md5sums", sommes.encode(), 0o644),
     ])
 
-    paquet = SORTIE / f"{PAQUET}_{VERSION}_{architecture}.deb"
+    paquet = SORTIE / f"{PAQUET}_{version}_{architecture}.deb"
     # L'ordre des trois membres est impose par le format.
     archive_ar([
         ("debian-binary", b"2.0\n"),

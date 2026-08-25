@@ -21,6 +21,8 @@ import sys
 import zipfile
 from pathlib import Path
 
+from version import code_android, version as numero_de_version
+
 RACINE = Path(__file__).resolve().parent.parent
 PROJET = RACINE / "android"
 SORTIE = RACINE / "target" / "android"
@@ -33,8 +35,6 @@ NOM_LIB = "libglyphfall_core.so"
 # redit pour Gradle — `aapt2`, lui, ne sait pas lire un fichier Gradle.
 API = 26
 CIBLE_SDK = 35
-VERSION_CODE = 1
-VERSION_NOM = "0.1.0"
 
 # Les quatre architectures d'Android, et le triplet Rust de chacune.
 ARCHITECTURES = {
@@ -171,7 +171,7 @@ def cle_de_debogage(outil_keytool):
     return magasin
 
 
-def assembler(abis, o):
+def assembler(abis, o, version):
     """Compile les ressources et le Java, puis fabrique l'APK signé."""
     travail = SORTIE / "assemblage"
     if travail.exists():
@@ -196,8 +196,8 @@ def assembler(abis, o):
     entete = (
         '<manifest xmlns:android="http://schemas.android.com/apk/res/android"\n'
         f'    package="{PAQUET}"\n'
-        f'    android:versionCode="{VERSION_CODE}"\n'
-        f'    android:versionName="{VERSION_NOM}">\n'
+        f'    android:versionCode="{code_android(version)}"\n'
+        f'    android:versionName="{version}">\n'
         f'    <uses-sdk android:minSdkVersion="{API}"'
         f' android:targetSdkVersion="{CIBLE_SDK}" />'
     )
@@ -269,6 +269,7 @@ def assembler(abis, o):
 
 def main():
     arguments = argparse.ArgumentParser(description=__doc__)
+    arguments.add_argument("--version", help="numéro à graver ; celui de Cargo.toml sinon")
     arguments.add_argument("--toutes", action="store_true",
                            help="compiler les quatre architectures")
     arguments.add_argument("--abi", action="append", choices=list(ARCHITECTURES),
@@ -283,7 +284,7 @@ def main():
     for abi in abis:
         compiler(abi, o["clang"])
 
-    apk = assembler(abis, o)
+    apk = assembler(abis, o, numero_de_version(choix.version))
     poids = apk.stat().st_size / 1048576
     print(f"\n{apk}  ({poids:.0f} Mo)")
     print("  architectures :", ", ".join(abis))
