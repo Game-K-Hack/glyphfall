@@ -23,7 +23,7 @@ char = "ㅇ"
 answers = ["ng"]
 mnemonics = [
     "Le dessin de la gorge ouverte, un cercle.",
-    "Muet au debut d'une syllabe : il ne fait que porter la voyelle. Son nom : ieung.",
+    "Forme d'un zero : au debut, il ne vaut rien. Son nom : ieung.",
 ]
 
 [[glyphs]]
@@ -31,5 +31,5 @@ char = "ㅎ"
 answers = ["h"]
 mnemonics = [
     "Un chapeau pose sur la gorge ouverte : le souffle sort par le haut.",
-    "Le ieung a deux traits de plus, donc deux crans de souffle. Son nom : hieut.",
+    "Forme d'un homme a chapeau (hat). Son nom : hieut.",
 ]

@@ -1,15 +1,15 @@
 ---
 id: "mnmothechnique-2026-08-23"
-status: "todo"
+status: "in-progress"
 priority: "medium"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-23T14:28:38.678Z"
-modified: "2026-08-23T17:44:47.596Z"
+modified: "2026-08-25T20:41:59.398Z"
 completedAt: null
 labels: []
-order: "a8"
+order: "a0"
 ---
 # Mnémothechnique
 

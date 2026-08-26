@@ -39,7 +39,7 @@ char = "ㄷ"
 answers = ["d", "t"]
 mnemonics = [
     "Le nieun que l'on referme par le haut : meme langue, contact plus ferme.",
-    "Un D carre, dos a gauche. Son nom : digeut.",
+    "Forme d'un d sans sa barre, ou d'une porte vue de cote (door). Son nom : digeut.",
 ]
 
 [[glyphs]]
@@ -47,7 +47,7 @@ char = "ㄹ"
 answers = ["r", "l"]
 mnemonics = [
     "Le zigzag de la langue qui roule puis retombe.",
-    "Un escalier a deux marches. Son nom : rieul.",
+    "Forme d'une route qui zigzague (route). Son nom : rieul.",
 ]
 
 [[glyphs]]
@@ -63,7 +63,7 @@ char = "ㅂ"
 answers = ["b", "p"]
 mnemonics = [
     "Le carre de la bouche qui s'entrouvre : deux traits s'echappent vers le haut.",
-    "Une coupe ouverte. Son nom : bieup.",
+    "Forme d'un bol a deux anses (bol). Son nom : bieup.",
 ]
 
 [[glyphs]]
@@ -71,7 +71,7 @@ char = "ㅅ"
 answers = ["s"]
 mnemonics = [
     "Le dessin d'une dent pointue : le souffle passe entre les dents.",
-    "Une tente, ou un A sans barre. Son nom : siot.",
+    "Forme d'un sommet de montagne (sommet). Son nom : siot.",
 ]
 
 [[glyphs]]
@@ -79,7 +79,7 @@ char = "ㅇ"
 answers = ["ng"]
 mnemonics = [
     "Le dessin de la gorge ouverte, un cercle.",
-    "Muet au debut d'une syllabe : il ne fait que porter la voyelle. Son nom : ieung.",
+    "Forme d'un zero : au debut, il ne vaut rien. Son nom : ieung.",
 ]
 
 [[glyphs]]
@@ -87,7 +87,7 @@ char = "ㅈ"
 answers = ["j"]
 mnemonics = [
     "La dent du siot coiffee d'un chapeau : meme endroit, l'air est bloque avant.",
-    "Un T pose sur un V. Son nom : jieut.",
+    "Forme de jambes croisees sous une table (jambes). Son nom : jieut.",
 ]
 
 [[glyphs]]
@@ -95,7 +95,7 @@ char = "ㅊ"
 answers = ["ch"]
 mnemonics = [
     "Le jieut avec un trait de plus : en hangeul, un trait ajoute veut dire souffle ajoute.",
-    "Le J aspire devient CH. Son nom : chieut.",
+    "Le jieut coiffe d'un chapeau (chapeau). Son nom : chieut.",
 ]
 
 [[glyphs]]
@@ -103,7 +103,7 @@ char = "ㅋ"
 answers = ["k"]
 mnemonics = [
     "Le giyeok avec un trait de plus : meme geste, souffle en plus.",
-    "Le G aspire devient K. Son nom : kieuk.",
+    "Forme d'une cle dentee (key). Son nom : kieuk.",
 ]
 
 [[glyphs]]
@@ -111,7 +111,7 @@ char = "ㅌ"
 answers = ["t"]
 mnemonics = [
     "Le digeut avec un trait de plus a l'interieur.",
-    "Le D aspire devient T. Son nom : tieut.",
+    "Forme d'un E, ou d'un trident sans le manche (trident). Son nom : tieut.",
 ]
 
 [[glyphs]]
@@ -119,7 +119,7 @@ char = "ㅍ"
 answers = ["p"]
 mnemonics = [
     "Le bieup couche a plat, ouvert en haut et en bas.",
-    "Le B aspire devient P. Son nom : pieup.",
+    "Forme d'un pont sur deux piles (pont), ou d'un pi grec a qui l'on aurait ajoute une barre. Son nom : pieup.",
 ]
 
 [[glyphs]]
@@ -127,5 +127,5 @@ char = "ㅎ"
 answers = ["h"]
 mnemonics = [
     "Un chapeau pose sur la gorge ouverte : le souffle sort par le haut.",
-    "Le ieung a deux traits de plus, donc deux crans de souffle. Son nom : hieut.",
+    "Forme d'un homme a chapeau (hat). Son nom : hieut.",
 ]

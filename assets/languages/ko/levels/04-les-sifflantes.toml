@@ -23,7 +23,7 @@ char = "ㅅ"
 answers = ["s"]
 mnemonics = [
     "Le dessin d'une dent pointue : le souffle passe entre les dents.",
-    "Une tente, ou un A sans barre. Son nom : siot.",
+    "Forme d'un sommet de montagne (sommet). Son nom : siot.",
 ]
 
 [[glyphs]]
@@ -31,7 +31,7 @@ char = "ㅈ"
 answers = ["j"]
 mnemonics = [
     "La dent du siot coiffee d'un chapeau : meme endroit, l'air est bloque avant.",
-    "Un T pose sur un V. Son nom : jieut.",
+    "Forme de jambes croisees sous une table (jambes). Son nom : jieut.",
 ]
 
 [[glyphs]]
@@ -39,5 +39,5 @@ char = "ㅊ"
 answers = ["ch"]
 mnemonics = [
     "Le jieut avec un trait de plus : en hangeul, un trait ajoute veut dire souffle ajoute.",
-    "Le J aspire devient CH. Son nom : chieut.",
+    "Le jieut coiffe d'un chapeau (chapeau). Son nom : chieut.",
 ]

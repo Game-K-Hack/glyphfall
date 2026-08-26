@@ -23,7 +23,7 @@ char = "ㅋ"
 answers = ["k"]
 mnemonics = [
     "Le giyeok avec un trait de plus : meme geste, souffle en plus.",
-    "Le G aspire devient K. Son nom : kieuk.",
+    "Forme d'une cle dentee (key). Son nom : kieuk.",
 ]
 
 [[glyphs]]
@@ -31,7 +31,7 @@ char = "ㅌ"
 answers = ["t"]
 mnemonics = [
     "Le digeut avec un trait de plus a l'interieur.",
-    "Le D aspire devient T. Son nom : tieut.",
+    "Forme d'un E, ou d'un trident sans le manche (trident). Son nom : tieut.",
 ]
 
 [[glyphs]]
@@ -39,5 +39,5 @@ char = "ㅍ"
 answers = ["p"]
 mnemonics = [
     "Le bieup couche a plat, ouvert en haut et en bas.",
-    "Le B aspire devient P. Son nom : pieup.",
+    "Forme d'un pont sur deux piles (pont), ou d'un pi grec a qui l'on aurait ajoute une barre. Son nom : pieup.",
 ]

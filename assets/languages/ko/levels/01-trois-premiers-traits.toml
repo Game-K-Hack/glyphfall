@@ -23,7 +23,7 @@ char = "ㄱ"
 answers = ["g", "k"]
 mnemonics = [
     "Le dessin de la langue qui se souleve au fond de la gorge pour bloquer l'air.",
-    "Un coin, ou un G majuscule qui aurait perdu sa boucle. Son nom : giyeok.",
+    "Forme d'un angle (gun), ou un G majuscule qui aurait perdu sa boucle. Son nom : giyeok.",
 ]
 
 [[glyphs]]
@@ -31,7 +31,7 @@ char = "ㄴ"
 answers = ["n"]
 mnemonics = [
     "Le bout de la langue collee derriere les dents du haut, vue de profil.",
-    "Un L a l'envers, ou le bas d'un N. Son nom : nieun.",
+    "Forme d'un L (nez). Son nom : nieun.",
 ]
 
 [[glyphs]]

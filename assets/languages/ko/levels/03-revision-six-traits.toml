@@ -39,7 +39,7 @@ char = "ㄷ"
 answers = ["d", "t"]
 mnemonics = [
     "Le nieun que l'on referme par le haut : meme langue, contact plus ferme.",
-    "Un D carre, dos a gauche. Son nom : digeut.",
+    "Forme d'un d sans sa barre, ou d'une porte vue de cote (door). Son nom : digeut.",
 ]
 
 [[glyphs]]
@@ -47,7 +47,7 @@ char = "ㄹ"
 answers = ["r", "l"]
 mnemonics = [
     "Le zigzag de la langue qui roule puis retombe.",
-    "Un escalier a deux marches. Son nom : rieul.",
+    "Forme d'une route qui zigzague (route). Son nom : rieul.",
 ]
 
 [[glyphs]]
@@ -63,5 +63,5 @@ char = "ㅂ"
 answers = ["b", "p"]
 mnemonics = [
     "Le carre de la bouche qui s'entrouvre : deux traits s'echappent vers le haut.",
-    "Une coupe ouverte. Son nom : bieup.",
+    "Forme d'un bol a deux anses (bol). Son nom : bieup.",
 ]
