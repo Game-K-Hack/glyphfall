@@ -8,6 +8,7 @@ use std::cell::Cell;
 
 use macroquad::prelude::*;
 
+use super::canvas;
 use super::fonts::Fonts;
 use super::palette::role;
 
@@ -137,6 +138,54 @@ pub fn forget_focus() {
     MUTED.with(|muted| muted.set(true));
 }
 
+// --- Glissement -------------------------------------------------------------
+
+/// Le glissement horizontal qui feuillette une liste, comme on tourne une page.
+///
+/// Renvoie de combien de pages avancer : `1` vers la droite, `-1` vers la
+/// gauche, `0` le reste du temps. `start` retient l'abscisse où le doigt s'est
+/// posé, et doit survivre d'une frame à l'autre.
+///
+/// Deux écrans s'en servent, et le geste a assez de pièges pour ne pas être
+/// écrit deux fois : le doigt levé ailleurs, le clic qui ouvre un autre écran,
+/// et le geste long qui ne doit pas défiler toute la liste d'un coup.
+pub fn swipe(start: &mut Option<f32>, mouse: Vec2) -> isize {
+    /// Distance à parcourir du doigt, en pixels virtuels.
+    ///
+    /// Un quart de la largeur : plus court, un appui un peu traînant
+    /// feuilletterait ; plus long, le geste ne tiendrait pas sur un petit
+    /// écran.
+    const DISTANCE: f32 = canvas::WIDTH / 4.0;
+
+    // Le doigt levé ailleurs — sur un écran empilé, ou hors de la fenêtre —
+    // n'est jamais vu ici : sans cet oubli, le point de départ survivrait.
+    if !is_mouse_button_down(MouseButton::Left) {
+        *start = None;
+    }
+    if is_mouse_button_pressed(MouseButton::Left) {
+        *start = Some(mouse.x);
+    }
+
+    let Some(origin) = *start else { return 0 };
+    let travelled = mouse.x - origin;
+
+    if travelled.abs() < DISTANCE {
+        return 0;
+    }
+
+    // Le geste est consommé : on repart de la position courante, ce qui permet
+    // d'enchaîner sans lever le doigt.
+    *start = Some(mouse.x);
+    if travelled < 0.0 { 1 } else { -1 }
+}
+
+/// Avance de `pages` éléments dans une liste, en revenant au début après le
+/// dernier. Compagnon de `swipe`, dont le résultat s'y branche directement,
+/// mais tout aussi utile aux flèches.
+pub fn turn(index: usize, pages: isize, count: usize) -> usize {
+    (index as isize + pages).rem_euclid(count as isize) as usize
+}
+
 // --- Texte -----------------------------------------------------------------
 
 /// Écrit à partir du coin **haut-gauche**, contrairement à `draw_text_ex` qui
@@ -249,6 +298,48 @@ pub fn wrap(fonts: &Fonts, content: &str, size: u16, max_width: f32) -> Vec<Stri
         lines.push(current);
     }
     lines
+}
+
+/// Écrit un texte à lignes multiples en respectant ses retours à la ligne et
+/// ses retraits, et renvoie l'ordonnée suivante.
+///
+/// `paragraph` recolle tout en un seul bloc : il convient à une phrase, pas à
+/// un texte que son auteur a mis en forme. Une prononciation énumère des cas —
+/// début de mot, entre deux voyelles, fin de syllabe — et cette structure est
+/// justement ce qui la rend lisible. Les lignes trop longues sont repliées, et
+/// le repli garde le retrait de sa ligne d'origine pour qu'on voie où elle
+/// continue.
+///
+/// Le texte est borné par `area` : ce qui n'y tient pas n'est pas écrit.
+pub fn block(fonts: &Fonts, content: &str, area: Rect, size: u16, color: Color) -> f32 {
+    let step = size as f32 + 2.0;
+    let mut y = area.y;
+
+    for source in content.lines() {
+        // La zone borne le texte plutôt qu'un nombre de lignes : une ligne vide
+        // ne vaut qu'un demi-interligne, et un plafond exprimé en lignes
+        // laisserait donc de la place inutilisée ou déborderait.
+        if y + step > area.bottom() {
+            break;
+        }
+        if source.trim().is_empty() {
+            y += step / 2.0;
+            continue;
+        }
+
+        let retrait = source.len() - source.trim_start().len();
+        let offset = text_width(fonts, &" ".repeat(retrait), size);
+
+        for line in wrap(fonts, source.trim(), size, area.w - offset) {
+            if y + step > area.bottom() {
+                break;
+            }
+            text(fonts, &line, area.x + offset, y, size, color);
+            y += step;
+        }
+    }
+
+    y
 }
 
 /// Écrit un texte sur plusieurs lignes centrées, et renvoie l'ordonnée de la

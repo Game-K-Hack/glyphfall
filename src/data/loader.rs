@@ -152,11 +152,22 @@ mod tests {
                 texts.extend(
                     level.glyphs.iter().flat_map(|glyph| glyph.mnemonics.iter().cloned()),
                 );
+                // Le nom et la prononciation sont écrits avec la même police,
+                // et la prononciation cite volontiers des mots français : elle
+                // est le texte le plus exposé aux accents de tout le jeu.
+                texts.extend(level.glyphs.iter().map(|glyph| glyph.name.clone()));
+                texts.extend(level.glyphs.iter().map(|glyph| glyph.pronunciation.clone()));
             }
         }
 
         for text in texts {
             for character in text.chars() {
+                // La prononciation est écrite en blocs : ses retours à la ligne
+                // et ses retraits mettent le texte en page, ils ne sont jamais
+                // dessinés.
+                if character.is_whitespace() {
+                    continue;
+                }
                 assert_ne!(
                     font.lookup_glyph_index(character),
                     0,
@@ -164,6 +175,87 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn every_pronunciation_fits_on_its_screen() {
+        // La prononciation est le seul texte du jeu qui garde ses retours à la
+        // ligne et ses retraits : c'est son auteur qui la met en page, et rien
+        // à l'exécution ne l'avertirait qu'elle est coupée — `ui::block`
+        // s'arrête sans bruit à la dernière ligne visible.
+        //
+        // Les deux budgets reprennent ceux de `screens::pronunciation`, qui
+        // sont figés à la compilation : les vérifier tous les deux ici est le
+        // seul moyen de couvrir l'orientation que ce binaire n'a pas.
+        // Largeur et hauteur de la zone de texte, dans les deux orientations,
+        // telles que `screens::pronunciation` les calcule.
+        const PORTRAIT: (f32, f32) = (196.0, 254.0);
+        const LANDSCAPE: (f32, f32) = (298.0, 160.0);
+
+        let catalog = load_catalog().expect("catalogue valide");
+        let bytes = font_bytes(crate::gfx::fonts::UI_FONT_FILE).expect("police d'interface");
+        let font = fontdue::Font::from_bytes(bytes, fontdue::FontSettings::default())
+            .expect("police d'interface lisible");
+
+        // La police d'interface est à chasse fixe : une seule largeur suffit
+        // donc à rejouer le découpage de `ui::wrap` sans contexte graphique.
+        let advance = font.metrics('M', 8.0).advance_width;
+
+        for language in &catalog.languages {
+            for level in &language.levels {
+                for glyph in &level.glyphs {
+                    if glyph.pronunciation.is_empty() {
+                        continue;
+                    }
+                    for (width, height) in [PORTRAIT, LANDSCAPE] {
+                        let used = height_used(&glyph.pronunciation, advance, width);
+                        assert!(
+                            used <= height,
+                            "la prononciation de « {} » prend {used} pixels de haut sur les                              {height} disponibles en {width} de large",
+                            glyph.char
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /// Rejoue la mise en page de `ui::block` : une ligne source vide vaut un
+    /// demi-interligne, et les lignes de continuation gardent le retrait de
+    /// leur source.
+    fn height_used(content: &str, advance: f32, max_width: f32) -> f32 {
+        const STEP: f32 = 8.0 + 2.0;
+        let mut height = 0.0;
+
+        for source in content.lines() {
+            if source.trim().is_empty() {
+                height += STEP / 2.0;
+                continue;
+            }
+            let retrait = source.len() - source.trim_start().len();
+            let available = max_width - retrait as f32 * advance;
+            let per_line = (available / advance).floor().max(1.0) as usize;
+
+            let mut current = 0;
+            for word in source.split_whitespace() {
+                let candidate = if current == 0 {
+                    word.chars().count()
+                } else {
+                    current + 1 + word.chars().count()
+                };
+                if candidate <= per_line || current == 0 {
+                    current = candidate;
+                } else {
+                    height += STEP;
+                    current = word.chars().count();
+                }
+            }
+            if current > 0 {
+                height += STEP;
+            }
+        }
+
+        height
     }
 
     #[test]

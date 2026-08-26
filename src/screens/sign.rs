@@ -7,7 +7,7 @@
 
 use macroquad::prelude::*;
 
-use crate::app::{App, Transition};
+use crate::app::{App, Screen, Transition};
 use crate::data::{Glyph, Language, Level};
 use crate::gfx::palette::role;
 use crate::gfx::ui::{self, Button};
@@ -29,12 +29,6 @@ const TRACINGS_Y: f32 = canvas::pick(190.0, 166.0);
 /// moyens de retenir dessous, sur toute la largeur.
 const TEXT_X: f32 = canvas::pick(10.0, CARD.x + CARD.w + 14.0);
 const TEXT_WIDTH: f32 = canvas::WIDTH - TEXT_X - canvas::pick(10.0, 16.0);
-
-/// Distance à parcourir du doigt pour changer de signe, en pixels virtuels.
-///
-/// Un quart de la largeur : plus court, un appui un peu traînant ferait changer
-/// de fiche ; plus long, le geste ne tiendrait pas sur un petit écran.
-const SWIPE: f32 = canvas::WIDTH / 4.0;
 
 pub fn sign_screen(
     app: &App,
@@ -58,34 +52,16 @@ pub fn sign_screen(
     // Les flèches passent d'un signe à l'autre sans repasser par le briefing :
     // on lit rarement une seule fiche.
     if is_key_pressed(KeyCode::Right) {
-        *index = (*index + 1) % level.glyphs.len();
+        *index = ui::turn(*index, 1, level.glyphs.len());
     }
     if is_key_pressed(KeyCode::Left) {
-        *index = (*index + level.glyphs.len() - 1) % level.glyphs.len();
+        *index = ui::turn(*index, -1, level.glyphs.len());
     }
 
     // Le glissement horizontal feuillette les fiches, comme on tourne une page.
-    // Seul le point de départ est retenu : suivre le doigt en continu ferait
-    // défiler plusieurs signes d'un seul geste un peu long.
-    if is_mouse_button_pressed(MouseButton::Left) {
-        *swipe = Some(mouse.x);
-    }
-    if let Some(start) = *swipe {
-        let travelled = mouse.x - start;
-
-        if travelled.abs() >= SWIPE {
-            *index = if travelled < 0.0 {
-                (*index + 1) % level.glyphs.len()
-            } else {
-                (*index + level.glyphs.len() - 1) % level.glyphs.len()
-            };
-            // Le geste est consommé : on repart de la position courante, ce qui
-            // permet d'enchaîner sans lever le doigt.
-            *swipe = Some(mouse.x);
-        }
-    }
-    if is_mouse_button_released(MouseButton::Left) {
-        *swipe = None;
+    let travelled = ui::swipe(swipe, mouse);
+    if travelled != 0 {
+        *index = ui::turn(*index, travelled, level.glyphs.len());
     }
 
     let glyph = &level.glyphs[*index];
@@ -95,7 +71,16 @@ pub fn sign_screen(
     draw_readings(&app.fonts, glyph);
     draw_mnemonics(&app.fonts, glyph);
 
-    let transition = draw_navigation(app, level, index, mouse);
+    let transition = draw_navigation(app, language, level, glyph, index, mouse);
+
+    // Le clic qui ouvre un autre écran est déjà enregistré comme un début de
+    // glissement : la fiche ne verra pas le doigt se lever, et le retrouverait
+    // au retour à l'endroit du bouton RETOUR, soit un demi-écran plus loin —
+    // assez pour qu'elle change de signe toute seule. Le geste est annulé au
+    // moment où il cesse d'être le sien.
+    if !matches!(transition, Transition::Stay) {
+        *swipe = None;
+    }
 
     // Flèches du clavier ou boutons de l'écran : changer de fiche est un
     // déplacement, et s'entend comme tel.
@@ -217,11 +202,20 @@ fn draw_readings(fonts_set: &Fonts, glyph: &Glyph) {
         ui::text(fonts_set, glyph.primary_answer(), TEXT_X, 34.0, fonts::TITLE, role::ACCENT);
     }
 
+    // Le nom de la lettre et les lectures tolérées partagent une ligne : ce
+    // sont deux façons de nommer le même signe, et la fiche n'a pas la hauteur
+    // d'en faire deux. Taire les variantes ferait croire à une seule bonne
+    // réponse, alors que le jeu en accepte plusieurs.
+    let mut parts = Vec::new();
+    if !glyph.name.is_empty() {
+        parts.push(glyph.name.clone());
+    }
     if glyph.answers.len() > 1 {
-        // Les variantes tolérées : les taire ferait croire à une seule bonne
-        // réponse, alors que le jeu en accepte plusieurs.
-        let others = glyph.answers[1..].join("  ");
-        let label = format!("aussi : {others}");
+        parts.push(format!("aussi : {}", glyph.answers[1..].join("  ")));
+    }
+
+    if !parts.is_empty() {
+        let label = parts.join("  -  ");
 
         if canvas::PORTRAIT {
             ui::text_centered(
@@ -280,19 +274,29 @@ fn draw_mnemonics(fonts_set: &Fonts, glyph: &Glyph) {
     }
 }
 
-fn draw_navigation(app: &App, level: &Level, index: &mut usize, mouse: Vec2) -> Transition {
+fn draw_navigation(
+    app: &App,
+    language: &Language,
+    level: &Level,
+    glyph: &Glyph,
+    index: &mut usize,
+    mouse: Vec2,
+) -> Transition {
     const Y: f32 = canvas::pick(356.0, 194.0);
-    const ARROW: f32 = canvas::pick(30.0, 22.0);
+    // Debout, la rangée doit loger une porte de plus : les flèches se serrent
+    // de six pixels, ce qui reste largement au-dessus du doigt une fois la
+    // toile agrandie.
+    const ARROW: f32 = canvas::pick(24.0, 22.0);
     const HEIGHT: f32 = canvas::pick(20.0, 16.0);
 
     let previous = Rect::new(10.0, Y, ARROW, HEIGHT);
     if ui::button(&app.fonts, mouse, Button::new(previous, "<")) {
-        *index = (*index + level.glyphs.len() - 1) % level.glyphs.len();
+        *index = ui::turn(*index, -1, level.glyphs.len());
     }
 
     let next = Rect::new(10.0 + ARROW + 4.0, Y, ARROW, HEIGHT);
     if ui::button(&app.fonts, mouse, Button::new(next, ">")) {
-        *index = (*index + 1) % level.glyphs.len();
+        *index = ui::turn(*index, 1, level.glyphs.len());
     }
 
     let back = Rect::new(canvas::WIDTH - 10.0 - 76.0, Y, 76.0, HEIGHT);
@@ -300,16 +304,23 @@ fn draw_navigation(app: &App, level: &Level, index: &mut usize, mouse: Vec2) -> 
         return Transition::Pop;
     }
 
-    // Centré entre les flèches et le bouton, et non sur la toile : centré sur
-    // la toile, le rappel passait sous le bouton de retour.
-    ui::text_centered(
-        &app.fonts,
-        canvas::label("GLISSE", "FLECHES POUR CHANGER"),
-        (next.x + next.w + back.x) / 2.0,
-        Y + canvas::pick(6.0, 4.0),
-        fonts::TEXT,
-        role::TEXT_DISABLED,
-    );
+    // Le rappel qui occupait cette place ne disait rien qu'on ne devine en
+    // voyant les flèches ; la prononciation, elle, a besoin de tout un écran,
+    // et donc d'une porte pour y entrer.
+    //
+    // Sans texte de prononciation, pas de porte : mieux vaut une place vide
+    // qu'un bouton qui mène à un écran qui n'a rien à dire.
+    let dire = Rect::new(next.x + next.w + 6.0, Y, canvas::pick(60.0, 76.0), HEIGHT);
+    if !glyph.pronunciation.is_empty()
+        && ui::button(&app.fonts, mouse, Button::new(dire, "SE DIT").accent(role::HINT))
+    {
+        return Transition::Push(Screen::Pronunciation {
+            language: language.id.clone(),
+            level: level.id.clone(),
+            index: *index,
+            swipe: None,
+        });
+    }
 
     Transition::Stay
 }

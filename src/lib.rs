@@ -42,6 +42,7 @@ use crate::screens::sign::sign_screen;
 use crate::screens::language_select::language_select_screen;
 use crate::screens::learning_path::{PathView, learning_path_screen};
 use crate::screens::options::options_screen;
+use crate::screens::pronunciation::pronunciation_screen;
 use crate::screens::title::title_screen;
 use crate::window::window_conf;
 
@@ -129,6 +130,14 @@ async fn run() {
                     _ => None,
                 }
             }
+            Some(("dit", target)) => {
+                target.split_once('/').map(|(language, level)| Screen::Pronunciation {
+                    language: language.to_string(),
+                    level: level.to_string(),
+                    index: 0,
+                    swipe: None,
+                })
+            }
             Some(("sign", target)) => target.split_once('/').map(|(language, level)| Screen::Sign {
                 language: language.to_string(),
                 level: level.to_string(),
@@ -195,6 +204,9 @@ async fn run() {
             }
             Screen::Sign { language, level, index, swipe } => {
                 sign_screen(&app, language, level, index, swipe, mouse)
+            }
+            Screen::Pronunciation { language, level, index, swipe } => {
+                pronunciation_screen(&app, language, level, index, swipe, mouse)
             }
             Screen::Playing(session) => game_screen(&app, session, mouse),
             Screen::Results { outcome, elapsed } => {

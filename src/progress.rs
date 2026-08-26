@@ -321,6 +321,8 @@ mod tests {
             glyphs: vec![Glyph {
                 char: "ㄱ".into(),
                 answers: vec!["g".into()],
+                name: String::new(),
+                pronunciation: String::new(),
                 mnemonics: vec!["un coin".into()],
             }],
         }

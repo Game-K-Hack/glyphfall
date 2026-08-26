@@ -79,6 +79,17 @@ pub enum Screen {
         /// depuis la fiche d'un signe.
         mode: Mode,
     },
+    /// Comment un signe se prononce, ouvert depuis sa fiche.
+    ///
+    /// Un écran plutôt qu'un pavé de plus sur la fiche : le texte y détaille
+    /// un cas par place dans le mot, et la fiche n'a pas cette hauteur.
+    Pronunciation {
+        language: String,
+        level: String,
+        index: usize,
+        /// Abscisse où le doigt s'est posé, tant qu'il n'est pas relevé.
+        swipe: Option<f32>,
+    },
     /// La fiche d'un signe, ouverte depuis le briefing.
     Sign {
         language: String,

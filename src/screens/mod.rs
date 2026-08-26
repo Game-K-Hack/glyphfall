@@ -9,4 +9,5 @@ pub mod sign;
 pub mod language_select;
 pub mod learning_path;
 pub mod options;
+pub mod pronunciation;
 pub mod title;

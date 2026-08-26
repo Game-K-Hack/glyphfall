@@ -171,6 +171,19 @@ pub struct Glyph {
     /// Toutes les romanisations correctes. La première est celle qu'on montre
     /// au joueur ; les suivantes sont des variantes tolérées (« si » / « shi »).
     pub answers: Vec<String>,
+    /// Le nom de la lettre, quand l'écriture en donne un (« giyeok »).
+    ///
+    /// Séparé des moyens mnémotechniques : ce n'est pas une astuce, c'est un
+    /// fait, et la fiche l'affiche à sa place, près de la lecture.
+    #[serde(default)]
+    pub name: String,
+    /// Comment le signe se prononce, en toutes lettres.
+    ///
+    /// Texte libre à plusieurs lignes : une consonne coréenne ne se dit pas
+    /// pareil selon sa place dans le mot, et cette mise en forme est conservée
+    /// telle quelle à l'affichage.
+    #[serde(default)]
+    pub pronunciation: String,
     /// Comment retenir ce signe. Au moins un, souvent deux ; la fiche du signe
     /// les montre tous.
     ///
@@ -228,6 +241,8 @@ mod tests {
         let glyph = Glyph {
             char: "し".into(),
             answers: vec!["shi".into(), "si".into()],
+            name: String::new(),
+            pronunciation: String::new(),
             mnemonics: vec!["se prononce chi".into()],
         };
 
