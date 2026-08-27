@@ -5,7 +5,7 @@
 ; directive. Inno Setup n'appose aucune marque, et sa traduction française est
 ; livrée avec l'outil.
 ;
-;   ISCC.exe /DVERSION=0.2.0 installer\glyphfall.iss
+;   ISCC.exe /DVERSION=0.2.1 installer\glyphfall.iss
 ;
 ; La version est passée par la ligne de commande, comme partout ailleurs dans
 ; ce dépôt : elle vient du tag de la release.
