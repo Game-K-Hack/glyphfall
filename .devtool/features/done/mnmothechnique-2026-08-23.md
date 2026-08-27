@@ -1,15 +1,15 @@
 ---
 id: "mnmothechnique-2026-08-23"
-status: "review"
+status: "done"
 priority: "medium"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-23T14:28:38.678Z"
-modified: "2026-08-27T12:28:46.377Z"
-completedAt: null
+modified: "2026-08-27T20:35:15.025Z"
+completedAt: "2026-08-27T20:35:15.025Z"
 labels: []
-order: "a4"
+order: "ZY"
 ---
 # Mnémothechnique
 

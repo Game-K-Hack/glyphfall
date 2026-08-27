@@ -6,10 +6,10 @@ assignee: null
 epic: null
 dueDate: null
 created: "2026-08-04T16:21:36.180Z"
-modified: "2026-08-23T14:48:21.781Z"
+modified: "2026-08-27T20:48:50.447Z"
 completedAt: null
 labels: []
-order: "a2"
+order: "Zyt"
 ---
 # Apprendre à écrire
 

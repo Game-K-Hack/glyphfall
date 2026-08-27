@@ -463,3 +463,8 @@ intérêt commercial.
 
 Les polices échappent à cette licence et gardent la leur, la SIL Open Font
 License 1.1 : voir [`assets/fonts/LICENCES.md`](assets/fonts/LICENCES.md).
+
+De même pour [`vendor/quad-snd`](vendor/quad-snd/LISEZ-MOI-GLYPHFALL.md), une
+copie corrigée de la bibliothèque audio de macroquad, sous MIT ou Apache-2.0.
+Sa mise en place ALSA échouait sur des machines Linux saines ; le correctif et
+son motif sont expliqués dans ce dossier.

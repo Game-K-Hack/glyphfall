@@ -33,3 +33,16 @@ directories = "6.0.0"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 quad-storage = "0.1.3"
+
+# --- Un correctif que nous portons nous-mêmes ------------------------------
+#
+# `quad-snd` 0.2.8 est la dernière version publiée, et sa mise en place ALSA
+# échoue sur des machines Linux parfaitement saines : elle impose une taille de
+# tampon exacte avant d'avoir fixé la stéréo et la fréquence, et l'écriture
+# groupée des réglages est alors refusée. Elle paniquait, ce qui tuait le fil
+# audio, après quoi chaque son demandé imprimait « Audio thread died ».
+#
+# La copie corrigée vit dans `vendor/quad-snd`. À supprimer le jour où le
+# correctif remonte en amont.
+[patch.crates-io]
+quad-snd = { path = "vendor/quad-snd" }

@@ -10,3 +10,7 @@
 /android/local.properties
 
 __pycache__
+vendor
+
+.devtool/*.md
+!.devtool/features/*.md

@@ -1,15 +1,15 @@
 ---
 id: "version-android-2026-08-04"
-status: "review"
+status: "done"
 priority: "low"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-04T17:36:06.186Z"
-modified: "2026-08-21T22:49:57.403Z"
-completedAt: null
+modified: "2026-08-27T20:35:13.968Z"
+completedAt: "2026-08-27T20:35:13.968Z"
 labels: []
-order: "a0"
+order: "ZZ"
 ---
 # Version Android
 

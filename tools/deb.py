@@ -40,6 +40,19 @@ ARCHITECTURES = {"amd64": "x86_64", "arm64": "arm64"}
 # Les bibliothèques que le jeu ouvre lui-même, à l'exécution : `dpkg-shlibdeps`
 # ne saurait pas les deviner, elles ne figurent pas dans l'exécutable. Sans
 # elles, le jeu s'installe puis refuse de démarrer.
+# Ce qui fournit reellement un peripherique « default » a ALSA.
+#
+# `libasound2` n'est que la bibliotheque : sur une machine de bureau moderne,
+# le peripherique « default » est un pont vers PipeWire ou PulseAudio, apporte
+# par un paquet separe. Sans lui, la bibliotheque se charge mais n'ouvre rien,
+# et le fil audio du moteur meurt en annoncant « Audio thread died ».
+#
+# En Recommends plutot qu'en Depends : un bureau complet les a deja, et le jeu
+# se lance sans son plutot que de refuser de s'installer.
+RECOMMANDATIONS = [
+    "pipewire-alsa | libasound2-plugins",
+]
+
 DEPENDANCES = [
     "libc6 (>= 2.31)",
     # Renommée dans les versions récentes, où le nom d'origine n'existe plus.
@@ -198,6 +211,7 @@ def main():
         "Maintainer: Harlock <harlock7@laposte.net>\n"
         f"Installed-Size: {poids}\n"
         f"Depends: {', '.join(DEPENDANCES)}\n"
+        f"Recommends: {', '.join(RECOMMANDATIONS)}\n"
         "Section: games\n"
         "Priority: optional\n"
         "Description: Apprendre les ecritures non latines en jouant\n"
