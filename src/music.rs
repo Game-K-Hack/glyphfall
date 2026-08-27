@@ -268,12 +268,12 @@ impl Music {
     }
 }
 
-struct Decoded {
+pub struct Decoded {
     /// Le morceau réencodé en WAV, prêt pour le moteur audio.
-    wav: Vec<u8>,
+    pub wav: Vec<u8>,
     /// Sa durée, connue exactement grâce au nombre d'échantillons décodés.
     /// Le moteur audio, lui, ne prévient pas de la fin d'un son.
-    seconds: f32,
+    pub seconds: f32,
 }
 
 /// Décode un fichier audio et le réemballe en WAV.
@@ -284,12 +284,21 @@ struct Decoded {
 ///
 /// Renvoie `None` si le fichier est illisible.
 fn decode(file: &'static File<'static>) -> Option<Decoded> {
-    let stream = MediaSourceStream::new(Box::new(Cursor::new(file.contents())), Default::default());
+    let extension = file.path().extension().and_then(|value| value.to_str()).unwrap_or("");
+    decode_bytes(file.contents(), extension)
+}
+
+/// Le même décodage, à partir d'octets nus.
+///
+/// Les voix passent par ici : ce sont des MP3 comme les musiques, mais elles
+/// ne vivent pas dans le même dossier embarqué.
+pub fn decode_bytes(octets: &'static [u8], extension: &str) -> Option<Decoded> {
+    let stream = MediaSourceStream::new(Box::new(Cursor::new(octets)), Default::default());
 
     // L'extension oriente la détection du format ; symphonia vérifie ensuite le
     // contenu réel, un fichier mal nommé est donc quand même reconnu.
     let mut hint = Hint::new();
-    if let Some(extension) = file.path().extension().and_then(|value| value.to_str()) {
+    if !extension.is_empty() {
         hint.with_extension(extension);
     }
 

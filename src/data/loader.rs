@@ -82,6 +82,15 @@ pub fn font_bytes(file_name: &str) -> Option<&'static [u8]> {
     FONTS.get_file(file_name).map(|file| file.contents())
 }
 
+/// Un fichier du dossier `voices/` d'une langue.
+///
+/// Les enregistrements vivent dans l'arbre de la langue qu'ils prononcent, et
+/// sont donc embarqués par le même `include_dir` que ses niveaux : rien à
+/// installer à côté du binaire, y compris dans le navigateur.
+pub fn voice_bytes(language: &str, file_name: &str) -> Option<&'static [u8]> {
+    LANGUAGES.get_file(format!("{language}/voices/{file_name}")).map(|file| file.contents())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

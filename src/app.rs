@@ -16,6 +16,7 @@ use crate::music::Music;
 use crate::gfx::Fonts;
 use crate::progress::Progress;
 use crate::settings::Settings;
+use crate::voices::Voices;
 use crate::screens::learning_path::PathView;
 use crate::session::{Mode, Outcome, Session};
 
@@ -25,6 +26,8 @@ pub struct App {
     pub fonts: Fonts,
     pub sfx: Sfx,
     pub music: Music,
+    /// Les enregistrements de prononciation, par langue.
+    pub voices: Voices,
     pub progress: Progress,
     pub settings: Settings,
     /// Le temps d'apprentissage du jour.

@@ -1,3 +1,17 @@
+// Glyphfall — apprendre le hangeul, les kana et les kanji en jouant.
+// Copyright (C) 2026 Game K
+//
+// Ce programme est un logiciel libre : vous pouvez le redistribuer et le
+// modifier selon les termes de la GNU General Public License, version 3,
+// publiée par la Free Software Foundation.
+//
+// Il est distribué dans l'espoir d'être utile, mais SANS AUCUNE GARANTIE,
+// pas même la garantie implicite de VALEUR MARCHANDE ou d'ADÉQUATION À UN
+// USAGE PARTICULIER. Voir la GNU General Public License pour les détails.
+//
+// Vous devriez avoir reçu une copie de la licence avec ce programme, dans
+// le fichier LICENSE. Sinon, voir <https://www.gnu.org/licenses/>.
+
 //! Glyphfall : le programme lui-même, indépendant de la façon dont il démarre.
 //!
 //! Le bureau et le navigateur passent par `main.rs`, Android par `quad_main` :
@@ -17,6 +31,7 @@ mod daily;
 mod data;
 mod gfx;
 mod music;
+mod voices;
 mod progress;
 mod screens;
 mod session;
@@ -44,6 +59,7 @@ use crate::screens::learning_path::{PathView, learning_path_screen};
 use crate::screens::options::options_screen;
 use crate::screens::pronunciation::pronunciation_screen;
 use crate::screens::title::title_screen;
+use crate::voices::Voices;
 use crate::window::window_conf;
 
 /// Ouvre la fenêtre et lance le jeu.
@@ -80,6 +96,10 @@ async fn run() {
     let settings = Settings::load();
     let sfx = Sfx::load(settings.sfx_gain()).await;
     let music = Music::load(settings.music_gain(), settings.music_game_gain());
+    // Les voix suivent le volume des bruitages : ce sont des sons courts qu'on
+    // déclenche, pas un fond sonore.
+    let voices =
+        Voices::load(catalog.languages.iter().map(|langue| langue.id.clone()), settings.sfx_gain());
 
     // L'ancienne sauvegarde rangeait tous les signes dans une même table, sans
     // distinguer les écritures. Les répartir demande le catalogue, d'où cette
@@ -90,7 +110,7 @@ async fn run() {
     }
 
     let mut app =
-        App { catalog, fonts, sfx, music, progress, settings, daily: Daily::load() };
+        App { catalog, fonts, sfx, music, voices, progress, settings, daily: Daily::load() };
 
     // Génère la musique d'ambiance puis quitte, sans ouvrir de fenêtre de jeu.
     #[cfg(not(target_arch = "wasm32"))]
@@ -175,6 +195,9 @@ async fn run() {
         let playing = matches!(navigator.top_mut(), Screen::Playing(_));
         let ambience = if playing { Ambience::Game } else { Ambience::Menus };
         app.music.update(get_frame_time(), ambience).await;
+        // Une voix demandée pendant le rendu se joue ici : les écrans ne
+        // peuvent pas attendre le chargement d'un son, la boucle si.
+        app.voices.update().await;
 
         // Seul le temps passé à apprendre compte : une manche en cours, ou la
         // fiche d'un signe que l'on étudie. Le briefing en est exclu — on peut

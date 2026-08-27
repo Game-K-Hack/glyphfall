@@ -80,7 +80,7 @@ pub fn pronunciation_screen(
     draw_sign(app, language, glyph);
     draw_pronunciation(&app.fonts, glyph);
 
-    let transition = draw_navigation(app, level, index, mouse);
+    let transition = draw_navigation(app, language, level, glyph, index, mouse);
 
     // Le clic qui referme l'écran est déjà un début de glissement : sans cet
     // oubli, la fiche retrouverait le doigt au retour à l'autre bout de la
@@ -156,7 +156,14 @@ fn draw_pronunciation(fonts_set: &Fonts, glyph: &Glyph) {
     ui::block(fonts_set, &glyph.pronunciation, TEXT, fonts::TEXT, role::TEXT);
 }
 
-fn draw_navigation(app: &App, level: &Level, index: &mut usize, mouse: Vec2) -> Transition {
+fn draw_navigation(
+    app: &App,
+    language: &Language,
+    level: &Level,
+    glyph: &Glyph,
+    index: &mut usize,
+    mouse: Vec2,
+) -> Transition {
     const Y: f32 = NAVIGATION_Y;
     const ARROW: f32 = canvas::pick(24.0, 22.0);
     const HEIGHT: f32 = canvas::pick(20.0, 16.0);
@@ -169,6 +176,17 @@ fn draw_navigation(app: &App, level: &Level, index: &mut usize, mouse: Vec2) -> 
     let next = Rect::new(10.0 + ARROW + 4.0, Y, ARROW, HEIGHT);
     if ui::button(&app.fonts, mouse, Button::new(next, ">")) {
         *index = ui::turn(*index, 1, level.glyphs.len());
+    }
+
+    // Tout le texte de cet écran décrit un son ; le bouton donne le son
+    // lui-même. Il n'apparaît que si un enregistrement existe : le cercle
+    // coréen n'en a pas, et ne peut pas en avoir — en tête de syllabe, il ne se
+    // prononce pas.
+    let ecouter = Rect::new(next.x + next.w + 6.0, Y, canvas::pick(60.0, 76.0), HEIGHT);
+    if app.voices.knows(&language.id, &glyph.char)
+        && ui::button(&app.fonts, mouse, Button::new(ecouter, "ECOUTER").accent(role::ACCENT))
+    {
+        app.voices.request(&language.id, &glyph.char);
     }
 
     let back = Rect::new(canvas::WIDTH - 10.0 - 76.0, Y, 76.0, HEIGHT);

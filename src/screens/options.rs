@@ -274,6 +274,7 @@ fn apply(app: &mut App, row: Row, delta: i8) {
         Row::Sfx => {
             app.settings.sfx = next;
             app.sfx.set_volume(app.settings.sfx_gain());
+            app.voices.set_volume(app.settings.sfx_gain());
             // Le réglage des bruitages n'a rien qui joue en continu : sans ce
             // blip, on ne saurait pas ce que vaut le cran choisi.
             app.sfx.navigate();

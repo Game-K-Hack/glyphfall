@@ -436,7 +436,30 @@ GLYPHFALL_COMPOSE=assets/music/menu/Claude.wav cargo run --release
   Nanum Myeongjo, Nanum Pen Script, Nanum Brush Script, Gaegu, Jua, Do Hyeon,
   Shippori Mincho, Klee One, Yuji Syuku, Yusei Magic, Zen Maru Gothic et
   RocknRoll One — toutes sur [Google Fonts](https://fonts.google.com), sous SIL
-  Open Font License, réduites aux signes du catalogue.
+  Open Font License, réduites aux signes du catalogue. Les mentions exigées
+  par cette licence sont reproduites dans
+  [`assets/fonts/LICENCES.md`](assets/fonts/LICENCES.md).
 - Palette : « Sweetie 16 » de GrafxKid, domaine public.
-- Bruitages et musique « Claude » : synthétisés par le jeu lui-même, voir
-  `src/audio.rs` et `src/compose.rs`.
+- Bruitages : synthétisés par le jeu lui-même, voir `src/audio.rs` et
+  `src/compose.rs`.
+- Musique : générée par un modèle libre exécuté en local, voir les
+  `LISEZ-MOI.md` de `assets/music/`.
+
+## Licence
+
+Glyphfall est sous **GNU General Public License v3.0** — voir
+[`LICENSE`](LICENSE).
+
+En clair : vous pouvez l'utiliser, l'étudier, le modifier et le redistribuer
+librement. La seule contrepartie est le copyleft — toute version modifiée que
+vous distribuez doit l'être sous cette même licence, code source compris, et
+garder les mentions d'auteur. Une version fermée dérivée de ce code n'est pas
+autorisée.
+
+Rien n'interdit à quiconque de vendre des copies : c'est une liberté que la
+GPL protège volontairement. Mais il devra livrer le source avec, sous GPL, et
+tout acheteur pourra le repartager gratuitement — ce qui ôte à l'exercice son
+intérêt commercial.
+
+Les polices échappent à cette licence et gardent la leur, la SIL Open Font
+License 1.1 : voir [`assets/fonts/LICENCES.md`](assets/fonts/LICENCES.md).
