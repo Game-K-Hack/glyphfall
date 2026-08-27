@@ -11,6 +11,20 @@
 //! enregistrement : une voyelle prononcée seule est exactement la syllabe que
 //! forme le cercle muet.
 //!
+//! # Pourquoi les kanji se taisent
+//!
+//! Les deux syllabaires et le coréen ont leurs enregistrements ; les kanji
+//! n'en ont pas, et n'en auront pas par ce chemin. On a essayé de fabriquer
+//! leurs lectures en recollant des mores — NICHI vaut `に` puis `ち`, dont les
+//! sons existent. Le résultat s'entend comme deux mots : chaque more a été
+//! captée seule, donc avec l'intonation de fin d'énoncé, et sa fondamentale
+//! retombe de cinquante à quatre-vingts hertz. Deux chutes de suite ne font
+//! pas un mot, surtout dans une langue où la mélodie distingue les mots.
+//!
+//! Leurs fiches donnent donc les lectures ON et KUN par écrit, avec un mot où
+//! les entendre. Pour leur donner une voix un jour, il faudra de vrais
+//! enregistrements de mots, ou une synthèse qui gère l'accent de hauteur.
+//!
 //! # Pourquoi une file d'attente
 //!
 //! Charger un son est asynchrone chez macroquad, or les écrans sont dessinés
@@ -129,43 +143,60 @@ impl Voices {
 mod tests {
     use super::*;
 
-    #[test]
-    fn le_coreen_sait_prononcer_ce_qu_il_enseigne() {
-        // Un signe qui tombe sans qu'on puisse l'entendre est un signe qu'on
-        // apprend à moitié. Seul `ㅇ` fait exception, et pour une bonne
-        // raison : en tête de syllabe, il ne se prononce pas.
-        let catalog = crate::data::load_catalog().expect("catalogue valide");
-        let voices = Voices::load(std::iter::once("ko".to_string()), 1.0);
+    /// Les voix de toutes les langues qui en déclarent, comme au démarrage.
+    fn toutes(catalog: &crate::data::Catalog) -> Voices {
+        Voices::load(catalog.languages.iter().map(|langue| langue.id.clone()), 1.0)
+    }
 
-        let langue = catalog.language("ko").expect("le coréen");
-        for level in &langue.levels {
-            for glyph in &level.glyphs {
-                if glyph.char == "ㅇ" {
-                    continue;
+    #[test]
+    fn chaque_langue_sait_prononcer_ce_qu_elle_enseigne() {
+        // Un signe qui tombe sans qu'on puisse l'entendre est un signe qu'on
+        // apprend à moitié. Une langue entièrement muette est un choix — le
+        // japonais l'a été longtemps — mais une langue qui a des voix doit les
+        // avoir toutes, sinon le bouton apparaît et disparaît sans raison
+        // visible.
+        //
+        // Seul `ㅇ` fait exception, et pour une bonne raison : en tête de
+        // syllabe, il ne se prononce pas.
+        let catalog = crate::data::load_catalog().expect("catalogue valide");
+        let voices = toutes(&catalog);
+
+        for langue in &catalog.languages {
+            if !voices.index.contains_key(&langue.id) {
+                continue;
+            }
+            for level in &langue.levels {
+                for glyph in &level.glyphs {
+                    if glyph.char == "ㅇ" {
+                        continue;
+                    }
+                    assert!(
+                        voices.knows(&langue.id, &glyph.char),
+                        "« {} » (niveau {}) n'a pas d'enregistrement",
+                        glyph.char,
+                        level.id
+                    );
                 }
-                assert!(
-                    voices.knows("ko", &glyph.char),
-                    "« {} » (niveau {}) n'a pas d'enregistrement",
-                    glyph.char,
-                    level.id
-                );
             }
         }
     }
 
     #[test]
     fn chaque_entree_de_l_index_designe_un_fichier_present() {
-        // L'index est écrit à la main à partir d'une liste fournie : une faute
-        // de frappe y donnerait un bouton muet, sans le moindre message.
-        let voices = Voices::load(std::iter::once("ko".to_string()), 1.0);
-        let coreen = voices.index.get("ko").expect("un index coréen");
-        assert!(!coreen.is_empty(), "l'index coréen est vide");
+        // Les index sont écrits à partir de listes fournies : une faute de
+        // frappe y donnerait un bouton muet, sans le moindre message.
+        let catalog = crate::data::load_catalog().expect("catalogue valide");
+        let voices = toutes(&catalog);
+        assert!(!voices.index.is_empty(), "aucune langue n'a de voix");
 
-        for (glyph, file_name) in coreen {
-            assert!(
-                voice_bytes("ko", file_name).is_some(),
-                "« {glyph} » renvoie à « {file_name} », qui n'est pas embarqué"
-            );
+        for (langue, fichiers) in &voices.index {
+            assert!(!fichiers.is_empty(), "l'index de « {langue} » est vide");
+            for (glyph, file_name) in fichiers {
+                assert!(
+                    voice_bytes(langue, file_name).is_some(),
+                    "« {glyph} » ({langue}) renvoie à « {file_name} », qui n'est pas embarqué"
+                );
+            }
         }
     }
 }
