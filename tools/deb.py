@@ -37,9 +37,6 @@ PAQUET = "glyphfall"
 # dépose le binaire correspondant.
 ARCHITECTURES = {"amd64": "x86_64", "arm64": "arm64"}
 
-# Les bibliothèques que le jeu ouvre lui-même, à l'exécution : `dpkg-shlibdeps`
-# ne saurait pas les deviner, elles ne figurent pas dans l'exécutable. Sans
-# elles, le jeu s'installe puis refuse de démarrer.
 # Ce qui fournit reellement un peripherique « default » a ALSA.
 #
 # `libasound2` n'est que la bibliotheque : sur une machine de bureau moderne,
@@ -49,12 +46,35 @@ ARCHITECTURES = {"amd64": "x86_64", "arm64": "arm64"}
 #
 # En Recommends plutot qu'en Depends : un bureau complet les a deja, et le jeu
 # se lance sans son plutot que de refuser de s'installer.
-RECOMMANDATIONS = [
-    "pipewire-alsa | libasound2-plugins",
-]
+RECOMMANDATIONS = []
 
+# Les bibliothèques que le jeu ouvre lui-même, à l'exécution : `dpkg-shlibdeps`
+# ne saurait pas les deviner, elles ne figurent pas dans l'exécutable. Sans
+# elles, le jeu s'installe puis refuse de démarrer.
 DEPENDANCES = [
     "libc6 (>= 2.31)",
+    # Le pont entre ALSA et le serveur de son, sans lequel le jeu reste muet
+    # sur tout bureau moderne : le serveur tient la carte, et un programme qui
+    # parle ALSA ne peut plus l'ouvrir en direct.
+    #
+    # Deux ponts existent, un par serveur, et l'un des deux suffit :
+    #
+    #   `pipewire-alsa` pose /usr/share/alsa/alsa.conf.d/50-pipewire.conf et
+    #   99-pipewire-default.conf, qui definissent le peripherique « pipewire »
+    #   et redirigent « default » vers lui.
+    #
+    #   `pulseaudio` pose pulse.conf, qui fait de meme vers PulseAudio. Sur une
+    #   machine qui l'utilise encore, il est deja la : la dependance ne coute
+    #   alors rien.
+    #
+    # `libasound2-plugins` seul ne suffit pas, malgre les apparences : il
+    # definit bien un peripherique « pulse », mais celui-ci reste inutilisable
+    # sans le crochet de `pulseaudio`. Verifie en retirant les fichiers un a un.
+    #
+    # En dependance et non en recommandation : une recommandation se refuse, et
+    # le joueur se retrouverait alors sans son sans savoir pourquoi.
+    "pipewire-alsa | pulseaudio",
+    "libasound2-plugins",
     # Renommée dans les versions récentes, où le nom d'origine n'existe plus.
     "libasound2t64 | libasound2",
     "libx11-6",
@@ -79,8 +99,15 @@ LICENCE = """Format: https://www.debian.org/doc/packaging-manuals/copyright-form
 Upstream-Name: Glyphfall
 
 Files: *
-Copyright: Glyphfall
-License: à préciser
+Copyright: 2026 Game K
+License: GPL-3.0-only
+ Ce programme est un logiciel libre : vous pouvez le redistribuer et le
+ modifier selon les termes de la GNU General Public License, version 3,
+ publiée par la Free Software Foundation.
+ .
+ Il est distribué dans l'espoir d'être utile, mais SANS AUCUNE GARANTIE.
+ .
+ Le texte complet est dans /usr/share/common-licenses/GPL-3.
 
 Files: assets/fonts/*
 Copyright: Google et leurs auteurs respectifs
@@ -211,8 +238,9 @@ def main():
         "Maintainer: Harlock <harlock7@laposte.net>\n"
         f"Installed-Size: {poids}\n"
         f"Depends: {', '.join(DEPENDANCES)}\n"
-        f"Recommends: {', '.join(RECOMMANDATIONS)}\n"
-        "Section: games\n"
+        # Un champ vide serait mal formé : on ne l'écrit que s'il a un contenu.
+        + (f"Recommends: {', '.join(RECOMMANDATIONS)}\n" if RECOMMANDATIONS else "")
+        + "Section: games\n"
         "Priority: optional\n"
         "Description: Apprendre les ecritures non latines en jouant\n"
         " Les signes tombent, le joueur tape leur lecture avant qu'ils ne\n"

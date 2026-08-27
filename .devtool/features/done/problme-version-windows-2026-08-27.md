@@ -1,15 +1,15 @@
 ---
 id: "problme-version-windows-2026-08-27"
-status: "in-progress"
+status: "done"
 priority: "medium"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-27T20:46:30.428Z"
-modified: "2026-08-27T20:46:30.428Z"
-completedAt: null
+modified: "2026-08-27T22:46:41.243Z"
+completedAt: "2026-08-27T22:46:41.243Z"
 labels: []
-order: "a1"
+order: "ZV"
 ---
 # Problème version Windows
 

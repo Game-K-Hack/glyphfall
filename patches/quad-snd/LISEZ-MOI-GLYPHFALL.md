@@ -34,6 +34,17 @@ voix et par morceau, jusqu'à noyer la console. La mise en place rend maintenant
 `None`, et le fil bascule sur `silence()` : il continue de vider la file des
 messages sans rien jouer. Le jeu tourne muet, et se tait aussi dans la console.
 
+**La liste des périphériques était trop courte.** L'original essayait
+« default » puis « pipewire », et s'arrêtait là. Sur un bureau où PipeWire
+tient la carte son, « default » retombe sur dmix, qui ne peut plus ouvrir un
+matériel déjà pris ; et le périphérique « pipewire » n'existe que si le paquet
+du pont ALSA est installé, ce qu'aucune distribution ne garantit. Résultat : un
+bureau parfaitement sonore, et un jeu muet.
+
+La liste comprend maintenant « pulse », dont le greffon vient d'un paquet
+répandu et que le serveur PulseAudio de PipeWire accepte, puis « sysdefault »
+et « hw:0 » comme filets.
+
 ## Pourquoi ce dossier est versionné
 
 Un `vendor/` — le miroir de toutes les dépendances que produit `cargo vendor` —

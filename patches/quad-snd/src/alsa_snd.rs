@@ -9,7 +9,25 @@ use std::sync::mpsc;
 pub use crate::mixer::Playback;
 
 mod consts {
-    pub const DEVICES: &[&str] = &["default\0", "pipewire\0"];
+    /// Les périphériques essayés, dans l'ordre.
+    ///
+    /// L'original s'arrêtait à « default » et « pipewire », ce qui laisse muet
+    /// un bureau pourtant sonore : quand PipeWire tient la carte, « default »
+    /// retombe sur dmix, qui ne peut plus ouvrir un matériel déjà pris, et le
+    /// périphérique « pipewire » n'existe que si le paquet du pont ALSA est
+    /// installé — ce qu'aucune distribution ne garantit.
+    ///
+    /// « pulse » comble ce trou : son greffon vient d'un paquet répandu, et le
+    /// serveur PulseAudio de PipeWire l'accepte. Les deux derniers sont des
+    /// filets : le périphérique par défaut sans mixage, puis la première carte
+    /// en accès direct.
+    pub const DEVICES: &[&str] = &[
+        "default\0",
+        "pipewire\0",
+        "pulse\0",
+        "sysdefault\0",
+        "hw:0\0",
+    ];
     pub const RATE: u32 = 44100;
     pub const CHANNELS: u32 = 2;
     pub const PCM_BUFFER_SIZE: ::std::os::raw::c_ulong = 4096;
@@ -31,7 +49,7 @@ unsafe fn setup_pcm_device() -> Option<*mut sys::snd_pcm_t> {
             0,
         ) >= 0
     }) {
-        eprintln!("audio : aucun peripherique ALSA (« default », « pipewire »)");
+        eprintln!("audio : aucun peripherique ALSA n'a pu etre ouvert");
         return None;
     }
 
