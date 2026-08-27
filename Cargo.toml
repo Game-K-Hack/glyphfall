@@ -42,7 +42,9 @@ quad-storage = "0.1.3"
 # groupée des réglages est alors refusée. Elle paniquait, ce qui tuait le fil
 # audio, après quoi chaque son demandé imprimait « Audio thread died ».
 #
-# La copie corrigée vit dans `vendor/quad-snd`. À supprimer le jour où le
-# correctif remonte en amont.
+# La copie corrigée vit dans `patches/quad-snd`, et non dans un `vendor/` :
+# ce n'est pas un miroir de dépendances mais un correctif que nous portons, et
+# la compilation ne se fait pas sans lui. À supprimer le jour où il remonte en
+# amont.
 [patch.crates-io]
-quad-snd = { path = "vendor/quad-snd" }
+quad-snd = { path = "patches/quad-snd" }
