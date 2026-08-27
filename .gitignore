@@ -14,3 +14,7 @@ vendor
 
 .devtool/*.md
 !.devtool/features/*.md
+
+# Le programme d'installation est fabrique par le workflow, pas versionne :
+# il pese autant que le jeu qu'il contient.
+/installer/*-setup.exe

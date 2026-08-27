@@ -37,10 +37,16 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --release
+      # Le script trouve Inno Setup sur la machine, ou en extrait une copie
+      # portable. Même commande ici et chez soi, comme pour Linux et Android.
+      - run: python tools/setup.py --sans-compiler
+
       - uses: actions/upload-artifact@v4
         with:
           name: glyphfall-windows-x86_64
-          path: target/release/glyphfall.exe
+          path: |
+            target/release/glyphfall.exe
+            installer/glyphfall-windows-x86_64-setup.exe
 
   linux:
     name: Linux ${{ matrix.arch }}
