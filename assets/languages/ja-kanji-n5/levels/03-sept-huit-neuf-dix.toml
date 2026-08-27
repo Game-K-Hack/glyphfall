@@ -21,6 +21,15 @@ three = 0.85
 [[glyphs]]
 char = "七"
 answers = ["7", "sept", "shichi", "nana"]
+pronunciation = """
+Lecture ON, venue du chinois : SHICHI.
+  Dans « shichigatsu », juillet.
+
+Lecture KUN, japonaise : nana(tsu).
+  Dans « nanatsu », sept choses.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un 7 retourne, barre d'un trait.",
 ]
@@ -28,6 +37,15 @@ mnemonics = [
 [[glyphs]]
 char = "八"
 answers = ["8", "huit", "hachi"]
+pronunciation = """
+Lecture ON, venue du chinois : HACHI.
+  Dans « hachigatsu », août.
+
+Lecture KUN, japonaise : yat(tsu).
+  Dans « yattsu », huit choses.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Deux traits qui s'ecartent : le chiffre porte-bonheur, car il s'ouvre.",
 ]
@@ -35,6 +53,15 @@ mnemonics = [
 [[glyphs]]
 char = "九"
 answers = ["9", "neuf", "kyu", "ku"]
+pronunciation = """
+Lecture ON, venue du chinois : KYU, KU.
+  Dans « kugatsu », septembre.
+
+Lecture KUN, japonaise : kokono(tsu).
+  Dans « kokonotsu », neuf choses.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un crochet avec une jambe qui part a droite.",
 ]
@@ -42,6 +69,15 @@ mnemonics = [
 [[glyphs]]
 char = "十"
 answers = ["10", "dix", "ju"]
+pronunciation = """
+Lecture ON, venue du chinois : JU.
+  Dans « jugatsu », octobre.
+
+Lecture KUN, japonaise : to.
+  Dans « toka », dix jours.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Une croix : les deux axes complets, donc la dizaine.",
 ]

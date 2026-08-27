@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "マ"
 answers = ["ma"]
+pronunciation = """
+Se lit « ma », en un seul temps.
+  Équivalent français : le M de « Mer » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant fin.",
     "Un chevron avec une queue.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "ミ"
 answers = ["mi"]
+pronunciation = """
+Se lit « mi », en un seul temps.
+  Équivalent français : le M de « Mer » puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Morceau du kanji signifiant trois.",
     "Trois traits : trois se dit mittsu.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ム"
 answers = ["mu"]
+pronunciation = """
+Se lit « mu », en un seul temps.
+  Équivalent français : le M de « Mer » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Morceau du kanji signifiant prive.",
     "Un angle ferme par un trait.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "メ"
 answers = ["me"]
+pronunciation = """
+Se lit « me », en un seul temps.
+  Équivalent français : le M de « Mer » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant femme.",
     "Une croix penchee, comme un X.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "モ"
 answers = ["mo"]
+pronunciation = """
+Se lit « mo », en un seul temps.
+  Équivalent français : le M de « Mer » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant peu.",
     "Le mo hiragana en plus anguleux.",

@@ -21,6 +21,12 @@ three = 0.88
 [[glyphs]]
 char = "さ"
 answers = ["sa"]
+pronunciation = """
+Se lit « sa », en un seul temps.
+  Équivalent français : le S de « Sable » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant gauche.",
     "Un s dont on a barre le haut.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "し"
 answers = ["shi", "si"]
+pronunciation = """
+Se lit « chi », en un seul temps.
+  Équivalent français : le CHI de « Chic ».
+
+Jamais « si » : devant le i, toute la ligne S glisse vers le son [ch].
+"""
 mnemonics = [
     "Cursive du kanji signifiant lui.",
     "Un hamecon. Se prononce chi, jamais si.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "す"
 answers = ["su"]
+pronunciation = """
+Se lit « su », en un seul temps.
+  Équivalent français : le S de « Sable » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Cursive du kanji signifiant tenir.",
     "Une boucle nouee sous une barre.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "せ"
 answers = ["se"]
+pronunciation = """
+Se lit « se », en un seul temps.
+  Équivalent français : le S de « Sable » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant monde.",
     "Une fourche a deux dents barree.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "そ"
 answers = ["so"]
+pronunciation = """
+Se lit « so », en un seul temps.
+  Équivalent français : le S de « Sable » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant ceci.",
     "Un zigzag qui descend d'un trait.",
@@ -61,6 +91,12 @@ mnemonics = [
 [[glyphs]]
 char = "た"
 answers = ["ta"]
+pronunciation = """
+Se lit « ta », en un seul temps.
+  Équivalent français : le T de « Table » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant grand.",
     "Un t suivi d'un petit trait, comme un ta ecrit vite.",
@@ -69,6 +105,12 @@ mnemonics = [
 [[glyphs]]
 char = "ち"
 answers = ["chi", "ti"]
+pronunciation = """
+Se lit « tchi », en un seul temps.
+  Équivalent français : le TCHI de « Tchèque ».
+
+Jamais « ti » : devant le i, la ligne T glisse vers le son [tch].
+"""
 mnemonics = [
     "Cursive du kanji signifiant savoir.",
     "Le ta retourne. Se prononce tchi.",
@@ -77,6 +119,13 @@ mnemonics = [
 [[glyphs]]
 char = "つ"
 answers = ["tsu", "tu"]
+pronunciation = """
+Se lit « tsou » : le T et le S collés, en un seul temps.
+  Équivalent français : le TS de « Tsar », suivi du OU de « Fou » aux lèvres
+  au repos.
+
+Jamais « tou » : le S fait partie du son, il ne s'ajoute pas.
+"""
 mnemonics = [
     "Cursive du kanji signifiant fleuve.",
     "Une vague. Se prononce tsou.",
@@ -85,6 +134,12 @@ mnemonics = [
 [[glyphs]]
 char = "て"
 answers = ["te"]
+pronunciation = """
+Se lit « te », en un seul temps.
+  Équivalent français : le T de « Table » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant main.",
     "Une main tendue vue de profil.",
@@ -93,6 +148,12 @@ mnemonics = [
 [[glyphs]]
 char = "と"
 answers = ["to"]
+pronunciation = """
+Se lit « to », en un seul temps.
+  Équivalent français : le T de « Table » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant s'arreter.",
     "Un clou plante, avec sa pointe.",

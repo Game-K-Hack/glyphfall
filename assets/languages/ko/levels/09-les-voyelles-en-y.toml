@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "ㅑ"
 answers = ["ya"]
+pronunciation = """
+Un seul son : [ya], en un seul temps.
+  Équivalent français : le YA de « Yack ».
+
+Deux traits au lieu d'un : le trait ajouté fait surgir le [y] devant.
+"""
 mnemonics = [
     "Le a avec deux traits au lieu d'un : deux traits veulent toujours dire un Y devant.",
     "Deux soleils a l'est, donc deux traits : le a devient ya.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅕ"
 answers = ["yeo"]
+pronunciation = """
+Un seul son : [y] suivi du eo relâché.
+  Équivalent français : commencez « Yeux » et finissez sur le O de « bol ».
+
+Deux traits au lieu d'un : le trait ajouté fait surgir le [y] devant.
+"""
 mnemonics = [
     "Le eo avec deux traits : un Y vient devant.",
 ]
@@ -36,6 +48,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅛ"
 answers = ["yo"]
+pronunciation = """
+Un seul son : [yo], les lèvres arrondies sur le o.
+  Équivalent français : le YO de « Yoga ».
+
+Deux traits au lieu d'un : le trait ajouté fait surgir le [y] devant.
+"""
 mnemonics = [
     "Le o avec deux traits : un Y vient devant.",
 ]
@@ -43,6 +61,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅠ"
 answers = ["yu"]
+pronunciation = """
+Un seul son : [you], les lèvres arrondies et serrées.
+  Équivalent français : le YOU de « Youpi ».
+
+Jamais « yu » à la française : la voyelle reste un ou.
+"""
 mnemonics = [
     "Le u avec deux traits : un Y vient devant. Se lit you.",
 ]

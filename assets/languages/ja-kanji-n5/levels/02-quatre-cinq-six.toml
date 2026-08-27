@@ -21,6 +21,15 @@ three = 0.85
 [[glyphs]]
 char = "四"
 answers = ["4", "quatre", "shi", "yon"]
+pronunciation = """
+Lecture ON, venue du chinois : SHI.
+  Dans « shigatsu », avril.
+
+Lecture KUN, japonaise : yon, yot(tsu).
+  Dans « yottsu », quatre choses.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Une bouche avec deux jambes dedans.",
     "On evite souvent shi, homophone de la mort : on dit yon.",
@@ -29,6 +38,15 @@ mnemonics = [
 [[glyphs]]
 char = "五"
 answers = ["5", "cinq", "go"]
+pronunciation = """
+Lecture ON, venue du chinois : GO.
+  Dans « gogatsu », mai.
+
+Lecture KUN, japonaise : itsu(tsu).
+  Dans « itsutsu », cinq choses.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un sablier entre deux barres.",
 ]
@@ -36,6 +54,15 @@ mnemonics = [
 [[glyphs]]
 char = "六"
 answers = ["6", "six", "roku"]
+pronunciation = """
+Lecture ON, venue du chinois : ROKU.
+  Dans « rokugatsu », juin.
+
+Lecture KUN, japonaise : mut(tsu).
+  Dans « muttsu », six choses.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un chapeau sur deux jambes.",
 ]

@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "た"
 answers = ["ta"]
+pronunciation = """
+Se lit « ta », en un seul temps.
+  Équivalent français : le T de « Table » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant grand.",
     "Un t suivi d'un petit trait, comme un ta ecrit vite.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "ち"
 answers = ["chi", "ti"]
+pronunciation = """
+Se lit « tchi », en un seul temps.
+  Équivalent français : le TCHI de « Tchèque ».
+
+Jamais « ti » : devant le i, la ligne T glisse vers le son [tch].
+"""
 mnemonics = [
     "Cursive du kanji signifiant savoir.",
     "Le ta retourne. Se prononce tchi.",
@@ -37,6 +49,13 @@ mnemonics = [
 [[glyphs]]
 char = "つ"
 answers = ["tsu", "tu"]
+pronunciation = """
+Se lit « tsou » : le T et le S collés, en un seul temps.
+  Équivalent français : le TS de « Tsar », suivi du OU de « Fou » aux lèvres
+  au repos.
+
+Jamais « tou » : le S fait partie du son, il ne s'ajoute pas.
+"""
 mnemonics = [
     "Cursive du kanji signifiant fleuve.",
     "Une vague. Se prononce tsou.",
@@ -45,6 +64,12 @@ mnemonics = [
 [[glyphs]]
 char = "て"
 answers = ["te"]
+pronunciation = """
+Se lit « te », en un seul temps.
+  Équivalent français : le T de « Table » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant main.",
     "Une main tendue vue de profil.",
@@ -53,6 +78,12 @@ mnemonics = [
 [[glyphs]]
 char = "と"
 answers = ["to"]
+pronunciation = """
+Se lit « to », en un seul temps.
+  Équivalent français : le T de « Table » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant s'arreter.",
     "Un clou plante, avec sa pointe.",

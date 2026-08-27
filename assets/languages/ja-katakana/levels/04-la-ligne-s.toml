@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "サ"
 answers = ["sa"]
+pronunciation = """
+Se lit « sa », en un seul temps.
+  Équivalent français : le S de « Sable » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant disperser.",
     "Deux traits verticaux barres.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "シ"
 answers = ["shi", "si"]
+pronunciation = """
+Se lit « chi », en un seul temps.
+  Équivalent français : le CHI de « Chic ».
+
+Jamais « si » : devant le i, toute la ligne S glisse vers le son [ch].
+"""
 mnemonics = [
     "Morceau du meme kanji que le shi hiragana.",
     "Deux points et un trait qui MONTE. Le tsu, lui, descend.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ス"
 answers = ["su"]
+pronunciation = """
+Se lit « su », en un seul temps.
+  Équivalent français : le S de « Sable » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Morceau du kanji signifiant grand.",
     "Un chevron d'ou pend une jambe.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "セ"
 answers = ["se"]
+pronunciation = """
+Se lit « se », en un seul temps.
+  Équivalent français : le S de « Sable » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Morceau du meme kanji que le se hiragana.",
     "Le se hiragana en plus anguleux.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "ソ"
 answers = ["so"]
+pronunciation = """
+Se lit « so », en un seul temps.
+  Équivalent français : le S de « Sable » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant ceci.",
     "Un point et un trait qui DESCEND. Le n, lui, monte.",

@@ -21,6 +21,17 @@ three = 0.85
 [[glyphs]]
 char = "ㅅ"
 answers = ["s"]
+name = "siot"
+pronunciation = """
+Partout : [s], plus léger qu'en français, presque soufflé.
+  Équivalent français : le S de « Sable ».
+
+Devant le son [i] : il glisse vers [ch].
+  Équivalent français : le CH de « Chic ».
+
+En fin de syllabe : il devient un [t] retenu, jamais un [s].
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "Le dessin d'une dent pointue : le souffle passe entre les dents.",
     "Forme d'un sommet de montagne (sommet). Son nom : siot.",
@@ -29,6 +40,17 @@ mnemonics = [
 [[glyphs]]
 char = "ㅈ"
 answers = ["j"]
+name = "jieut"
+pronunciation = """
+Début de mot : entre [dj] et [tch], perçu comme un [tch] doux.
+  Équivalent français : le TCH de « Tchèque », sans le souffle.
+
+Entre deux voyelles : franchement [dj].
+  Équivalent français : le DJ de « Djibouti ».
+
+En fin de syllabe : un [t] retenu.
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "La dent du siot coiffee d'un chapeau : meme endroit, l'air est bloque avant.",
     "Forme de jambes croisees sous une table (jambes). Son nom : jieut.",
@@ -37,6 +59,15 @@ mnemonics = [
 [[glyphs]]
 char = "ㅊ"
 answers = ["ch"]
+name = "chieut"
+pronunciation = """
+Partout : [tch] soufflé. C'est le jieut avec de l'air en plus, et ce souffle
+est ce qui distingue les deux à l'oreille.
+  Équivalent français : le TCH de « Tchèque », en expirant franchement.
+
+En fin de syllabe : un [t] retenu, comme toutes les sifflantes.
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "Le jieut avec un trait de plus : en hangeul, un trait ajoute veut dire souffle ajoute.",
     "Le jieut coiffe d'un chapeau (chapeau). Son nom : chieut.",

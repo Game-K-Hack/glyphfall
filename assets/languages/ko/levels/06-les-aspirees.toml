@@ -21,6 +21,14 @@ three = 0.85
 [[glyphs]]
 char = "ㅋ"
 answers = ["k"]
+name = "kieuk"
+pronunciation = """
+Partout : [k] soufflé. C'est le giyeok avec de l'air en plus.
+  Équivalent français : le K de « Kilo », en expirant franchement.
+
+En fin de syllabe : la gorge se ferme, comme pour le giyeok.
+  Équivalent français : le C de « sac » coupé net.
+"""
 mnemonics = [
     "Le giyeok avec un trait de plus : meme geste, souffle en plus.",
     "Forme d'une cle dentee (key). Son nom : kieuk.",
@@ -29,6 +37,14 @@ mnemonics = [
 [[glyphs]]
 char = "ㅌ"
 answers = ["t"]
+name = "tieut"
+pronunciation = """
+Partout : [t] soufflé. C'est le digeut avec de l'air en plus.
+  Équivalent français : le T de « Table », en expirant franchement.
+
+En fin de syllabe : un [t] retenu, sans souffle cette fois.
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "Le digeut avec un trait de plus a l'interieur.",
     "Forme d'un E, ou d'un trident sans le manche (trident). Son nom : tieut.",
@@ -37,6 +53,14 @@ mnemonics = [
 [[glyphs]]
 char = "ㅍ"
 answers = ["p"]
+name = "pieup"
+pronunciation = """
+Partout : [p] soufflé. C'est le bieup avec de l'air en plus.
+  Équivalent français : le P de « Panne », en expirant franchement.
+
+En fin de syllabe : les lèvres se ferment et rien ne sort.
+  Équivalent français : le P de « cap » coupé net.
+"""
 mnemonics = [
     "Le bieup couche a plat, ouvert en haut et en bas.",
     "Forme d'un pont sur deux piles (pont), ou d'un pi grec a qui l'on aurait ajoute une barre. Son nom : pieup.",

@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "や"
 answers = ["ya"]
+pronunciation = """
+Se lit « ya », en un seul temps.
+  Équivalent français : le Y de « Yack » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant aussi.",
     "Un yacht avec sa voile.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "ゆ"
 answers = ["yu"]
+pronunciation = """
+Se lit « yu », en un seul temps.
+  Équivalent français : le Y de « Yack » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Cursive du kanji signifiant provenir.",
     "Un poisson stylise, avec sa nageoire et sa queue.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "よ"
 answers = ["yo"]
+pronunciation = """
+Se lit « yo », en un seul temps.
+  Équivalent français : le Y de « Yack » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant avec.",
     "Un yoyo qui pend au bout de son fil.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "わ"
 answers = ["wa"]
+pronunciation = """
+Se lit « wa », en un seul temps.
+  Équivalent français : le OU de « Oui » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant harmonie.",
     "Comme le ne et le re, mais la fin se referme en boucle courte.",
@@ -53,6 +77,13 @@ mnemonics = [
 [[glyphs]]
 char = "を"
 answers = ["wo", "o"]
+pronunciation = """
+Se lit « o », comme le kana de la voyelle seule.
+  Équivalent français : le O de « Eau ».
+
+Ne sert qu'à marquer le complément d'objet : on ne le rencontre jamais à
+l'intérieur d'un mot.
+"""
 mnemonics = [
     "Cursive du kanji signifiant lointain.",
     "Ne sert que de particule : il marque le complement d'objet. Se prononce o.",
@@ -61,6 +92,13 @@ mnemonics = [
 [[glyphs]]
 char = "ん"
 answers = ["n"]
+pronunciation = """
+Se lit « n ». Seul kana à tenir une syllabe sans voyelle.
+  Équivalent français : le N de « Anne », mais compté comme un temps entier.
+
+Il prend la couleur de ce qui suit : [m] devant un p ou un b, [ng] devant un
+k ou un g.
+"""
 mnemonics = [
     "Cursive du kanji signifiant infini.",
     "La seule consonne qui tient seule, sans voyelle.",

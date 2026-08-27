@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "ア"
 answers = ["a"]
+pronunciation = """
+Se lit « a », en un seul temps.
+  Équivalent français : le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Morceau du meme kanji que le a hiragana, celui qui signifie paisible.",
     "Un chevron surmonte d'un trait.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "イ"
 answers = ["i"]
+pronunciation = """
+Se lit « i », en un seul temps.
+  Équivalent français : le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Morceau gauche du kanji signifiant personne.",
     "Deux traits, comme le i hiragana mais anguleux.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ウ"
 answers = ["u"]
+pronunciation = """
+Se lit « u », en un seul temps.
+  Équivalent français : le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Le toit du kanji signifiant maison.",
     "Un toit avec sa cheminee.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "エ"
 answers = ["e"]
+pronunciation = """
+Se lit « e », en un seul temps.
+  Équivalent français : le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Le kanji signifiant travail, pris tel quel.",
     "Un H couche : trois barres, celle du milieu verticale.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "オ"
 answers = ["o"]
+pronunciation = """
+Se lit « o », en un seul temps.
+  Équivalent français : le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant sur.",
     "Une croix a laquelle pend un trait.",

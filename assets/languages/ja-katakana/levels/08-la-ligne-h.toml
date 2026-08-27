@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "ハ"
 answers = ["ha"]
+pronunciation = """
+Se lit « ha », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Le kanji signifiant huit, pris tel quel.",
     "Deux traits qui s'ecartent.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "ヒ"
 answers = ["hi"]
+pronunciation = """
+Se lit « hi », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Morceau du meme kanji que le hi hiragana.",
     "Un trait vertical avec un pied.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "フ"
 answers = ["fu", "hu"]
+pronunciation = """
+Se lit « fou », mais soufflé entre les lèvres, sans mordre la lèvre du bas.
+  Équivalent français : entre le F de « Fou » et un H expiré.
+
+Ni un F net, ni un H seul : le son est à mi-chemin.
+"""
 mnemonics = [
     "Morceau du kanji signifiant inegal.",
     "Un seul angle. A ne pas confondre avec le wa et le ku.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "ヘ"
 answers = ["he"]
+pronunciation = """
+Se lit « he », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Le meme signe qu'en hiragana : une colline.",
     "Le seul kana identique dans les deux syllabaires.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "ホ"
 answers = ["ho"]
+pronunciation = """
+Se lit « ho », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant garantir.",
     "Une croix avec deux jambes.",

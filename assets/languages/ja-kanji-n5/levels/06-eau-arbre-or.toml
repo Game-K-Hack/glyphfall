@@ -21,6 +21,15 @@ three = 0.85
 [[glyphs]]
 char = "水"
 answers = ["eau"]
+pronunciation = """
+Lecture ON, venue du chinois : SUI.
+  Dans « suiyobi », mercredi.
+
+Lecture KUN, japonaise : mizu.
+  Dans « mizu », l'eau.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un cours d'eau avec ses eclaboussures.",
     "Mercredi est le jour de l'eau.",
@@ -29,6 +38,15 @@ mnemonics = [
 [[glyphs]]
 char = "木"
 answers = ["arbre", "bois"]
+pronunciation = """
+Lecture ON, venue du chinois : MOKU, BOKU.
+  Dans « mokuyobi », jeudi.
+
+Lecture KUN, japonaise : ki.
+  Dans « ki », l'arbre.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un tronc avec ses branches et ses racines.",
     "Jeudi est le jour de l'arbre.",
@@ -37,6 +55,15 @@ mnemonics = [
 [[glyphs]]
 char = "金"
 answers = ["or", "argent"]
+pronunciation = """
+Lecture ON, venue du chinois : KIN, KON.
+  Dans « kinyobi », vendredi.
+
+Lecture KUN, japonaise : kane.
+  Dans « okane », l'argent qu'on dépense.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un toit sur des pepites enfouies.",
     "Vendredi est le jour de l'or. Signifie aussi l'argent que l'on depense.",

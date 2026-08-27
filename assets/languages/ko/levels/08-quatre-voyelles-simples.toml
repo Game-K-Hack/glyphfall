@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "ㅏ"
 answers = ["a"]
+pronunciation = """
+Un seul son : [a] ouvert, la bouche bien dégagée.
+  Équivalent français : le A de « Papa ».
+
+Il reste bref : le coréen n'allonge pas ses voyelles comme le fait « pâte ».
+"""
 mnemonics = [
     "Le trait vertical est l'humain debout ; le point du soleil s'est pose a sa droite.",
     "Le soleil a l'est : le son sort devant, bouche grande ouverte.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅓ"
 answers = ["eo"]
+pronunciation = """
+Un seul son : [o] relâché, la bouche ouverte et les lèvres au repos.
+  Équivalent français : entre le O de « bol » et le EU de « peur ».
+
+À ne pas confondre avec le o : celui-ci ne s'arrondit jamais.
+"""
 mnemonics = [
     "Le miroir du a : le soleil est passe a gauche, le son recule dans la bouche.",
     "Entre le o et le e francais, comme le eu de peur.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅗ"
 answers = ["o"]
+pronunciation = """
+Un seul son : [o] fermé, les lèvres bien arrondies et poussées en avant.
+  Équivalent français : le O de « eau ».
+
+C'est l'arrondi qui le sépare du eo. Exagérez-le au début.
+"""
 mnemonics = [
     "La barre est la terre, le trait au-dessus est le soleil qui se leve.",
     "Le soleil au-dessus de l'horizon : les levres s'arrondissent.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅜ"
 answers = ["u"]
+pronunciation = """
+Un seul son : [ou], les lèvres arrondies et serrées.
+  Équivalent français : le OU de « Fou ».
+
+Jamais le U de « lune » : ce son français n'existe pas en coréen.
+"""
 mnemonics = [
     "Le miroir du o : le soleil est passe sous la terre.",
     "Se prononce ou et jamais u : le u francais n'existe pas en coreen.",

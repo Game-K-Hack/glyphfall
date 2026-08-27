@@ -21,6 +21,17 @@ three = 0.85
 [[glyphs]]
 char = "ㄷ"
 answers = ["d", "t"]
+name = "digeut"
+pronunciation = """
+Début de mot : entre [d] et [t], plutôt un [t] doux.
+  Équivalent français : le T de « Table », sans le souffle qui suit.
+
+Entre deux voyelles : franchement [d].
+  Équivalent français : le D de « Date ».
+
+En fin de syllabe : la langue se pose et rien ne sort.
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "Le nieun que l'on referme par le haut : meme langue, contact plus ferme.",
     "Forme d'un d sans sa barre, ou d'une porte vue de cote (door). Son nom : digeut.",
@@ -29,6 +40,16 @@ mnemonics = [
 [[glyphs]]
 char = "ㄹ"
 answers = ["r", "l"]
+name = "rieul"
+pronunciation = """
+Début de mot et entre deux voyelles : un [r] battu, la langue effleure le
+palais une seule fois. Elle ne roule pas et ne racle pas.
+  Équivalent français : aucun. Le R de « Paris » est bien trop en arrière ;
+  visez le R espagnol de « pero ».
+
+En fin de syllabe : un [l] net.
+  Équivalent français : le L de « bal ».
+"""
 mnemonics = [
     "Le zigzag de la langue qui roule puis retombe.",
     "Forme d'une route qui zigzague (route). Son nom : rieul.",
@@ -37,6 +58,17 @@ mnemonics = [
 [[glyphs]]
 char = "ㅂ"
 answers = ["b", "p"]
+name = "bieup"
+pronunciation = """
+Début de mot : entre [b] et [p], perçu comme un [p] doux.
+  Équivalent français : le P de « Panne », sans le souffle qui suit.
+
+Entre deux voyelles : franchement [b].
+  Équivalent français : le B de « Bal ».
+
+En fin de syllabe : les lèvres se ferment et rien ne sort.
+  Équivalent français : le P de « cap » coupé net.
+"""
 mnemonics = [
     "Le carre de la bouche qui s'entrouvre : deux traits s'echappent vers le haut.",
     "Forme d'un bol a deux anses (bol). Son nom : bieup.",

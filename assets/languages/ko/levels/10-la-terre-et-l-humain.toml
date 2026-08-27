@@ -21,6 +21,13 @@ three = 0.85
 [[glyphs]]
 char = "ㅡ"
 answers = ["eu"]
+pronunciation = """
+Un seul son : la bouche étirée comme pour sourire, les lèvres surtout pas
+arrondies, et le son s'avale vers l'arrière.
+  Équivalent français : le E de « je », tiré vers l'arrière de la bouche.
+
+Ni ou ni u : c'est l'absence d'arrondi qui le définit.
+"""
 mnemonics = [
     "La terre, toute plate. Le troisieme symbole de base avec le ciel et l'humain.",
     "Un son avale, bouche etiree, comme le e de je.",
@@ -29,6 +36,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅣ"
 answers = ["i"]
+pronunciation = """
+Un seul son : [i] franc.
+  Équivalent français : le I de « Lit ».
+
+C'est lui qui fait glisser le siot vers le son [ch] quand il le suit.
+"""
 mnemonics = [
     "L'humain debout, tout droit. Le deuxieme symbole de base.",
 ]

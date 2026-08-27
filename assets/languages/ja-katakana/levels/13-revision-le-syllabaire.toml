@@ -21,6 +21,12 @@ three = 0.90
 [[glyphs]]
 char = "シ"
 answers = ["shi", "si"]
+pronunciation = """
+Se lit « chi », en un seul temps.
+  Équivalent français : le CHI de « Chic ».
+
+Jamais « si » : devant le i, toute la ligne S glisse vers le son [ch].
+"""
 mnemonics = [
     "Morceau du meme kanji que le shi hiragana.",
     "Deux points et un trait qui MONTE. Le tsu, lui, descend.",
@@ -29,6 +35,13 @@ mnemonics = [
 [[glyphs]]
 char = "ツ"
 answers = ["tsu", "tu"]
+pronunciation = """
+Se lit « tsou » : le T et le S collés, en un seul temps.
+  Équivalent français : le TS de « Tsar », suivi du OU de « Fou » aux lèvres
+  au repos.
+
+Jamais « tou » : le S fait partie du son, il ne s'ajoute pas.
+"""
 mnemonics = [
     "Morceau du meme kanji que le tsu hiragana.",
     "Trois traits qui MONTENT. Le shi a deux points, le tsu en a trois.",
@@ -37,6 +50,12 @@ mnemonics = [
 [[glyphs]]
 char = "ソ"
 answers = ["so"]
+pronunciation = """
+Se lit « so », en un seul temps.
+  Équivalent français : le S de « Sable » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant ceci.",
     "Un point et un trait qui DESCEND. Le n, lui, monte.",
@@ -45,6 +64,13 @@ mnemonics = [
 [[glyphs]]
 char = "ン"
 answers = ["n"]
+pronunciation = """
+Se lit « n ». Seul kana à tenir une syllabe sans voyelle.
+  Équivalent français : le N de « Anne », mais compté comme un temps entier.
+
+Il prend la couleur de ce qui suit : [m] devant un p ou un b, [ng] devant un
+k ou un g.
+"""
 mnemonics = [
     "Morceau du kanji signifiant infini.",
     "Un point et un trait qui MONTE. Le so, lui, descend.",
@@ -53,6 +79,12 @@ mnemonics = [
 [[glyphs]]
 char = "ク"
 answers = ["ku"]
+pronunciation = """
+Se lit « ku », en un seul temps.
+  Équivalent français : le C de « Carte » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Morceau du kanji signifiant longtemps.",
     "Un bec, plus ferme que celui du ku hiragana. A ne pas confondre avec le wa et le ta.",
@@ -61,6 +93,12 @@ mnemonics = [
 [[glyphs]]
 char = "フ"
 answers = ["fu", "hu"]
+pronunciation = """
+Se lit « fou », mais soufflé entre les lèvres, sans mordre la lèvre du bas.
+  Équivalent français : entre le F de « Fou » et un H expiré.
+
+Ni un F net, ni un H seul : le son est à mi-chemin.
+"""
 mnemonics = [
     "Morceau du kanji signifiant inegal.",
     "Un seul angle. A ne pas confondre avec le wa et le ku.",
@@ -69,6 +107,12 @@ mnemonics = [
 [[glyphs]]
 char = "ロ"
 answers = ["ro"]
+pronunciation = """
+Se lit « ro », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant lui.",
     "Un carre ferme. Le ko, lui, est ouvert a droite.",
@@ -77,6 +121,13 @@ mnemonics = [
 [[glyphs]]
 char = "ヲ"
 answers = ["wo", "o"]
+pronunciation = """
+Se lit « o », comme le kana de la voyelle seule.
+  Équivalent français : le O de « Eau ».
+
+Ne sert qu'à marquer le complément d'objet : on ne le rencontre jamais à
+l'intérieur d'un mot.
+"""
 mnemonics = [
     "Morceau du kanji signifiant lointain.",
     "Particule d'objet, presque jamais ecrite en katakana.",
@@ -85,6 +136,12 @@ mnemonics = [
 [[glyphs]]
 char = "ヘ"
 answers = ["he"]
+pronunciation = """
+Se lit « he », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Le meme signe qu'en hiragana : une colline.",
     "Le seul kana identique dans les deux syllabaires.",

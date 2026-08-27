@@ -195,7 +195,7 @@ def main():
         f"Package: {PAQUET}\n"
         f"Version: {version}\n"
         f"Architecture: {architecture}\n"
-        "Maintainer: Glyphfall <informatique@socodep.fr>\n"
+        "Maintainer: Harlock <harlock7@laposte.net>\n"
         f"Installed-Size: {poids}\n"
         f"Depends: {', '.join(DEPENDANCES)}\n"
         "Section: games\n"

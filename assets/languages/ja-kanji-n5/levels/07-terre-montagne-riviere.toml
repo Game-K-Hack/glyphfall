@@ -21,6 +21,15 @@ three = 0.85
 [[glyphs]]
 char = "土"
 answers = ["terre", "sol"]
+pronunciation = """
+Lecture ON, venue du chinois : DO, TO.
+  Dans « doyobi », samedi.
+
+Lecture KUN, japonaise : tsuchi.
+  Dans « tsuchi », la terre du sol.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Une pousse qui sort du sol.",
     "Samedi est le jour de la terre.",
@@ -29,6 +38,15 @@ mnemonics = [
 [[glyphs]]
 char = "山"
 answers = ["montagne"]
+pronunciation = """
+Lecture ON, venue du chinois : SAN.
+  Dans « fujisan », le mont Fuji.
+
+Lecture KUN, japonaise : yama.
+  Dans « yama », la montagne.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Trois pics, celui du milieu plus haut.",
 ]
@@ -36,6 +54,15 @@ mnemonics = [
 [[glyphs]]
 char = "川"
 answers = ["riviere", "fleuve"]
+pronunciation = """
+Lecture ON, venue du chinois : SEN.
+  Dans « kasen », les cours d'eau.
+
+Lecture KUN, japonaise : kawa.
+  Dans « kawa », la rivière.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Trois filets d'eau qui coulent en parallele.",
 ]

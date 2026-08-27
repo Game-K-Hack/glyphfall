@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "ら"
 answers = ["ra"]
+pronunciation = """
+Se lit « ra », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant bon.",
     "Un trait pose sur une boucle.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "り"
 answers = ["ri"]
+pronunciation = """
+Se lit « ri », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Cursive du kanji signifiant profit.",
     "Deux traits verticaux, le second recourbe.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "る"
 answers = ["ru"]
+pronunciation = """
+Se lit « ru », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Cursive du kanji signifiant rester.",
     "Comme le ro, mais termine par une boucle fermee.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "れ"
 answers = ["re"]
+pronunciation = """
+Se lit « re », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant rite.",
     "Comme le ne, mais la fin part vers la droite.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "ろ"
 answers = ["ro"]
+pronunciation = """
+Se lit « ro », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant lui.",
     "Comme le ru, mais sans la boucle : une route ouverte.",

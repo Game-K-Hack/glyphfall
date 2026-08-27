@@ -21,6 +21,12 @@ three = 0.88
 [[glyphs]]
 char = "な"
 answers = ["na"]
+pronunciation = """
+Se lit « na », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant quoi.",
     "Une croix suivie d'une boucle.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "に"
 answers = ["ni"]
+pronunciation = """
+Se lit « ni », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Cursive du kanji signifiant benevolence.",
     "Un trait vertical suivi de deux traits couches.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ぬ"
 answers = ["nu"]
+pronunciation = """
+Se lit « nu », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Cursive du kanji signifiant serviteur.",
     "Comme le me, mais avec une boucle au bout. Nouer une boucle : nu.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "ね"
 answers = ["ne"]
+pronunciation = """
+Se lit « ne », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant genou.",
     "Comme le nu, mais la boucle est ouverte.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "の"
 answers = ["no"]
+pronunciation = """
+Se lit « no », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant sur.",
     "Une spirale unique, le kana le plus simple a reconnaitre.",
@@ -61,6 +91,12 @@ mnemonics = [
 [[glyphs]]
 char = "は"
 answers = ["ha"]
+pronunciation = """
+Se lit « ha », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant feuille.",
     "Un h dont la barre est traversee.",
@@ -69,6 +105,12 @@ mnemonics = [
 [[glyphs]]
 char = "ひ"
 answers = ["hi"]
+pronunciation = """
+Se lit « hi », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Cursive du kanji signifiant comparer.",
     "Un nez de profil, ou un sourire.",
@@ -77,6 +119,12 @@ mnemonics = [
 [[glyphs]]
 char = "ふ"
 answers = ["fu", "hu"]
+pronunciation = """
+Se lit « fou », mais soufflé entre les lèvres, sans mordre la lèvre du bas.
+  Équivalent français : entre le F de « Fou » et un H expiré.
+
+Ni un F net, ni un H seul : le son est à mi-chemin.
+"""
 mnemonics = [
     "Cursive du kanji signifiant inegal.",
     "Un mont Fuji stylise, avec des flocons de part et d'autre.",
@@ -85,6 +133,12 @@ mnemonics = [
 [[glyphs]]
 char = "へ"
 answers = ["he"]
+pronunciation = """
+Se lit « he », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant partie.",
     "Une colline. Le plus simple des kana, identique en katakana.",
@@ -93,6 +147,12 @@ mnemonics = [
 [[glyphs]]
 char = "ほ"
 answers = ["ho"]
+pronunciation = """
+Se lit « ho », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant garantir.",
     "Le ha avec une barre de plus en haut.",

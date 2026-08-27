@@ -21,6 +21,13 @@ three = 0.85
 [[glyphs]]
 char = "가"
 answers = ["ga", "ka"]
+pronunciation = """
+Début de mot : « ka » doux.
+Ailleurs : « ga ».
+  Équivalent français : le CA de « Carte », puis le GA de « Gare ».
+
+Dans « gajok », la famille.
+"""
 mnemonics = [
     "Giyeok plus a : la consonne a gauche, la voyelle verticale a sa droite.",
     "Se lit ka en debut de mot, ga entre deux voyelles. Le jeu accepte les deux.",
@@ -29,6 +36,12 @@ mnemonics = [
 [[glyphs]]
 char = "나"
 answers = ["na"]
+pronunciation = """
+Se lit « na », toujours de la même façon.
+  Équivalent français : le NA de « Nappe ».
+
+Dans « nara », le pays.
+"""
 mnemonics = [
     "Nieun plus a : la langue derriere les dents, puis la bouche s'ouvre.",
     "On le trouve dans nara, qui veut dire pays.",
@@ -37,6 +50,13 @@ mnemonics = [
 [[glyphs]]
 char = "다"
 answers = ["da", "ta"]
+pronunciation = """
+Début de mot : « ta » doux.
+Ailleurs : « da ».
+  Équivalent français : le TA de « Table », puis le DA de « Dame ».
+
+Dans « dasot », le chiffre cinq.
+"""
 mnemonics = [
     "Digeut plus a. Meme regle de position que les autres voyelles verticales.",
     "Se lit ta en debut de mot, da a l'interieur.",
@@ -45,6 +65,12 @@ mnemonics = [
 [[glyphs]]
 char = "라"
 answers = ["ra", "la"]
+pronunciation = """
+Se lit « ra », toujours de la même façon.
+  Équivalent français : un R battu, la langue effleure une fois.
+
+Dans « ramyon », les nouilles instantanées.
+"""
 mnemonics = [
     "Rieul plus a. Le son est entre le R et le L francais, la langue effleure.",
 ]
@@ -52,6 +78,12 @@ mnemonics = [
 [[glyphs]]
 char = "마"
 answers = ["ma"]
+pronunciation = """
+Se lit « ma », toujours de la même façon.
+  Équivalent français : le MA de « Ma ».
+
+Dans « maum », ce qu'on a sur le coeur.
+"""
 mnemonics = [
     "Mieum plus a : le carre de la bouche fermee, puis elle s'ouvre grand.",
 ]

@@ -21,6 +21,16 @@ three = 0.85
 [[glyphs]]
 char = "ㅇ"
 answers = ["ng"]
+name = "ieung"
+pronunciation = """
+Début de syllabe : rien du tout. La lettre est là parce qu'une syllabe s'écrit
+toujours avec une consonne devant, mais elle ne se prononce pas.
+  Équivalent français : aucun son, seulement la voyelle qui suit.
+
+En fin de syllabe : [ng], le son se prolonge dans le nez sans que la langue
+touche quoi que ce soit.
+  Équivalent français : le NG de « parking ».
+"""
 mnemonics = [
     "Le dessin de la gorge ouverte, un cercle.",
     "Forme d'un zero : au debut, il ne vaut rien. Son nom : ieung.",
@@ -29,6 +39,15 @@ mnemonics = [
 [[glyphs]]
 char = "ㅎ"
 answers = ["h"]
+name = "hieut"
+pronunciation = """
+Début de mot : un [h] expiré, jamais muet.
+  Équivalent français : aucun. Pensez au H anglais de « hat », ou au souffle
+  qu'on met sur une vitre pour la buer.
+
+Entre deux voyelles : très affaibli, parfois presque effacé.
+  Équivalent français : un simple souffle entre les deux voyelles.
+"""
 mnemonics = [
     "Un chapeau pose sur la gorge ouverte : le souffle sort par le haut.",
     "Forme d'un homme a chapeau (hat). Son nom : hieut.",

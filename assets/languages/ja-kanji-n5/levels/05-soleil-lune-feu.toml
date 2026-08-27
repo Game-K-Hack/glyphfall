@@ -21,6 +21,15 @@ three = 0.85
 [[glyphs]]
 char = "日"
 answers = ["soleil", "jour"]
+pronunciation = """
+Lecture ON, venue du chinois : NICHI, JITSU.
+  Dans « nichiyobi », dimanche.
+
+Lecture KUN, japonaise : hi, ka.
+  Dans « hi », le soleil, le jour.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un soleil carre avec un trait au milieu.",
     "Ouvre la semaine : dimanche est le jour du soleil.",
@@ -29,6 +38,15 @@ mnemonics = [
 [[glyphs]]
 char = "月"
 answers = ["lune", "mois"]
+pronunciation = """
+Lecture ON, venue du chinois : GETSU, GATSU.
+  Dans « getsuyobi », lundi.
+
+Lecture KUN, japonaise : tsuki.
+  Dans « tsuki », la lune, le mois.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un croissant de lune redresse.",
     "Lundi est le jour de la lune. Sert aussi a compter les mois.",
@@ -37,6 +55,15 @@ mnemonics = [
 [[glyphs]]
 char = "火"
 answers = ["feu"]
+pronunciation = """
+Lecture ON, venue du chinois : KA.
+  Dans « kayobi », mardi.
+
+Lecture KUN, japonaise : hi.
+  Dans « hi », le feu.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Une flamme avec deux etincelles de part et d'autre.",
     "Mardi est le jour du feu.",

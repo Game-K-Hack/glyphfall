@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "さ"
 answers = ["sa"]
+pronunciation = """
+Se lit « sa », en un seul temps.
+  Équivalent français : le S de « Sable » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant gauche.",
     "Un s dont on a barre le haut.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "し"
 answers = ["shi", "si"]
+pronunciation = """
+Se lit « chi », en un seul temps.
+  Équivalent français : le CHI de « Chic ».
+
+Jamais « si » : devant le i, toute la ligne S glisse vers le son [ch].
+"""
 mnemonics = [
     "Cursive du kanji signifiant lui.",
     "Un hamecon. Se prononce chi, jamais si.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "す"
 answers = ["su"]
+pronunciation = """
+Se lit « su », en un seul temps.
+  Équivalent français : le S de « Sable » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Cursive du kanji signifiant tenir.",
     "Une boucle nouee sous une barre.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "せ"
 answers = ["se"]
+pronunciation = """
+Se lit « se », en un seul temps.
+  Équivalent français : le S de « Sable » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant monde.",
     "Une fourche a deux dents barree.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "そ"
 answers = ["so"]
+pronunciation = """
+Se lit « so », en un seul temps.
+  Équivalent français : le S de « Sable » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant ceci.",
     "Un zigzag qui descend d'un trait.",

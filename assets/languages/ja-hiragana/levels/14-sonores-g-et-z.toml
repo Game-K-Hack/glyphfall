@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "が"
 answers = ["ga"]
+pronunciation = """
+Se lit « ga », en un seul temps.
+  Équivalent français : le G de « Gare » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Le ka avec les deux petits traits : la sourde devient sonore, ka donne ga.",
 ]
@@ -28,6 +34,12 @@ mnemonics = [
 [[glyphs]]
 char = "ぎ"
 answers = ["gi"]
+pronunciation = """
+Se lit « gi », en un seul temps.
+  Équivalent français : le G de « Gare » puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Le ki avec les deux petits traits : la sourde devient sonore, ki donne gi.",
 ]
@@ -35,6 +47,12 @@ mnemonics = [
 [[glyphs]]
 char = "ぐ"
 answers = ["gu"]
+pronunciation = """
+Se lit « gu », en un seul temps.
+  Équivalent français : le G de « Gare » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Le ku avec les deux petits traits : la sourde devient sonore, ku donne gu.",
 ]
@@ -42,6 +60,12 @@ mnemonics = [
 [[glyphs]]
 char = "げ"
 answers = ["ge"]
+pronunciation = """
+Se lit « ge », en un seul temps.
+  Équivalent français : le G de « Gare » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Le ke avec les deux petits traits : la sourde devient sonore, ke donne ge.",
 ]
@@ -49,6 +73,12 @@ mnemonics = [
 [[glyphs]]
 char = "ご"
 answers = ["go"]
+pronunciation = """
+Se lit « go », en un seul temps.
+  Équivalent français : le G de « Gare » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Le ko avec les deux petits traits : la sourde devient sonore, ko donne go.",
 ]
@@ -56,6 +86,12 @@ mnemonics = [
 [[glyphs]]
 char = "ざ"
 answers = ["za"]
+pronunciation = """
+Se lit « za », en un seul temps.
+  Équivalent français : le Z de « Zèbre » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Le sa avec les deux petits traits : la sourde devient sonore, sa donne za.",
 ]
@@ -63,6 +99,12 @@ mnemonics = [
 [[glyphs]]
 char = "じ"
 answers = ["ji", "zi"]
+pronunciation = """
+Se lit « dji », en un seul temps.
+  Équivalent français : le DJI de « Djibouti ».
+
+Jamais « zi » : devant le i, la ligne Z glisse vers le son [dj].
+"""
 mnemonics = [
     "Le shi avec les deux petits traits. Se lit ji, pas zi.",
 ]
@@ -70,6 +112,12 @@ mnemonics = [
 [[glyphs]]
 char = "ず"
 answers = ["zu"]
+pronunciation = """
+Se lit « zu », en un seul temps.
+  Équivalent français : le Z de « Zèbre » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Le su avec les deux petits traits : la sourde devient sonore, su donne zu.",
 ]
@@ -77,6 +125,12 @@ mnemonics = [
 [[glyphs]]
 char = "ぜ"
 answers = ["ze"]
+pronunciation = """
+Se lit « ze », en un seul temps.
+  Équivalent français : le Z de « Zèbre » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Le se avec les deux petits traits : la sourde devient sonore, se donne ze.",
 ]
@@ -84,6 +138,12 @@ mnemonics = [
 [[glyphs]]
 char = "ぞ"
 answers = ["zo"]
+pronunciation = """
+Se lit « zo », en un seul temps.
+  Équivalent français : le Z de « Zèbre » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Le so avec les deux petits traits : la sourde devient sonore, so donne zo.",
 ]

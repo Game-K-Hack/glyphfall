@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "か"
 answers = ["ka"]
+pronunciation = """
+Se lit « ka », en un seul temps.
+  Équivalent français : le C de « Carte » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant ajouter.",
     "Une croix penchee suivie d'une virgule.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "き"
 answers = ["ki"]
+pronunciation = """
+Se lit « ki », en un seul temps.
+  Équivalent français : le C de « Carte » puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Cursive du kanji signifiant plusieurs.",
     "Une cle avec deux barres.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "く"
 answers = ["ku"]
+pronunciation = """
+Se lit « ku », en un seul temps.
+  Équivalent français : le C de « Carte » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Cursive du kanji signifiant longtemps.",
     "Un bec ouvert vers la droite.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "け"
 answers = ["ke"]
+pronunciation = """
+Se lit « ke », en un seul temps.
+  Équivalent français : le C de « Carte » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant calcul.",
     "Un k dont la barre verticale est detachee.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "こ"
 answers = ["ko"]
+pronunciation = """
+Se lit « ko », en un seul temps.
+  Équivalent français : le C de « Carte » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant soi.",
     "Deux traits couches, comme deux cordes.",

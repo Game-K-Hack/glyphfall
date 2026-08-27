@@ -21,6 +21,13 @@ three = 0.90
 [[glyphs]]
 char = "그"
 answers = ["geu", "keu"]
+pronunciation = """
+Début de mot : « keu » doux.
+Ailleurs : « geu ».
+  Équivalent français : un K puis le E de « je », lèvres surtout pas arrondies.
+
+Dans « geu », ce ou cette.
+"""
 mnemonics = [
     "Giyeok plus eu : la barre plate de la terre se glisse sous la consonne.",
     "Le eu coreen est un son avale, bouche etiree, sans equivalent francais exact.",
@@ -29,6 +36,13 @@ mnemonics = [
 [[glyphs]]
 char = "기"
 answers = ["gi", "ki"]
+pronunciation = """
+Début de mot : « ki » doux.
+Ailleurs : « gi ».
+  Équivalent français : le KI de « Kilo », puis le GUI de « Guide ».
+
+Dans « gicha », le train.
+"""
 mnemonics = [
     "Giyeok plus i : la barre droite de l'humain se place a cote, car elle est verticale.",
 ]
@@ -36,6 +50,12 @@ mnemonics = [
 [[glyphs]]
 char = "니"
 answers = ["ni"]
+pronunciation = """
+Se lit « ni », toujours de la même façon.
+  Équivalent français : le NI de « Nid ».
+
+Dans « omoni », la mère.
+"""
 mnemonics = [
     "Nieun plus i. Deux traits verticaux qui se suivent, faciles a confondre de loin.",
 ]
@@ -43,6 +63,13 @@ mnemonics = [
 [[glyphs]]
 char = "디"
 answers = ["di", "ti"]
+pronunciation = """
+Début de mot : « ti » doux.
+Ailleurs : « di ».
+  Équivalent français : le TI de « Tigre », puis le DI de « Dire ».
+
+Dans « dijain », le design, un mot emprunté.
+"""
 mnemonics = [
     "Digeut plus i. Se lit ti en debut de mot, di a l'interieur.",
 ]
@@ -50,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "리"
 answers = ["ri", "li"]
+pronunciation = """
+Se lit « ri », toujours de la même façon.
+  Équivalent français : un R battu suivi du I de « Lit ».
+
+Dans « uri », nous.
+"""
 mnemonics = [
     "Rieul plus i : le zigzag suivi de la barre droite.",
 ]
@@ -57,6 +90,12 @@ mnemonics = [
 [[glyphs]]
 char = "미"
 answers = ["mi"]
+pronunciation = """
+Se lit « mi », toujours de la même façon.
+  Équivalent français : le MI de « Mie ».
+
+Dans « mianhaeyo », pardon.
+"""
 mnemonics = [
     "Mieum plus i : le carre suivi de la barre droite. Comme dans mium, la haine.",
 ]

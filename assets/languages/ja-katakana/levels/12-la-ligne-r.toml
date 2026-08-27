@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "ラ"
 answers = ["ra"]
+pronunciation = """
+Se lit « ra », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant bon.",
     "Un trait sur un crochet.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "リ"
 answers = ["ri"]
+pronunciation = """
+Se lit « ri », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Morceau du meme kanji que le ri hiragana.",
     "Deux traits verticaux, comme le ri hiragana redresse.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ル"
 answers = ["ru"]
+pronunciation = """
+Se lit « ru », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Morceau du kanji signifiant rester.",
     "Deux jambes qui s'ecartent.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "レ"
 answers = ["re"]
+pronunciation = """
+Se lit « re », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant rite.",
     "Un seul angle qui remonte.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "ロ"
 answers = ["ro"]
+pronunciation = """
+Se lit « ro », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant lui.",
     "Un carre ferme. Le ko, lui, est ouvert a droite.",

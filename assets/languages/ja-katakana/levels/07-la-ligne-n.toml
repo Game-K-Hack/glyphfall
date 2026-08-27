@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "ナ"
 answers = ["na"]
+pronunciation = """
+Se lit « na », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant quoi.",
     "Une croix penchee, comme le debut du na hiragana.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "ニ"
 answers = ["ni"]
+pronunciation = """
+Se lit « ni », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Le kanji signifiant deux, pris tel quel.",
     "Deux traits : ni comme deux.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ヌ"
 answers = ["nu"]
+pronunciation = """
+Se lit « nu », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Morceau du kanji signifiant serviteur.",
     "Comme le su, mais la jambe part de la barre.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "ネ"
 answers = ["ne"]
+pronunciation = """
+Se lit « ne », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant genou.",
     "Une croix surmontee d'un trait, avec une jambe.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "ノ"
 answers = ["no"]
+pronunciation = """
+Se lit « no », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant sur.",
     "Un seul trait penche : le plus simple de tous.",

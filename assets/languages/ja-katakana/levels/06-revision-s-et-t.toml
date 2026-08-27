@@ -21,6 +21,12 @@ three = 0.88
 [[glyphs]]
 char = "サ"
 answers = ["sa"]
+pronunciation = """
+Se lit « sa », en un seul temps.
+  Équivalent français : le S de « Sable » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant disperser.",
     "Deux traits verticaux barres.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "シ"
 answers = ["shi", "si"]
+pronunciation = """
+Se lit « chi », en un seul temps.
+  Équivalent français : le CHI de « Chic ».
+
+Jamais « si » : devant le i, toute la ligne S glisse vers le son [ch].
+"""
 mnemonics = [
     "Morceau du meme kanji que le shi hiragana.",
     "Deux points et un trait qui MONTE. Le tsu, lui, descend.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ス"
 answers = ["su"]
+pronunciation = """
+Se lit « su », en un seul temps.
+  Équivalent français : le S de « Sable » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Morceau du kanji signifiant grand.",
     "Un chevron d'ou pend une jambe.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "セ"
 answers = ["se"]
+pronunciation = """
+Se lit « se », en un seul temps.
+  Équivalent français : le S de « Sable » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Morceau du meme kanji que le se hiragana.",
     "Le se hiragana en plus anguleux.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "ソ"
 answers = ["so"]
+pronunciation = """
+Se lit « so », en un seul temps.
+  Équivalent français : le S de « Sable » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant ceci.",
     "Un point et un trait qui DESCEND. Le n, lui, monte.",
@@ -61,6 +91,12 @@ mnemonics = [
 [[glyphs]]
 char = "タ"
 answers = ["ta"]
+pronunciation = """
+Se lit « ta », en un seul temps.
+  Équivalent français : le T de « Table » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant beaucoup.",
     "Un ku barre d'un trait.",
@@ -69,6 +105,12 @@ mnemonics = [
 [[glyphs]]
 char = "チ"
 answers = ["chi", "ti"]
+pronunciation = """
+Se lit « tchi », en un seul temps.
+  Équivalent français : le TCHI de « Tchèque ».
+
+Jamais « ti » : devant le i, la ligne T glisse vers le son [tch].
+"""
 mnemonics = [
     "Morceau du kanji signifiant mille.",
     "Un 7 barre. Se prononce tchi.",
@@ -77,6 +119,13 @@ mnemonics = [
 [[glyphs]]
 char = "ツ"
 answers = ["tsu", "tu"]
+pronunciation = """
+Se lit « tsou » : le T et le S collés, en un seul temps.
+  Équivalent français : le TS de « Tsar », suivi du OU de « Fou » aux lèvres
+  au repos.
+
+Jamais « tou » : le S fait partie du son, il ne s'ajoute pas.
+"""
 mnemonics = [
     "Morceau du meme kanji que le tsu hiragana.",
     "Trois traits qui MONTENT. Le shi a deux points, le tsu en a trois.",
@@ -85,6 +134,12 @@ mnemonics = [
 [[glyphs]]
 char = "テ"
 answers = ["te"]
+pronunciation = """
+Se lit « te », en un seul temps.
+  Équivalent français : le T de « Table » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant ciel.",
     "Deux barres et une jambe.",
@@ -93,6 +148,12 @@ mnemonics = [
 [[glyphs]]
 char = "ト"
 answers = ["to"]
+pronunciation = """
+Se lit « to », en un seul temps.
+  Équivalent français : le T de « Table » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant s'arreter.",
     "Un trait vertical avec un ergot.",

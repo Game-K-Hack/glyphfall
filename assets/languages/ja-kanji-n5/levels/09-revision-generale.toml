@@ -21,6 +21,15 @@ three = 0.90
 [[glyphs]]
 char = "人"
 answers = ["personne", "homme", "humain"]
+pronunciation = """
+Lecture ON, venue du chinois : JIN, NIN.
+  Dans « nihonjin », un Japonais.
+
+Lecture KUN, japonaise : hito.
+  Dans « hito », une personne.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Deux jambes qui marchent, vues de face.",
 ]
@@ -28,6 +37,15 @@ mnemonics = [
 [[glyphs]]
 char = "山"
 answers = ["montagne"]
+pronunciation = """
+Lecture ON, venue du chinois : SAN.
+  Dans « fujisan », le mont Fuji.
+
+Lecture KUN, japonaise : yama.
+  Dans « yama », la montagne.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Trois pics, celui du milieu plus haut.",
 ]
@@ -35,6 +53,15 @@ mnemonics = [
 [[glyphs]]
 char = "川"
 answers = ["riviere", "fleuve"]
+pronunciation = """
+Lecture ON, venue du chinois : SEN.
+  Dans « kasen », les cours d'eau.
+
+Lecture KUN, japonaise : kawa.
+  Dans « kawa », la rivière.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Trois filets d'eau qui coulent en parallele.",
 ]
@@ -42,6 +69,15 @@ mnemonics = [
 [[glyphs]]
 char = "日"
 answers = ["soleil", "jour"]
+pronunciation = """
+Lecture ON, venue du chinois : NICHI, JITSU.
+  Dans « nichiyobi », dimanche.
+
+Lecture KUN, japonaise : hi, ka.
+  Dans « hi », le soleil, le jour.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un soleil carre avec un trait au milieu.",
     "Ouvre la semaine : dimanche est le jour du soleil.",
@@ -50,6 +86,15 @@ mnemonics = [
 [[glyphs]]
 char = "月"
 answers = ["lune", "mois"]
+pronunciation = """
+Lecture ON, venue du chinois : GETSU, GATSU.
+  Dans « getsuyobi », lundi.
+
+Lecture KUN, japonaise : tsuki.
+  Dans « tsuki », la lune, le mois.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un croissant de lune redresse.",
     "Lundi est le jour de la lune. Sert aussi a compter les mois.",
@@ -58,6 +103,15 @@ mnemonics = [
 [[glyphs]]
 char = "土"
 answers = ["terre", "sol"]
+pronunciation = """
+Lecture ON, venue du chinois : DO, TO.
+  Dans « doyobi », samedi.
+
+Lecture KUN, japonaise : tsuchi.
+  Dans « tsuchi », la terre du sol.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Une pousse qui sort du sol.",
     "Samedi est le jour de la terre.",

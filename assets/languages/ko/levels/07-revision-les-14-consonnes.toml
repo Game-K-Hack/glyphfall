@@ -21,6 +21,17 @@ three = 0.88
 [[glyphs]]
 char = "ㄱ"
 answers = ["g", "k"]
+name = "giyeok"
+pronunciation = """
+Début de mot : entre [g] et [k], perçu comme un [k] doux.
+  Équivalent français : le C de « Carte », sans le souffle qui suit.
+
+Entre deux voyelles : franchement [g].
+  Équivalent français : le G de « Gare ».
+
+En fin de syllabe : la gorge se ferme sans rien laisser sortir.
+  Équivalent français : le C de « sac » coupé net.
+"""
 mnemonics = [
     "Le dessin de la langue qui se souleve au fond de la gorge pour bloquer l'air.",
     "Un coin, ou un G majuscule qui aurait perdu sa boucle. Son nom : giyeok.",
@@ -29,6 +40,14 @@ mnemonics = [
 [[glyphs]]
 char = "ㄴ"
 answers = ["n"]
+name = "nieun"
+pronunciation = """
+Partout le même son : [n], la langue collée derrière les dents du haut.
+  Équivalent français : le N de « Nature ».
+
+En fin de syllabe, il s'entend encore, là où le français l'avale dans la voyelle.
+  Équivalent français : le N de « Anne », pas celui de « an ».
+"""
 mnemonics = [
     "Le bout de la langue collee derriere les dents du haut, vue de profil.",
     "Un L a l'envers, ou le bas d'un N. Son nom : nieun.",
@@ -37,6 +56,17 @@ mnemonics = [
 [[glyphs]]
 char = "ㄷ"
 answers = ["d", "t"]
+name = "digeut"
+pronunciation = """
+Début de mot : entre [d] et [t], plutôt un [t] doux.
+  Équivalent français : le T de « Table », sans le souffle qui suit.
+
+Entre deux voyelles : franchement [d].
+  Équivalent français : le D de « Date ».
+
+En fin de syllabe : la langue se pose et rien ne sort.
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "Le nieun que l'on referme par le haut : meme langue, contact plus ferme.",
     "Forme d'un d sans sa barre, ou d'une porte vue de cote (door). Son nom : digeut.",
@@ -45,6 +75,16 @@ mnemonics = [
 [[glyphs]]
 char = "ㄹ"
 answers = ["r", "l"]
+name = "rieul"
+pronunciation = """
+Début de mot et entre deux voyelles : un [r] battu, la langue effleure le
+palais une seule fois. Elle ne roule pas et ne racle pas.
+  Équivalent français : aucun. Le R de « Paris » est bien trop en arrière ;
+  visez le R espagnol de « pero ».
+
+En fin de syllabe : un [l] net.
+  Équivalent français : le L de « bal ».
+"""
 mnemonics = [
     "Le zigzag de la langue qui roule puis retombe.",
     "Forme d'une route qui zigzague (route). Son nom : rieul.",
@@ -53,6 +93,14 @@ mnemonics = [
 [[glyphs]]
 char = "ㅁ"
 answers = ["m"]
+name = "mieum"
+pronunciation = """
+Partout le même son : [m], les deux lèvres fermées puis relâchées.
+  Équivalent français : le M de « Mer ».
+
+En fin de syllabe, la bouche reste fermée sur le son au lieu de le nasaliser.
+  Équivalent français : le M de « pomme », pas celui de « pompe ».
+"""
 mnemonics = [
     "Le dessin de la bouche fermee, vue de face : un carre.",
     "Le M de mouth, ou de mieum, son nom.",
@@ -61,6 +109,17 @@ mnemonics = [
 [[glyphs]]
 char = "ㅂ"
 answers = ["b", "p"]
+name = "bieup"
+pronunciation = """
+Début de mot : entre [b] et [p], perçu comme un [p] doux.
+  Équivalent français : le P de « Panne », sans le souffle qui suit.
+
+Entre deux voyelles : franchement [b].
+  Équivalent français : le B de « Bal ».
+
+En fin de syllabe : les lèvres se ferment et rien ne sort.
+  Équivalent français : le P de « cap » coupé net.
+"""
 mnemonics = [
     "Le carre de la bouche qui s'entrouvre : deux traits s'echappent vers le haut.",
     "Forme d'un bol a deux anses (bol). Son nom : bieup.",
@@ -69,6 +128,17 @@ mnemonics = [
 [[glyphs]]
 char = "ㅅ"
 answers = ["s"]
+name = "siot"
+pronunciation = """
+Partout : [s], plus léger qu'en français, presque soufflé.
+  Équivalent français : le S de « Sable ».
+
+Devant le son [i] : il glisse vers [ch].
+  Équivalent français : le CH de « Chic ».
+
+En fin de syllabe : il devient un [t] retenu, jamais un [s].
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "Le dessin d'une dent pointue : le souffle passe entre les dents.",
     "Forme d'un sommet de montagne (sommet). Son nom : siot.",
@@ -77,6 +147,16 @@ mnemonics = [
 [[glyphs]]
 char = "ㅇ"
 answers = ["ng"]
+name = "ieung"
+pronunciation = """
+Début de syllabe : rien du tout. La lettre est là parce qu'une syllabe s'écrit
+toujours avec une consonne devant, mais elle ne se prononce pas.
+  Équivalent français : aucun son, seulement la voyelle qui suit.
+
+En fin de syllabe : [ng], le son se prolonge dans le nez sans que la langue
+touche quoi que ce soit.
+  Équivalent français : le NG de « parking ».
+"""
 mnemonics = [
     "Le dessin de la gorge ouverte, un cercle.",
     "Forme d'un zero : au debut, il ne vaut rien. Son nom : ieung.",
@@ -85,6 +165,17 @@ mnemonics = [
 [[glyphs]]
 char = "ㅈ"
 answers = ["j"]
+name = "jieut"
+pronunciation = """
+Début de mot : entre [dj] et [tch], perçu comme un [tch] doux.
+  Équivalent français : le TCH de « Tchèque », sans le souffle.
+
+Entre deux voyelles : franchement [dj].
+  Équivalent français : le DJ de « Djibouti ».
+
+En fin de syllabe : un [t] retenu.
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "La dent du siot coiffee d'un chapeau : meme endroit, l'air est bloque avant.",
     "Forme de jambes croisees sous une table (jambes). Son nom : jieut.",
@@ -93,6 +184,15 @@ mnemonics = [
 [[glyphs]]
 char = "ㅊ"
 answers = ["ch"]
+name = "chieut"
+pronunciation = """
+Partout : [tch] soufflé. C'est le jieut avec de l'air en plus, et ce souffle
+est ce qui distingue les deux à l'oreille.
+  Équivalent français : le TCH de « Tchèque », en expirant franchement.
+
+En fin de syllabe : un [t] retenu, comme toutes les sifflantes.
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "Le jieut avec un trait de plus : en hangeul, un trait ajoute veut dire souffle ajoute.",
     "Le jieut coiffe d'un chapeau (chapeau). Son nom : chieut.",
@@ -101,6 +201,14 @@ mnemonics = [
 [[glyphs]]
 char = "ㅋ"
 answers = ["k"]
+name = "kieuk"
+pronunciation = """
+Partout : [k] soufflé. C'est le giyeok avec de l'air en plus.
+  Équivalent français : le K de « Kilo », en expirant franchement.
+
+En fin de syllabe : la gorge se ferme, comme pour le giyeok.
+  Équivalent français : le C de « sac » coupé net.
+"""
 mnemonics = [
     "Le giyeok avec un trait de plus : meme geste, souffle en plus.",
     "Forme d'une cle dentee (key). Son nom : kieuk.",
@@ -109,6 +217,14 @@ mnemonics = [
 [[glyphs]]
 char = "ㅌ"
 answers = ["t"]
+name = "tieut"
+pronunciation = """
+Partout : [t] soufflé. C'est le digeut avec de l'air en plus.
+  Équivalent français : le T de « Table », en expirant franchement.
+
+En fin de syllabe : un [t] retenu, sans souffle cette fois.
+  Équivalent français : le T de « net » coupé net.
+"""
 mnemonics = [
     "Le digeut avec un trait de plus a l'interieur.",
     "Forme d'un E, ou d'un trident sans le manche (trident). Son nom : tieut.",
@@ -117,6 +233,14 @@ mnemonics = [
 [[glyphs]]
 char = "ㅍ"
 answers = ["p"]
+name = "pieup"
+pronunciation = """
+Partout : [p] soufflé. C'est le bieup avec de l'air en plus.
+  Équivalent français : le P de « Panne », en expirant franchement.
+
+En fin de syllabe : les lèvres se ferment et rien ne sort.
+  Équivalent français : le P de « cap » coupé net.
+"""
 mnemonics = [
     "Le bieup couche a plat, ouvert en haut et en bas.",
     "Forme d'un pont sur deux piles (pont), ou d'un pi grec a qui l'on aurait ajoute une barre. Son nom : pieup.",
@@ -125,6 +249,15 @@ mnemonics = [
 [[glyphs]]
 char = "ㅎ"
 answers = ["h"]
+name = "hieut"
+pronunciation = """
+Début de mot : un [h] expiré, jamais muet.
+  Équivalent français : aucun. Pensez au H anglais de « hat », ou au souffle
+  qu'on met sur une vitre pour la buer.
+
+Entre deux voyelles : très affaibli, parfois presque effacé.
+  Équivalent français : un simple souffle entre les deux voyelles.
+"""
 mnemonics = [
     "Un chapeau pose sur la gorge ouverte : le souffle sort par le haut.",
     "Forme d'un homme a chapeau (hat). Son nom : hieut.",

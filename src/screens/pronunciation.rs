@@ -114,16 +114,36 @@ fn draw_sign(app: &App, language: &Language, glyph: &Glyph) {
 
     // Debout la lecture se met à côté du pavé, couché dessous : c'est de ce
     // côté-là qu'il reste de la place une fois le texte installé.
-    let (x, y) = if canvas::PORTRAIT {
-        (CARD.x + CARD.w + 12.0, CARD.y + 4.0)
+    let (x, y, largeur) = if canvas::PORTRAIT {
+        let x = CARD.x + CARD.w + 12.0;
+        (x, CARD.y + 4.0, canvas::WIDTH - x - 10.0)
     } else {
-        (CARD.x, CARD.y + CARD.h + 6.0)
+        (CARD.x, CARD.y + CARD.h + 6.0, TEXT.x - CARD.x - 10.0)
     };
 
-    ui::text(&app.fonts, glyph.primary_answer(), x, y, fonts::TITLE, role::ACCENT);
+    // Une lecture de kanji est un mot français entier — « montagne », « personne »
+    // — là où un kana en a deux lettres. La taille du titre convient aux
+    // secondes et déborderait sur le texte pour les premières : on la garde
+    // tant qu'elle tient, et on redescend sinon.
+    let lecture = glyph.primary_answer();
+    let taille = if ui::text_width(&app.fonts, lecture, fonts::TITLE) <= largeur {
+        fonts::TITLE
+    } else {
+        fonts::TEXT
+    };
+    ui::text_truncated(&app.fonts, lecture, x, y, taille, role::ACCENT, largeur);
 
     if !glyph.name.is_empty() {
-        ui::text(&app.fonts, &glyph.name, x, y + 22.0, fonts::TEXT, role::TEXT_MUTED);
+        let dessous = y + taille as f32 + 6.0;
+        ui::text_truncated(
+            &app.fonts,
+            &glyph.name,
+            x,
+            dessous,
+            fonts::TEXT,
+            role::TEXT_MUTED,
+            largeur,
+        );
     }
 }
 

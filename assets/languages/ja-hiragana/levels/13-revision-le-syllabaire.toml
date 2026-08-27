@@ -21,6 +21,12 @@ three = 0.90
 [[glyphs]]
 char = "お"
 answers = ["o"]
+pronunciation = """
+Se lit « o », en un seul temps.
+  Équivalent français : le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant lettre.",
     "Le a avec un trait de plus en haut a droite. A ne pas confondre avec lui.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "し"
 answers = ["shi", "si"]
+pronunciation = """
+Se lit « chi », en un seul temps.
+  Équivalent français : le CHI de « Chic ».
+
+Jamais « si » : devant le i, toute la ligne S glisse vers le son [ch].
+"""
 mnemonics = [
     "Cursive du kanji signifiant lui.",
     "Un hamecon. Se prononce chi, jamais si.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ち"
 answers = ["chi", "ti"]
+pronunciation = """
+Se lit « tchi », en un seul temps.
+  Équivalent français : le TCHI de « Tchèque ».
+
+Jamais « ti » : devant le i, la ligne T glisse vers le son [tch].
+"""
 mnemonics = [
     "Cursive du kanji signifiant savoir.",
     "Le ta retourne. Se prononce tchi.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "ぬ"
 answers = ["nu"]
+pronunciation = """
+Se lit « nu », en un seul temps.
+  Équivalent français : le N de « Nappe » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Cursive du kanji signifiant serviteur.",
     "Comme le me, mais avec une boucle au bout. Nouer une boucle : nu.",
@@ -53,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "め"
 answers = ["me"]
+pronunciation = """
+Se lit « me », en un seul temps.
+  Équivalent français : le M de « Mer » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant femme.",
     "Comme le nu, mais sans la boucle finale.",
@@ -61,6 +91,12 @@ mnemonics = [
 [[glyphs]]
 char = "ほ"
 answers = ["ho"]
+pronunciation = """
+Se lit « ho », en un seul temps.
+  Équivalent français : un H expiré, jamais muet puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Cursive du kanji signifiant garantir.",
     "Le ha avec une barre de plus en haut.",
@@ -69,6 +105,12 @@ mnemonics = [
 [[glyphs]]
 char = "る"
 answers = ["ru"]
+pronunciation = """
+Se lit « ru », en un seul temps.
+  Équivalent français : un R battu, la langue effleure le palais une seule fois puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Cursive du kanji signifiant rester.",
     "Comme le ro, mais termine par une boucle fermee.",
@@ -77,6 +119,13 @@ mnemonics = [
 [[glyphs]]
 char = "ん"
 answers = ["n"]
+pronunciation = """
+Se lit « n ». Seul kana à tenir une syllabe sans voyelle.
+  Équivalent français : le N de « Anne », mais compté comme un temps entier.
+
+Il prend la couleur de ce qui suit : [m] devant un p ou un b, [ng] devant un
+k ou un g.
+"""
 mnemonics = [
     "Cursive du kanji signifiant infini.",
     "La seule consonne qui tient seule, sans voyelle.",
@@ -85,6 +134,13 @@ mnemonics = [
 [[glyphs]]
 char = "を"
 answers = ["wo", "o"]
+pronunciation = """
+Se lit « o », comme le kana de la voyelle seule.
+  Équivalent français : le O de « Eau ».
+
+Ne sert qu'à marquer le complément d'objet : on ne le rencontre jamais à
+l'intérieur d'un mot.
+"""
 mnemonics = [
     "Cursive du kanji signifiant lointain.",
     "Ne sert que de particule : il marque le complement d'objet. Se prononce o.",

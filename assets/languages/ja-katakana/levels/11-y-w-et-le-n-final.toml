@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "ヤ"
 answers = ["ya"]
+pronunciation = """
+Se lit « ya », en un seul temps.
+  Équivalent français : le Y de « Yack » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant aussi.",
     "Le ya hiragana en plus anguleux.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "ユ"
 answers = ["yu"]
+pronunciation = """
+Se lit « yu », en un seul temps.
+  Équivalent français : le Y de « Yack » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Morceau du kanji signifiant provenir.",
     "Un crochet couche, comme un U tourne d'un quart de tour.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ヨ"
 answers = ["yo"]
+pronunciation = """
+Se lit « yo », en un seul temps.
+  Équivalent français : le Y de « Yack » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant avec.",
     "Un E a l'envers, trois barres.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "ワ"
 answers = ["wa"]
+pronunciation = """
+Se lit « wa », en un seul temps.
+  Équivalent français : le OU de « Oui » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Morceau du kanji signifiant harmonie.",
     "Comme le fu mais ferme en haut. A ne pas confondre avec le ku.",
@@ -53,6 +77,13 @@ mnemonics = [
 [[glyphs]]
 char = "ヲ"
 answers = ["wo", "o"]
+pronunciation = """
+Se lit « o », comme le kana de la voyelle seule.
+  Équivalent français : le O de « Eau ».
+
+Ne sert qu'à marquer le complément d'objet : on ne le rencontre jamais à
+l'intérieur d'un mot.
+"""
 mnemonics = [
     "Morceau du kanji signifiant lointain.",
     "Particule d'objet, presque jamais ecrite en katakana.",
@@ -61,6 +92,13 @@ mnemonics = [
 [[glyphs]]
 char = "ン"
 answers = ["n"]
+pronunciation = """
+Se lit « n ». Seul kana à tenir une syllabe sans voyelle.
+  Équivalent français : le N de « Anne », mais compté comme un temps entier.
+
+Il prend la couleur de ce qui suit : [m] devant un p ou un b, [ng] devant un
+k ou un g.
+"""
 mnemonics = [
     "Morceau du kanji signifiant infini.",
     "Un point et un trait qui MONTE. Le so, lui, descend.",

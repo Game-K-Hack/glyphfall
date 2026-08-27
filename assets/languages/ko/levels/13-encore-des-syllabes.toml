@@ -21,6 +21,13 @@ three = 0.85
 [[glyphs]]
 char = "바"
 answers = ["ba", "pa"]
+pronunciation = """
+Début de mot : « pa » doux.
+Ailleurs : « ba ».
+  Équivalent français : le PA de « Panne », puis le BA de « Bal ».
+
+Dans « bada », la mer.
+"""
 mnemonics = [
     "Bieup plus a : la coupe ouverte, puis la voyelle a droite.",
     "Se lit pa en debut de mot, ba a l'interieur.",
@@ -29,6 +36,12 @@ mnemonics = [
 [[glyphs]]
 char = "사"
 answers = ["sa"]
+pronunciation = """
+Se lit « sa », toujours de la même façon.
+  Équivalent français : le SA de « Sable », en plus léger.
+
+Dans « sarang », l'amour.
+"""
 mnemonics = [
     "Siot plus a : la dent pointue, puis la voyelle. On le trouve dans sarang, l'amour.",
 ]
@@ -36,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "아"
 answers = ["a"]
+pronunciation = """
+Se lit « a » : le cercle ne se prononce pas, il ne fait que porter la voyelle.
+  Équivalent français : le A de « Papa », seul.
+
+Dans « agi », le bébé, et dans « aniyo », non.
+"""
 mnemonics = [
     "Ieung plus a. Le cercle est muet ici : il n'est la que pour porter la voyelle.",
     "Une syllabe commence toujours par une consonne a l'ecrit, meme quand on n'en entend aucune.",
@@ -44,6 +63,13 @@ mnemonics = [
 [[glyphs]]
 char = "자"
 answers = ["ja"]
+pronunciation = """
+Début de mot : « tcha » doux.
+Ailleurs : « dja ».
+  Équivalent français : le TCHA de « Tchad », puis le DJA de « Djakarta ».
+
+Dans « jada », dormir.
+"""
 mnemonics = [
     "Jieut plus a. Le son est proche du dj de djinn, en plus leger.",
 ]
@@ -51,6 +77,12 @@ mnemonics = [
 [[glyphs]]
 char = "하"
 answers = ["ha"]
+pronunciation = """
+Se lit « ha », toujours de la même façon.
+  Équivalent français : un H expiré, jamais muet, puis le A de « Papa ».
+
+Dans « hana », le chiffre un.
+"""
 mnemonics = [
     "Hieut plus a : le chapeau sur la gorge, puis la voyelle. Comme dans hana, un.",
 ]

@@ -21,6 +21,12 @@ three = 0.88
 [[glyphs]]
 char = "ㅏ"
 answers = ["a"]
+pronunciation = """
+Un seul son : [a] ouvert, la bouche bien dégagée.
+  Équivalent français : le A de « Papa ».
+
+Il reste bref : le coréen n'allonge pas ses voyelles comme le fait « pâte ».
+"""
 mnemonics = [
     "Le trait vertical est l'humain debout ; le point du soleil s'est pose a sa droite.",
     "Le soleil a l'est : le son sort devant, bouche grande ouverte.",
@@ -29,6 +35,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅑ"
 answers = ["ya"]
+pronunciation = """
+Un seul son : [ya], en un seul temps.
+  Équivalent français : le YA de « Yack ».
+
+Deux traits au lieu d'un : le trait ajouté fait surgir le [y] devant.
+"""
 mnemonics = [
     "Le a avec deux traits au lieu d'un : deux traits veulent toujours dire un Y devant.",
     "Deux soleils a l'est, donc deux traits : le a devient ya.",
@@ -37,6 +49,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅓ"
 answers = ["eo"]
+pronunciation = """
+Un seul son : [o] relâché, la bouche ouverte et les lèvres au repos.
+  Équivalent français : entre le O de « bol » et le EU de « peur ».
+
+À ne pas confondre avec le o : celui-ci ne s'arrondit jamais.
+"""
 mnemonics = [
     "Le miroir du a : le soleil est passe a gauche, le son recule dans la bouche.",
     "Entre le o et le e francais, comme le eu de peur.",
@@ -45,6 +63,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅕ"
 answers = ["yeo"]
+pronunciation = """
+Un seul son : [y] suivi du eo relâché.
+  Équivalent français : commencez « Yeux » et finissez sur le O de « bol ».
+
+Deux traits au lieu d'un : le trait ajouté fait surgir le [y] devant.
+"""
 mnemonics = [
     "Le eo avec deux traits : un Y vient devant.",
 ]
@@ -52,6 +76,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅗ"
 answers = ["o"]
+pronunciation = """
+Un seul son : [o] fermé, les lèvres bien arrondies et poussées en avant.
+  Équivalent français : le O de « eau ».
+
+C'est l'arrondi qui le sépare du eo. Exagérez-le au début.
+"""
 mnemonics = [
     "La barre est la terre, le trait au-dessus est le soleil qui se leve.",
     "Le soleil au-dessus de l'horizon : les levres s'arrondissent.",
@@ -60,6 +90,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅛ"
 answers = ["yo"]
+pronunciation = """
+Un seul son : [yo], les lèvres arrondies sur le o.
+  Équivalent français : le YO de « Yoga ».
+
+Deux traits au lieu d'un : le trait ajouté fait surgir le [y] devant.
+"""
 mnemonics = [
     "Le o avec deux traits : un Y vient devant.",
 ]
@@ -67,6 +103,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅜ"
 answers = ["u"]
+pronunciation = """
+Un seul son : [ou], les lèvres arrondies et serrées.
+  Équivalent français : le OU de « Fou ».
+
+Jamais le U de « lune » : ce son français n'existe pas en coréen.
+"""
 mnemonics = [
     "Le miroir du o : le soleil est passe sous la terre.",
     "Se prononce ou et jamais u : le u francais n'existe pas en coreen.",
@@ -75,6 +117,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅠ"
 answers = ["yu"]
+pronunciation = """
+Un seul son : [you], les lèvres arrondies et serrées.
+  Équivalent français : le YOU de « Youpi ».
+
+Jamais « yu » à la française : la voyelle reste un ou.
+"""
 mnemonics = [
     "Le u avec deux traits : un Y vient devant. Se lit you.",
 ]
@@ -82,6 +130,13 @@ mnemonics = [
 [[glyphs]]
 char = "ㅡ"
 answers = ["eu"]
+pronunciation = """
+Un seul son : la bouche étirée comme pour sourire, les lèvres surtout pas
+arrondies, et le son s'avale vers l'arrière.
+  Équivalent français : le E de « je », tiré vers l'arrière de la bouche.
+
+Ni ou ni u : c'est l'absence d'arrondi qui le définit.
+"""
 mnemonics = [
     "La terre, toute plate. Le troisieme symbole de base avec le ciel et l'humain.",
     "Un son avale, bouche etiree, comme le e de je.",
@@ -90,6 +145,12 @@ mnemonics = [
 [[glyphs]]
 char = "ㅣ"
 answers = ["i"]
+pronunciation = """
+Un seul son : [i] franc.
+  Équivalent français : le I de « Lit ».
+
+C'est lui qui fait glisser le siot vers le son [ch] quand il le suit.
+"""
 mnemonics = [
     "L'humain debout, tout droit. Le deuxieme symbole de base.",
 ]

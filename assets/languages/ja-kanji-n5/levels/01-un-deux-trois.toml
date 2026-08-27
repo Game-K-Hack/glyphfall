@@ -21,6 +21,15 @@ three = 0.85
 [[glyphs]]
 char = "一"
 answers = ["1", "un", "ichi"]
+pronunciation = """
+Lecture ON, venue du chinois : ICHI.
+  Dans « ichigatsu », janvier.
+
+Lecture KUN, japonaise : hito(tsu).
+  Dans « hitotsu », une chose.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Un trait, un. L'ecriture chinoise commence par le plus simple.",
 ]
@@ -28,6 +37,15 @@ mnemonics = [
 [[glyphs]]
 char = "二"
 answers = ["2", "deux", "ni"]
+pronunciation = """
+Lecture ON, venue du chinois : NI.
+  Dans « nigatsu », février.
+
+Lecture KUN, japonaise : futa(tsu).
+  Dans « futatsu », deux choses.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Deux traits pour deux : le compte continue apres le trait unique.",
 ]
@@ -35,6 +53,15 @@ mnemonics = [
 [[glyphs]]
 char = "三"
 answers = ["3", "trois", "san"]
+pronunciation = """
+Lecture ON, venue du chinois : SAN.
+  Dans « sangatsu », mars.
+
+Lecture KUN, japonaise : mit(tsu).
+  Dans « mittsu », trois choses.
+
+Le ON sert dans les mots composés, le KUN quand le kanji est seul.
+"""
 mnemonics = [
     "Trois traits, trois. Au-dela, on cesse de compter les traits.",
 ]

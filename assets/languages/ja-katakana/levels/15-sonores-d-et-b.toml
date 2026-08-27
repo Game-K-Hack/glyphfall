@@ -21,6 +21,12 @@ three = 0.85
 [[glyphs]]
 char = "ダ"
 answers = ["da"]
+pronunciation = """
+Se lit « da », en un seul temps.
+  Équivalent français : le D de « Dame » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Le ta avec les deux petits traits : la sourde devient sonore, ta donne da.",
 ]
@@ -28,6 +34,12 @@ mnemonics = [
 [[glyphs]]
 char = "ヂ"
 answers = ["ji", "di"]
+pronunciation = """
+Se lit « dji », exactement comme le ji de la ligne Z.
+  Équivalent français : le DJI de « Djibouti ».
+
+Presque disparu : sauf exception, ce son s'écrit avec le ji de la ligne Z.
+"""
 mnemonics = [
     "Le chi avec les deux petits traits. Meme son que le ji precedent, mais tres rare.",
 ]
@@ -35,6 +47,12 @@ mnemonics = [
 [[glyphs]]
 char = "ヅ"
 answers = ["zu", "du"]
+pronunciation = """
+Se lit « dzou », presque comme le zu de la ligne Z.
+  Équivalent français : un DZ suivi du OU aux lèvres au repos.
+
+Presque disparu : sauf exception, ce son s'écrit avec le zu de la ligne Z.
+"""
 mnemonics = [
     "Le tsu avec les deux petits traits. Meme son que le zu precedent, mais rare.",
 ]
@@ -42,6 +60,12 @@ mnemonics = [
 [[glyphs]]
 char = "デ"
 answers = ["de"]
+pronunciation = """
+Se lit « de », en un seul temps.
+  Équivalent français : le D de « Dame » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Le te avec les deux petits traits : la sourde devient sonore, te donne de.",
 ]
@@ -49,6 +73,12 @@ mnemonics = [
 [[glyphs]]
 char = "ド"
 answers = ["do"]
+pronunciation = """
+Se lit « do », en un seul temps.
+  Équivalent français : le D de « Dame » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Le to avec les deux petits traits : la sourde devient sonore, to donne do.",
 ]
@@ -56,6 +86,12 @@ mnemonics = [
 [[glyphs]]
 char = "バ"
 answers = ["ba"]
+pronunciation = """
+Se lit « ba », en un seul temps.
+  Équivalent français : le B de « Bal » puis le A de « Papa ».
+
+Le A japonais est bref et net, jamais allongé comme dans « pâte ».
+"""
 mnemonics = [
     "Le ha avec les deux petits traits : la sourde devient sonore, ha donne ba.",
 ]
@@ -63,6 +99,12 @@ mnemonics = [
 [[glyphs]]
 char = "ビ"
 answers = ["bi"]
+pronunciation = """
+Se lit « bi », en un seul temps.
+  Équivalent français : le B de « Bal » puis le I de « Lit ».
+
+Le I est franc et bref, jamais traîné.
+"""
 mnemonics = [
     "Le hi avec les deux petits traits : la sourde devient sonore, hi donne bi.",
 ]
@@ -70,6 +112,12 @@ mnemonics = [
 [[glyphs]]
 char = "ブ"
 answers = ["bu"]
+pronunciation = """
+Se lit « bu », en un seul temps.
+  Équivalent français : le B de « Bal » puis le OU de « Fou », mais les lèvres à peine arrondies.
+
+Ni le OU de « Fou » ni le U de « Lune » : gardez les lèvres au repos.
+"""
 mnemonics = [
     "Le fu avec les deux petits traits : la sourde devient sonore, fu donne bu.",
 ]
@@ -77,6 +125,12 @@ mnemonics = [
 [[glyphs]]
 char = "ベ"
 answers = ["be"]
+pronunciation = """
+Se lit « be », en un seul temps.
+  Équivalent français : le B de « Bal » puis le È de « Père ».
+
+Le E japonais est toujours ouvert, jamais le E muet de « je ».
+"""
 mnemonics = [
     "Le he avec les deux petits traits : la sourde devient sonore, he donne be.",
 ]
@@ -84,6 +138,12 @@ mnemonics = [
 [[glyphs]]
 char = "ボ"
 answers = ["bo"]
+pronunciation = """
+Se lit « bo », en un seul temps.
+  Équivalent français : le B de « Bal » puis le O de « Eau ».
+
+Le O est fermé et bref : « ko », jamais « kô ».
+"""
 mnemonics = [
     "Le ho avec les deux petits traits : la sourde devient sonore, ho donne bo.",
 ]
