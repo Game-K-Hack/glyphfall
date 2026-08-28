@@ -54,12 +54,22 @@ jobs:
       # portable. Même commande ici et chez soi, comme pour Linux et Android.
       - run: python tools/setup.py --sans-compiler
 
+      # Les fichiers sont rassembles a plat avant d'etre publies.
+      #
+      # Avec plusieurs chemins, `upload-artifact` conserve l'arborescence
+      # depuis leur ancetre commun : l'artefact Windows arrivait sous
+      # `target/release/` et `installer/`, et la publication, qui ne ramasse
+      # que le premier niveau, n'y voyait que des dossiers.
+      - name: Rassembler
+        shell: bash
+        run: |
+          mkdir -p publication
+          cp target/release/glyphfall.exe publication/
+          cp installer/glyphfall-windows-x86_64-setup.exe publication/
       - uses: actions/upload-artifact@v4
         with:
           name: glyphfall-windows-x86_64
-          path: |
-            target/release/glyphfall.exe
-            installer/glyphfall-windows-x86_64-setup.exe
+          path: publication/
 
   linux:
     name: Linux ${{ matrix.arch }}
@@ -89,12 +99,15 @@ jobs:
       - run: cargo install cargo-zigbuild
       - run: python tools/linux.py --arch ${{ matrix.arch }}
       - run: python tools/deb.py --arch ${{ matrix.debian }}
+      - name: Rassembler
+        run: |
+          mkdir -p publication
+          cp target/linux/glyphfall-linux-${{ matrix.arch }}.tar.gz publication/
+          cp target/deb/glyphfall_*_${{ matrix.debian }}.deb publication/
       - uses: actions/upload-artifact@v4
         with:
           name: glyphfall-linux-${{ matrix.arch }}
-          path: |
-            target/linux/glyphfall-linux-${{ matrix.arch }}.tar.gz
-            target/deb/glyphfall_*_${{ matrix.debian }}.deb
+          path: publication/
 
   macos:
     name: macOS ${{ matrix.arch }}
