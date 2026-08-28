@@ -1,0 +1,17 @@
+# Le navigateur fournit à l'exécution ce que l'éditeur de liens ne trouve pas.
+#
+# miniquad appelle des fonctions que `gl.js` définit côté page — `sapp_set_cursor`,
+# `fs_take_buffer`, `sapp_set_fullscreen` et quelques autres. Elles n'existent
+# donc dans aucun objet compilé, et c'est normal : le module WebAssembly les
+# déclare en importations, que le navigateur relie au chargement.
+#
+# Rust l'acceptait tacitement jusqu'à la 1.95. Depuis la 1.98, l'éditeur de
+# liens refuse tout symbole indéfini et la compilation échoue :
+#
+#     rust-lld: error: undefined symbol: sapp_set_cursor_grab
+#
+# Ce réglage rétablit l'ancien comportement pour la seule cible navigateur. Les
+# autres plateformes ne sont pas concernées : elles ont de vraies bibliothèques
+# à lier.
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "link-arg=--allow-undefined"]

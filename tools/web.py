@@ -100,7 +100,15 @@ def main():
 
     if not choix.sans_compiler:
         executer(["rustup", "target", "add", CIBLE], cwd=RACINE)
-        executer(["cargo", "build", "--release", "--target", CIBLE], cwd=RACINE)
+        # `--bin` et non la compilation complete : la caisse produit aussi une
+        # bibliotheque partagee, qui n'existe que pour Android — l'activite
+        # Java y charge `quad_main`. Pour le navigateur elle ne sert a rien, et
+        # les versions recentes de Rust refusent de l'assembler : elle laisse
+        # indefinis les symboles que `gl.js` ne fournit qu'a l'execution
+        # (`sapp_set_cursor`, `fs_take_buffer`...). L'executable, lui, a le
+        # droit de les attendre.
+        executer(["cargo", "build", "--release", "--target", CIBLE, "--bin", "glyphfall"],
+                 cwd=RACINE)
 
     wasm = RACINE / "target" / CIBLE / "release" / "glyphfall.wasm"
     if not wasm.exists():
