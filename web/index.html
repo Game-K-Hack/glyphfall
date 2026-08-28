@@ -6,48 +6,431 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="icone-192.png">
-    <title>Glyphfall</title>
+    <title>Glyphfall — apprendre le hangeul et les kana en jouant</title>
+    <meta name="description"
+        content="Un jeu d'arcade gratuit et libre où l'on apprend à lire le coréen et le japonais. Jouable dans le navigateur, ou à télécharger pour Windows, macOS, Linux et Android.">
+
+    <!-- L'aperçu qu'affichent les réseaux et les messageries. Sans lui, un lien
+         partagé n'est qu'une URL nue. -->
+    <meta property="og:title" content="Glyphfall">
+    <meta property="og:description"
+        content="Un jeu d'arcade où l'on apprend à lire le coréen et le japonais sans le voir.">
+    <meta property="og:image" content="banniere.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
     <style>
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            background: #1a1c2c;
+        /* La palette « Sweetie 16 », celle du jeu et des pages légales. */
+        :root {
+            --fond: #1a1c2c;
+            --panneau: #333c57;
+            --trait: #566c86;
+            --texte: #f4f4f4;
+            --or: #ffcd75;
+            --ciel: #41a6f6;
+            --vert: #38b764;
         }
 
-        canvas {
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0 1rem 4rem;
+            background: var(--fond);
+            color: var(--texte);
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            line-height: 1.7;
+        }
+
+        main {
+            max-width: 46rem;
+            margin: 0 auto;
+        }
+
+        /* Le bandeau est agrandi au plus proche voisin, comme le jeu lui-même :
+           interpolé, chaque pixel du titre deviendrait flou. */
+        .bandeau {
             display: block;
             width: 100%;
-            height: 100%;
-            /* Le jeu s'agrandit d'un facteur entier : sans cela, le navigateur
-               interpolerait par-dessus et flouterait chaque pixel. */
+            height: auto;
+            margin: 2rem 0 0;
             image-rendering: pixelated;
+        }
+
+        .accroche {
+            margin: 1.5rem 0 2.5rem;
+            font-size: 1.15rem;
+            color: var(--texte);
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--ciel);
+            font-size: 1.1rem;
+            letter-spacing: 0.03em;
+            margin-top: 3rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--panneau);
+        }
+
+        a {
+            color: var(--ciel);
+        }
+
+        a:focus-visible {
+            outline: 2px solid var(--or);
+            outline-offset: 3px;
+        }
+
+        /* Jouer est l'action principale : elle est seule, verte, et large. */
+        .jouer {
+            display: block;
+            max-width: 22rem;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            background: var(--vert);
+            border: 1px solid var(--vert);
+            color: var(--fond);
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-align: center;
+            text-decoration: none;
+            transition: filter 0.15s;
+        }
+
+        .jouer:hover,
+        .jouer:focus-visible {
+            filter: brightness(1.15);
+        }
+
+        .sous-jouer {
+            margin: 0.75rem 0 0;
+            color: var(--trait);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .grille {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .carte {
+            padding: 1.1rem 1.25rem;
+            background: var(--panneau);
+            border: 1px solid var(--trait);
+        }
+
+        /* La plateforme reconnue passe devant les autres et se signale par un
+           liseré : le visiteur n'a plus à choisir dans une liste. */
+        .carte.detectee {
+            order: -1;
+            border-color: var(--or);
+        }
+
+        .carte h3 {
+            margin: 0 0 0.2rem;
+            color: var(--or);
+            font-size: 1rem;
+        }
+
+        .carte p {
+            margin: 0 0 0.8rem;
+            color: var(--trait);
+            font-size: 0.85rem;
+        }
+
+        .carte ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .carte li+li {
+            margin-top: 0.4rem;
+        }
+
+        .carte li a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .carte a:hover {
+            text-decoration: underline;
+        }
+
+        /* Les pictogrammes disent la nature du fichier — programme
+           d'installation, exécutable, paquet, archive — là où le titre de la
+           carte dit déjà le système. Ils héritent de la couleur du lien, et
+           s'alignent donc sur lui au survol comme au focus.
+
+           `flex-shrink` : sans lui, un intitulé sur deux lignes écraserait le
+           dessin au lieu de replier le texte. */
+        .picto {
+            flex-shrink: 0;
+            width: 1.05rem;
+            height: 1.05rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Le badge officiel de Google, tel qu'il est distribué : ses règles de
+           marque interdisent de le redessiner ou de le recolorer. Sa marge
+           blanche fait partie de l'image — d'où le retrait négatif, qui la
+           réaligne sur le texte de la carte sans toucher au fichier.
+
+           Le magasin est la voie normale sur Android : il gère les mises à
+           jour, là où un APK posé à la main reste figé à sa version. */
+        .magasin {
+            display: block;
+        }
+
+        .magasin img {
+            display: block;
+            width: 100%;
+            max-width: 8rem;
+            height: auto;
+        }
+
+        .menu {
+            color: var(--trait);
+            font-size: 0.8rem;
+        }
+
+        .chiffres {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .chiffres strong {
+            display: block;
+            color: var(--or);
+            font-size: 1.5rem;
+        }
+
+        .chiffres span {
+            color: var(--trait);
+            font-size: 0.85rem;
+        }
+
+        .liste-sobre {
+            padding-left: 1.2rem;
+        }
+
+        footer {
+            margin-top: 3.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--panneau);
+            color: var(--trait);
+            font-size: 0.9rem;
+        }
+
+        footer nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 
 <body>
-    <canvas id="glcanvas" tabindex="1"></canvas>
+    <!-- Les dessins sont définis une fois et repris par référence : les répéter
+         à chaque lien aurait alourdi la page de huit copies identiques. -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <symbol id="i-installation" viewBox="0 0 24 24">
+                <path d="M12 3v10" />
+                <path d="m8 9 4 4 4-4" />
+                <path d="M4 16v4h16v-4" />
+            </symbol>
+            <symbol id="i-executable" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="16" rx="1.5" />
+                <path d="M3 9h18" />
+                <path d="M6 6.5h.01M8.5 6.5h.01" />
+            </symbol>
+            <symbol id="i-archive" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="4" rx="0.5" />
+                <path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8" />
+                <path d="M10 12h4" />
+            </symbol>
+            <symbol id="i-paquet" viewBox="0 0 24 24">
+                <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z" />
+                <path d="m3 7.5 9 4.5 9-4.5" />
+                <path d="M12 12v9" />
+            </symbol>
+            <symbol id="i-telephone" viewBox="0 0 24 24">
+                <rect x="6.5" y="2" width="11" height="20" rx="2" />
+                <path d="M10.5 18.5h3" />
+            </symbol>
+        </defs>
+    </svg>
 
-    <!-- L'ordre compte : sapp_jsutils avant quad-storage, qui s'appuie dessus.
-         `audio.js` fournit les fonctions que le moteur audio appelle depuis le
-         wasm ; sans lui, le jeu se charge mais reste muet. -->
-    <script src="gl.js"></script>
-    <script src="sapp_jsutils.js"></script>
-    <script src="quad-storage.js"></script>
-    <script src="audio.js"></script>
+    <main>
+        <img class="bandeau" src="banniere.png" width="1024" height="500"
+            alt="Glyphfall — hangeul, kana, kanji. Apprendre en jouant.">
+
+        <p class="accroche">
+            Les signes tombent. Vous tapez leur lecture avant qu'ils touchent le
+            sol. Au bout de quelques parties, vous lisez le hangeul — personne
+            ne vous a demandé de réviser.
+        </p>
+
+        <a class="jouer" href="jouer.html">Jouer dans le navigateur</a>
+        <p class="sous-jouer">Sans installation, sans compte. Il faut un
+            navigateur récent&nbsp;: le jeu s'appuie sur WebGL&nbsp;2.</p>
+
+        <h2>Télécharger</h2>
+        <p class="menu">
+            Toujours la dernière version publiée<span id="version"></span>.
+            Gratuit, sans publicité, et le jeu fonctionne hors ligne.
+        </p>
+
+        <div class="grille">
+            <div class="carte" data-systeme="windows">
+                <h3>Windows</h3>
+                <p>64 bits</p>
+                <ul>
+                    <li><a href="https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall-windows-x86_64-setup.exe"><svg class="picto" aria-hidden="true"><use href="#i-installation"></use></svg>Programme
+                            d'installation</a></li>
+                    <li><a href="https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall.exe"><svg class="picto" aria-hidden="true"><use href="#i-executable"></use></svg>Exécutable
+                            seul</a></li>
+                </ul>
+            </div>
+
+            <div class="carte" data-systeme="macos">
+                <h3>macOS</h3>
+                <p>Archive à décompresser</p>
+                <ul>
+                    <li><a href="https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall-macos-arm64.tar.gz"><svg class="picto" aria-hidden="true"><use href="#i-archive"></use></svg>Puce
+                            Apple (M1 et suivantes)</a></li>
+                    <li><a href="https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall-macos-x86_64.tar.gz"><svg class="picto" aria-hidden="true"><use href="#i-archive"></use></svg>Intel</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="carte" data-systeme="linux">
+                <h3>Linux</h3>
+                <p>Paquet Debian, ou archive</p>
+                <ul>
+                    <li><a id="deb-amd64" href="https://github.com/Game-K-Hack/glyphfall/releases/latest"><svg class="picto" aria-hidden="true"><use href="#i-paquet"></use></svg>Debian
+                            et Ubuntu — amd64</a></li>
+                    <li><a id="deb-arm64" href="https://github.com/Game-K-Hack/glyphfall/releases/latest"><svg class="picto" aria-hidden="true"><use href="#i-paquet"></use></svg>Debian
+                            et Ubuntu — arm64</a></li>
+                    <li><a href="https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall-linux-x86_64.tar.gz"><svg class="picto" aria-hidden="true"><use href="#i-archive"></use></svg>Archive
+                            x86_64</a></li>
+                    <li><a href="https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall-linux-arm64.tar.gz"><svg class="picto" aria-hidden="true"><use href="#i-archive"></use></svg>Archive
+                            arm64</a></li>
+                </ul>
+            </div>
+
+            <div class="carte" data-systeme="android">
+                <h3>Android</h3>
+                <p>Depuis le magasin, ou à la main</p>
+                <a class="magasin" href="https://play.google.com/store/apps/details?id=fr.harlock.glyphfall">
+                    <img src="google-play.png" width="646" height="250" alt="Disponible sur Google Play">
+                </a>
+                <ul>
+                    <li><a href="https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall.apk"><svg class="picto" aria-hidden="true"><use href="#i-telephone"></use></svg>Fichier
+                            APK</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>Ce que contient le jeu</h2>
+
+        <div class="chiffres">
+            <div><strong>4</strong><span>parcours</span></div>
+            <div><strong>58</strong><span>niveaux</span></div>
+            <div><strong>208</strong><span>signes</span></div>
+            <div><strong>4</strong><span>modes</span></div>
+        </div>
+
+        <ul class="liste-sobre">
+            <li>Le <strong>hangeul</strong> coréen, ses quatorze consonnes et ses
+                dix voyelles, puis les syllabes.</li>
+            <li>Les <strong>hiragana</strong> et les <strong>katakana</strong>,
+                soixante-et-onze signes chacun.</li>
+            <li>Vingt premiers <strong>kanji</strong> : les nombres, les jours de
+                la semaine.</li>
+            <li>Chaque signe a sa fiche : le tracé trait par trait, un moyen de
+                le retenir, sa prononciation — et la voix d'un locuteur pour le
+                coréen et les kana.</li>
+            <li>Quatre modes, du <em>normal</em> noté en étoiles à
+                l'<em>infini</em>, où la chute accélère jusqu'à ce que vous
+                cédiez.</li>
+        </ul>
+
+        <h2>Sans rien demander</h2>
+        <ul class="liste-sobre">
+            <li>Pas de publicité, pas d'achat, pas de compte.</li>
+            <li>Aucune permission demandée sur Android.</li>
+            <li>Votre progression reste chez vous et n'en sort pas.</li>
+            <li>Logiciel libre sous licence GPL-3.0 : le code est public, et
+                toute version dérivée doit le rester.</li>
+        </ul>
+
+        <footer>
+            <nav>
+                <a href="cgu.html">Conditions d'utilisation</a>
+                <a href="confidentialite.html">Politique de confidentialité</a>
+                <a href="https://github.com/Game-K-Hack/glyphfall">Code source</a>
+                <a href="https://github.com/Game-K-Hack/glyphfall/releases">Toutes les versions</a>
+            </nav>
+            <p>Glyphfall est un logiciel libre distribué sous licence GPL-3.0.</p>
+        </footer>
+    </main>
+
     <script>
-        // Sans cela, la barre d'espace et les flèches feraient défiler la page
-        // au lieu d'arriver au jeu.
-        window.addEventListener("keydown", (event) => {
-            if ([" ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
-                event.preventDefault();
+        // La plateforme du visiteur, pour mettre sa carte en premier. On se
+        // contente de ce que l'agent déclare : se tromper ne coûte rien, les
+        // quatre cartes restant visibles.
+        (function () {
+            const agent = navigator.userAgent;
+            const systeme =
+                /Android/i.test(agent) ? "android" :
+                    /Windows/i.test(agent) ? "windows" :
+                        /Mac OS X|Macintosh/i.test(agent) ? "macos" :
+                            /Linux|X11/i.test(agent) ? "linux" : null;
+            if (systeme) {
+                const carte = document.querySelector('[data-systeme="' + systeme + '"]');
+                if (carte) carte.classList.add("detectee");
             }
-        });
+        })();
 
-        load("glyphfall.wasm");
+        // Les paquets Debian portent le numéro de version dans leur nom : eux
+        // seuls échappent à l'adresse `latest/download`, qui exige un nom fixe.
+        // On demande donc la dernière version à GitHub pour compléter ces deux
+        // liens. Sans réseau, ou si la requête échoue, ils mènent à la page des
+        // versions — un détour, pas une impasse.
+        fetch("https://api.github.com/repos/Game-K-Hack/glyphfall/releases/latest")
+            .then((reponse) => reponse.ok ? reponse.json() : Promise.reject())
+            .then((version) => {
+                const numero = version.tag_name;
+                document.getElementById("version").textContent = " (" + numero + ")";
+                const base = "https://github.com/Game-K-Hack/glyphfall/releases/download/"
+                    + encodeURIComponent(numero) + "/";
+                for (const arch of ["amd64", "arm64"]) {
+                    const lien = document.getElementById("deb-" + arch);
+                    if (lien) {
+                        lien.href = base + "glyphfall_" + numero + "_" + arch + ".deb";
+                    }
+                }
+            })
+            .catch(() => { });
     </script>
 </body>
 

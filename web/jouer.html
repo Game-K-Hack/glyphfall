@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="icone-192.png">
+    <title>Glyphfall</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background: #1a1c2c;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            /* Le jeu s'agrandit d'un facteur entier : sans cela, le navigateur
+               interpolerait par-dessus et flouterait chaque pixel. */
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="glcanvas" tabindex="1"></canvas>
+
+    <!-- L'ordre compte : sapp_jsutils avant quad-storage, qui s'appuie dessus.
+         `audio.js` fournit les fonctions que le moteur audio appelle depuis le
+         wasm ; sans lui, le jeu se charge mais reste muet. -->
+    <script src="gl.js"></script>
+    <script src="sapp_jsutils.js"></script>
+    <script src="quad-storage.js"></script>
+    <script src="audio.js"></script>
+    <script>
+        // « Quitter » n'a pas de sens dans un onglet : il n'y a pas de fenêtre
+        // à fermer, et le jeu laisserait une toile figée en noir. Le moteur
+        // appelle donc cette fonction, que la page lui fournit ici — même
+        // mécanisme d'extension que `quad-storage`. Elle doit être enregistrée
+        // avant `load()`, qui construit les importations du module.
+        miniquad_add_plugin({
+            register_plugin: (importObject) => {
+                importObject.env.glyphfall_retour_accueil = () => {
+                    window.location.href = "./";
+                };
+            },
+            version: 1,
+            name: "glyphfall_retour",
+        });
+
+        // Sans cela, la barre d'espace et les flèches feraient défiler la page
+        // au lieu d'arriver au jeu.
+        window.addEventListener("keydown", (event) => {
+            if ([" ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+                event.preventDefault();
+            }
+        });
+
+        load("glyphfall.wasm");
+    </script>
+</body>
+
+</html>

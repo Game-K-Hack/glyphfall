@@ -40,6 +40,29 @@ mod storage;
 mod trace;
 mod window;
 
+// Quitter, dans un navigateur : revenir à la page qui a lancé le jeu.
+//
+// La fonction n'existe pas dans le binaire ; c'est `jouer.html` qui la fournit
+// au chargement, par le même mécanisme d'extension que `gl.js` et
+// `quad-storage` — d'où le `--allow-undefined` de `.cargo/config.toml`.
+//
+// Elle n'est déclarée que pour le navigateur : sur un bureau ou sur Android,
+// quitter garde le sens qu'il a toujours eu.
+#[cfg(target_arch = "wasm32")]
+unsafe extern "C" {
+    fn glyphfall_retour_accueil();
+}
+
+// Le numéro que réclame le protocole d'extension de miniquad, en regard du
+// `version` déclaré dans la page. Sans elle, la console annonce que
+// l'extension « n'est pas utilisée par le code Rust » — ce qui est faux, et
+// tromperait le prochain à ouvrir les outils du navigateur.
+#[cfg(target_arch = "wasm32")]
+#[unsafe(no_mangle)]
+pub extern "C" fn glyphfall_retour_crate_version() -> u32 {
+    1
+}
+
 use crate::app::{App, Navigator, Screen, Transition};
 use crate::daily::Daily;
 use crate::audio::Sfx;
@@ -340,6 +363,14 @@ async fn run() {
             // et n'affiche plus qu'un écran noir — il faut la terminer.
             #[cfg(target_os = "android")]
             std::process::exit(0);
+
+            // Dans un navigateur il n'y a pas de fenêtre à fermer : la toile
+            // resterait affichée, figée et noire. On rend donc la main à la
+            // page qui a lancé le jeu.
+            #[cfg(target_arch = "wasm32")]
+            unsafe {
+                glyphfall_retour_accueil()
+            };
 
             #[cfg(not(target_os = "android"))]
             return;
