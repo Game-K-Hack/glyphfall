@@ -72,15 +72,13 @@ def icones():
     L'`.ico` est celui du programme d'installation Windows : six tailles, du
     16 au 256, toutes agrandies au plus proche voisin depuis l'icône du jeu.
     Un seul fichier pour deux usages, plutôt qu'une copie qui dériverait.
+
+    Le PNG de 192, réclamé par Android et iOS pour l'écran d'accueil, est
+    versionné plutôt que fabriqué ici. Il ne changera qu'avec l'icône du jeu,
+    et le produire demandait Pillow — une dépendance que le coureur
+    d'intégration n'a pas, et qui faisait échouer la construction.
     """
-    from PIL import Image
-
     shutil.copy2(RACINE / "installer/glyphfall.ico", SORTIE / "favicon.ico")
-
-    # Android et iOS veulent un PNG carré pour l'écran d'accueil. Trois fois
-    # l'icône de 64, au plus proche voisin : du pixel reste du pixel.
-    source = Image.open(RACINE / "src/assets/icons/icon64.png").convert("RGBA")
-    source.resize((192, 192), Image.NEAREST).save(SORTIE / "icone-192.png")
 
 
 def poids(chemin):
@@ -121,6 +119,8 @@ def main():
     shutil.copy2(wasm, SORTIE / "glyphfall.wasm")
     for page in SOURCE.glob("*.html"):
         shutil.copy2(page, SORTIE / page.name)
+    for image in SOURCE.glob("*.png"):
+        shutil.copy2(image, SORTIE / image.name)
     for source, nom in scripts():
         if not source.exists():
             sys.exit(f"script introuvable : {source}")

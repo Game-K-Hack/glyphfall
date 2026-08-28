@@ -81,6 +81,10 @@ jobs:
         with:
           targets: ${{ matrix.cible }}
       - uses: Swatinem/rust-cache@v2
+      # Les deux seules dépendances Python de toute la chaîne, et elles ne
+      # servent qu'ici : `linux.py` charge `ziglang` et `deb.py` charge
+      # `pillow`, tous deux à l'intérieur d'une fonction. Les retirer ne
+      # casserait rien au chargement, seulement à l'exécution.
       - run: pip install ziglang pillow
       - run: cargo install cargo-zigbuild
       - run: python tools/linux.py --arch ${{ matrix.arch }}
