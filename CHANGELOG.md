@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/Game-K-Hack/glyphfall/compare/0.3.1...0.3.2) (2026-08-28)
+
+
+### Corrections
+
+* la release recoit une archive web, pas sept cents mp3 ([442e311](https://github.com/Game-K-Hack/glyphfall/commit/442e3117f3b063f0029c44b43693c8cace166f74))
+
 ## [0.3.1](https://github.com/Game-K-Hack/glyphfall/compare/0.3.0...0.3.1) (2026-08-28)
 
 
