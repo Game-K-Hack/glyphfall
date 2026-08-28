@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/Game-K-Hack/glyphfall/compare/0.4.0...0.4.1) (2026-08-28)
+
+
+### Corrections
+
+* le paquet Android vise l'API 36, comme Play l'exige au 31 aout ([c4b5984](https://github.com/Game-K-Hack/glyphfall/commit/c4b5984b07a299dd3f95ca2f6816acaa00e776e1))
+* les bibliotheques natives s'alignent sur des pages de 16 Ko ([c6da069](https://github.com/Game-K-Hack/glyphfall/commit/c6da069a5c8ca306c49dafb968efa59417022b37))
+
 ## [0.4.0](https://github.com/Game-K-Hack/glyphfall/compare/0.3.2...0.4.0) (2026-08-28)
 
 

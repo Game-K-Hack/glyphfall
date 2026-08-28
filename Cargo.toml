@@ -1,6 +1,6 @@
 [package]
 name = "glyphfall"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2024"
 # Déclarée ici autant que dans LICENSE : cargo, les miroirs et les outils
 # d'audit de dépendances ne lisent que ce champ.
