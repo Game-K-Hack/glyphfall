@@ -147,6 +147,11 @@ def main():
         if chemin.exists():
             print(f"  {nom:<22} {poids(chemin) / 1048576:6.1f} Mo")
     print(f"  {'total':<22} {poids(SORTIE) / 1048576:6.1f} Mo")
+
+    archive = Path(shutil.make_archive(
+        str(RACINE / "target" / "glyphfall-web"), "zip", root_dir=SORTIE))
+    print(f"\n{archive}  ({poids(archive) / 1048576:.1f} Mo)")
+
     print(f"\n  essai local :  python -m http.server --directory {SORTIE}")
 
 

@@ -154,9 +154,15 @@ jobs:
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
       - run: python tools/web.py
-      - uses: actions/upload-artifact@v4
+      - name: Archive, pour la publication
+        uses: actions/upload-artifact@v4
         with:
           name: glyphfall-web
+          path: target/glyphfall-web.zip
+      - name: Site deplie, pour les Pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-web
           path: target/web/
 
   pages:
@@ -173,7 +179,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: glyphfall-web
+          name: site-web
           path: site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
@@ -192,8 +198,16 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
+          # Le site deplie est exclu : il n'a rien a faire dans une release,
+          # et ses sept cents fichiers y seraient attaches un par un.
+          pattern: glyphfall-*
+          # Tout a plat dans un seul dossier, faute de quoi chaque artefact
+          # arriverait dans son propre sous-dossier et le motif ci-dessous
+          # ramasserait des dossiers autant que des fichiers. Les noms sont
+          # distincts d'une plateforme a l'autre : rien ne s'ecrase.
+          merge-multiple: true
           path: fichiers
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.version }}
-          files: fichiers/**/*
+          files: fichiers/*
