@@ -8,5 +8,5 @@ pub mod loader;
 pub mod model;
 
 pub use catalog::Catalog;
-pub use loader::{font_bytes, load_catalog, voice_bytes};
+pub use loader::{asset_bytes, font_bytes, load_catalog, voice_index};
 pub use model::{GameMode, Glyph, Language, Level, Rules, Speed, Stars};

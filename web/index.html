@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="icone-192.png">
     <title>Glyphfall</title>
     <style>
         html,
@@ -29,10 +31,13 @@
 <body>
     <canvas id="glcanvas" tabindex="1"></canvas>
 
-    <!-- L'ordre compte : sapp_jsutils avant quad-storage, qui s'appuie dessus. -->
+    <!-- L'ordre compte : sapp_jsutils avant quad-storage, qui s'appuie dessus.
+         `audio.js` fournit les fonctions que le moteur audio appelle depuis le
+         wasm ; sans lui, le jeu se charge mais reste muet. -->
     <script src="gl.js"></script>
     <script src="sapp_jsutils.js"></script>
     <script src="quad-storage.js"></script>
+    <script src="audio.js"></script>
     <script>
         // Sans cela, la barre d'espace et les flèches feraient défiler la page
         // au lieu d'arriver au jeu.

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="icone-192.png">
+    <title>Politique de confidentialité — Glyphfall</title>
+    <style>
+        /* La palette « Sweetie 16 », celle du jeu. */
+        :root {
+            --fond: #1a1c2c;
+            --panneau: #333c57;
+            --trait: #566c86;
+            --texte: #f4f4f4;
+            --or: #ffcd75;
+            --ciel: #41a6f6;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem 1rem 4rem;
+            background: var(--fond);
+            color: var(--texte);
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            line-height: 1.7;
+        }
+
+        main {
+            max-width: 42rem;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--or);
+            font-size: 1.6rem;
+            letter-spacing: 0.04em;
+        }
+
+        h2 {
+            color: var(--ciel);
+            font-size: 1.1rem;
+            margin-top: 2.5rem;
+        }
+
+        a {
+            color: var(--ciel);
+        }
+
+        .date {
+            color: var(--trait);
+            font-size: 0.9rem;
+        }
+
+        /* La barre de navigation : le retour au jeu, et l'autre page légale.
+           Les deux pages se citent l'une l'autre — arriver sur les conditions
+           depuis un magasin sans pouvoir atteindre la confidentialité serait
+           une impasse. */
+        .barre {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--panneau);
+        }
+
+        .bouton {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1.1rem;
+            border: 1px solid var(--trait);
+            background: var(--panneau);
+            color: var(--texte);
+            font-weight: 600;
+            text-decoration: none;
+            transition: border-color 0.15s, background 0.15s, color 0.15s;
+        }
+
+        /* La flèche recule d'un cheveu au survol : le mouvement dit le sens
+           avant que le mot ne soit lu. */
+        .bouton .fleche {
+            color: var(--or);
+            transition: transform 0.15s;
+        }
+
+        .bouton:hover,
+        .bouton:focus-visible {
+            border-color: var(--or);
+            background: #3d4766;
+            color: var(--or);
+        }
+
+        .bouton:hover .fleche,
+        .bouton:focus-visible .fleche {
+            transform: translateX(-0.25rem);
+        }
+
+        .voisine {
+            margin-left: auto;
+            color: var(--trait);
+            font-size: 0.95rem;
+        }
+
+        .voisine:hover,
+        .voisine:focus-visible {
+            color: var(--ciel);
+        }
+
+        /* Au clavier, on doit voir ou l'on est. */
+        a:focus-visible {
+            outline: 2px solid var(--or);
+            outline-offset: 3px;
+        }
+
+        ul {
+            padding-left: 1.2rem;
+        }
+
+        code {
+            background: var(--panneau);
+            padding: 0.1rem 0.35rem;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <nav class="barre">
+            <a class="bouton" href="./"><span class="fleche" aria-hidden="true">&#8592;</span> Retour au jeu</a>
+            <a class="voisine" href="cgu.html">Conditions d'utilisation</a>
+        </nav>
+        <h1>Politique de confidentialité</h1>
+        <p class="date">Version 0.2.1 — 28 août 2026</p>
+
+        <p>
+            Glyphfall ne collecte aucune donnée personnelle. Ce n'est pas une
+            promesse de bonne conduite : le jeu n'en a pas les moyens
+            techniques.
+        </p>
+
+        <h2>Ce qui n'existe pas</h2>
+        <ul>
+            <li>Aucun compte, aucune inscription, aucune identification.</li>
+            <li>Aucune publicité, aucun traceur, aucune mesure d'audience.</li>
+            <li>Aucun achat, aucun paiement.</li>
+            <li>
+                Aucune permission sur Android : ni réseau, ni fichiers, ni
+                localisation, ni micro, ni caméra, ni carnet d'adresses. Vous
+                pouvez le vérifier dans les réglages de votre téléphone.
+            </li>
+        </ul>
+
+        <h2>Ce que le jeu enregistre, et où</h2>
+        <p>
+            Votre progression — niveaux réussis, étoiles obtenues, signes
+            acquis, réglages de volume — est conservée sur votre appareil, et
+            nulle part ailleurs :
+        </p>
+        <ul>
+            <li>
+                dans le navigateur, par le stockage local du site, comme le
+                ferait n'importe quelle page&nbsp;;
+            </li>
+            <li>
+                sur ordinateur et sur téléphone, dans le dossier de données de
+                l'application.
+            </li>
+        </ul>
+        <p>
+            Rien n'en sort. Ces données ne sont ni transmises, ni consultées,
+            ni partagées, ni vendues, parce qu'aucun code du jeu ne sait
+            ouvrir une connexion réseau.
+        </p>
+        <p>
+            Pour les effacer&nbsp;: videz les données du site dans votre
+            navigateur, ou désinstallez l'application.
+        </p>
+
+        <h2>Les enfants</h2>
+        <p>
+            Le jeu convient à tous les âges. Comme il ne collecte rien, il ne
+            collecte rien des enfants non plus.
+        </p>
+
+        <h2>Nous écrire</h2>
+        <p>
+            Pour toute question sur cette politique&nbsp;:
+            <a href="https://github.com/Game-K-Hack/glyphfall/issues">le suivi
+            du dépôt</a>.
+        </p>
+
+        <h2>Modifications</h2>
+        <p>
+            Toute modification de cette page sera datée ci-dessus. Le dépôt en
+            garde l'historique complet, publiquement consultable.
+        </p>
+    </main>
+</body>
+
+</html>

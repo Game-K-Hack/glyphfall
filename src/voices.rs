@@ -40,7 +40,7 @@ use std::collections::HashMap;
 use macroquad::audio::{PlaySoundParams, Sound, load_sound_from_bytes, play_sound, stop_sound};
 use serde::Deserialize;
 
-use crate::data::voice_bytes;
+use crate::data::{asset_bytes, voice_index};
 use crate::music::decode_bytes;
 
 /// Le fichier qui dit quel enregistrement prononce quel signe.
@@ -79,7 +79,7 @@ impl Voices {
         let mut index = HashMap::new();
 
         for language in languages {
-            let Some(fichiers) = voice_bytes(&language, "index.toml")
+            let Some(fichiers) = voice_index(&language)
                 .and_then(|octets| std::str::from_utf8(octets).ok())
                 .and_then(|texte| toml::from_str::<Index>(texte).ok())
                 .map(|index| index.fichiers)
@@ -122,7 +122,9 @@ impl Voices {
         let Some(file_name) = self.index.get(&language).and_then(|voix| voix.get(&glyph)) else {
             return;
         };
-        let Some(octets) = voice_bytes(&language, file_name) else { return };
+        // Sur le web, l'enregistrement est téléchargé ici, à la demande.
+        let chemin = format!("assets/voices/{language}/{file_name}");
+        let Some(octets) = asset_bytes(&chemin).await else { return };
 
         let extension = file_name.rsplit('.').next().unwrap_or("");
         let Some(decoded) = decode_bytes(octets, extension) else { return };
@@ -192,9 +194,10 @@ mod tests {
         for (langue, fichiers) in &voices.index {
             assert!(!fichiers.is_empty(), "l'index de « {langue} » est vide");
             for (glyph, file_name) in fichiers {
+                let chemin = std::path::Path::new("assets/voices").join(langue).join(file_name);
                 assert!(
-                    voice_bytes(langue, file_name).is_some(),
-                    "« {glyph} » ({langue}) renvoie à « {file_name} », qui n'est pas embarqué"
+                    chemin.exists(),
+                    "« {glyph} » ({langue}) renvoie à « {file_name} », qui n'existe pas"
                 );
             }
         }

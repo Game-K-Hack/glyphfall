@@ -165,23 +165,28 @@ versions, les niveaux d'API.
 Pour le navigateur :
 
 ```sh
-rustup target add wasm32-unknown-unknown
-cargo build --release --target wasm32-unknown-unknown
-cp target/wasm32-unknown-unknown/release/glyphfall.wasm web/
+python tools/web.py
+python -m http.server --directory target/web 8080
 ```
 
-Puis servez le dossier `web/` par HTTP — ouvrir `index.html` depuis le disque
-ne marche pas, le navigateur refuse de charger un `.wasm` en `file://` :
+Ouvrir `index.html` depuis le disque ne marche pas : le navigateur refuse de
+charger un `.wasm` en `file://`. Il faut passer par HTTP, même en local.
 
-```sh
-python -m http.server --directory web 8080
-```
+**Ce que le binaire embarque, et ce qu'il ne porte plus.** Les polices et les
+leçons voyagent dans le `.wasm` — trois mégaoctets, disponibles dès la première
+image. Les musiques et les voix, soixante-huit de plus, sont recopiées à côté
+de la page et récupérées à la demande : les embarquer ferait attendre, avant le
+premier écran, un contenu qui ne sera peut-être jamais joué. Le `.wasm` tombe
+ainsi de 72 Mo à 5.
 
-Tout le contenu (langues, polices) est embarqué dans le binaire à la
-compilation : il n'y a rien à distribuer à côté de l'exécutable. En
-contrepartie le `.wasm` est lourd, la musique en constituant l'essentiel — les
-polices, elles, sont réduites aux signes du catalogue et pèsent une poignée de
-centaines de kilo-octets chacune. Servez-le avec la compression `gzip` activée.
+C'est la seule différence entre le navigateur et les autres plateformes, où
+tout reste embarqué et où il n'y a rien à distribuer à côté de l'exécutable.
+`data::asset_bytes` cache cet écart derrière une seule fonction, et les chemins
+sont les mêmes des deux côtés — d'où le `assets/` recopié tel quel par
+`tools/web.py`.
+
+Le workflow publie le tout sur GitHub Pages à chaque release, avec la politique
+de confidentialité et les conditions d'utilisation, qui vivent dans `web/`.
 
 ## Ajouter une langue
 

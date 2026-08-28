@@ -16,7 +16,6 @@
 
 use std::io::Cursor;
 
-use include_dir::{Dir, File, include_dir};
 use macroquad::audio::{
     PlaySoundParams, Sound, load_sound_from_bytes, set_sound_volume, stop_sound,
 };
@@ -30,12 +29,22 @@ use symphonia::core::probe::Hint;
 
 use crate::audio::{WAV_HEADER_SIZE, to_pcm16, write_wav_header};
 
-static MENU_MUSIC: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/assets/music/menu");
-static GAME_MUSIC: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/assets/music/game");
+/// Le catalogue des morceaux, embarqué même quand les morceaux ne le sont pas.
+///
+/// Un navigateur ne sait pas parcourir un dossier : sur le web les fichiers
+/// sont récupérés un à un, ce qui suppose de connaître leurs noms d'avance.
+/// Un test vérifie que cette liste correspond au contenu réel des dossiers.
+const PISTES: &str = include_str!("../assets/music/pistes.toml");
 
 /// Les extensions reconnues. Tout le reste du dossier est ignoré, ce qui
 /// permet d'y laisser des notes ou des sources.
 const AUDIO_EXTENSIONS: [&str; 3] = ["mp3", "ogg", "wav"];
+
+#[derive(serde::Deserialize)]
+struct Catalogue {
+    menu: Vec<String>,
+    manche: Vec<String>,
+}
 
 /// Silence entre deux morceaux, en secondes. Un enchaînement immédiat donne
 /// l'impression d'un seul morceau incohérent.
@@ -50,9 +59,10 @@ pub enum Ambience {
 
 /// Une liste de morceaux et son ordre de passage.
 struct Playlist {
-    /// Les fichiers repérés, encore encodés : les décoder tous saturerait la
-    /// mémoire pour rien.
-    tracks: Vec<&'static File<'static>>,
+    /// Les chemins des morceaux, tels que `assets/music/menu/Rehab.ogg`. On ne
+    /// garde pas les octets : les décoder tous saturerait la mémoire, et sur
+    /// le web ils ne sont même pas encore là.
+    tracks: Vec<String>,
     /// L'ordre de passage, remélangé à chaque tour.
     order: Vec<usize>,
     /// Position dans `order`.
@@ -62,21 +72,22 @@ struct Playlist {
 }
 
 impl Playlist {
-    fn new(directory: &'static Dir<'static>) -> Self {
-        let mut tracks: Vec<_> = directory
-            .files()
-            .filter(|file| {
-                file.path()
-                    .extension()
-                    .and_then(|extension| extension.to_str())
-                    .map(|extension| AUDIO_EXTENSIONS.contains(&extension.to_lowercase().as_str()))
+    fn new(dossier: &str, noms: &[String]) -> Self {
+        let mut tracks: Vec<String> = noms
+            .iter()
+            .filter(|nom| {
+                nom.rsplit_once('.')
+                    .map(|(_, extension)| {
+                        AUDIO_EXTENSIONS.contains(&extension.to_lowercase().as_str())
+                    })
                     .unwrap_or(false)
             })
+            .map(|nom| format!("assets/music/{dossier}/{nom}"))
             .collect();
 
-        // `files()` ne garantit pas d'ordre : on trie pour que le mélange parte
-        // toujours de la même liste, et donc soit reproductible à graine égale.
-        tracks.sort_by_key(|file| file.path());
+        // On trie pour que le mélange parte toujours de la même liste, et soit
+        // donc reproductible à graine égale.
+        tracks.sort();
 
         let mut playlist = Self { tracks, order: Vec::new(), next: 0, last: None };
         playlist.reshuffle();
@@ -87,7 +98,7 @@ impl Playlist {
         self.tracks.is_empty()
     }
 
-    fn take_next(&mut self) -> Option<(usize, &'static File<'static>)> {
+    fn take_next(&mut self) -> Option<(usize, String)> {
         if self.tracks.is_empty() {
             return None;
         }
@@ -98,7 +109,7 @@ impl Playlist {
         let index = *self.order.get(self.next)?;
         self.next += 1;
         self.last = Some(index);
-        Some((index, self.tracks[index]))
+        Some((index, self.tracks[index].clone()))
     }
 
     /// Remélange l'ordre de passage.
@@ -152,9 +163,14 @@ struct Playing {
 
 impl Music {
     pub fn load(menus_volume: f32, game_volume: f32) -> Self {
+        // Un catalogue illisible ne doit pas empêcher de jouer : le jeu sait
+        // déjà se passer de musique.
+        let catalogue: Catalogue =
+            toml::from_str(PISTES).unwrap_or(Catalogue { menu: Vec::new(), manche: Vec::new() });
+
         Self {
-            menus: Playlist::new(&MENU_MUSIC),
-            game: Playlist::new(&GAME_MUSIC),
+            menus: Playlist::new("menu", &catalogue.menu),
+            game: Playlist::new("game", &catalogue.manche),
             current: None,
             playing: None,
             silence: 0.0,
@@ -251,9 +267,14 @@ impl Music {
             Ambience::Menus => &mut self.menus,
             Ambience::Game => &mut self.game,
         };
-        let Some((_, file)) = playlist.take_next() else { return };
+        let Some((_, chemin)) = playlist.take_next() else { return };
 
-        let Some(Decoded { wav, seconds }) = decode(file) else {
+        // Sur le web, c'est ici que le morceau est réellement téléchargé. Le
+        // silence entre deux pistes couvre l'attente.
+        let Some(octets) = crate::data::asset_bytes(&chemin).await else { return };
+        let extension = chemin.rsplit('.').next().unwrap_or("");
+
+        let Some(Decoded { wav, seconds }) = decode_bytes(octets, extension) else {
             // Un fichier illisible est sauté plutôt que réessayé en boucle.
             return;
         };
@@ -282,17 +303,12 @@ pub struct Decoded {
 /// le morceau en flottants : sur une piste de plusieurs minutes, cela évite de
 /// tenir deux copies complètes en mémoire au même instant.
 ///
-/// Renvoie `None` si le fichier est illisible.
-fn decode(file: &'static File<'static>) -> Option<Decoded> {
-    let extension = file.path().extension().and_then(|value| value.to_str()).unwrap_or("");
-    decode_bytes(file.contents(), extension)
-}
-
-/// Le même décodage, à partir d'octets nus.
+/// Les octets sont possédés plutôt qu'empruntés : symphonia exige une source
+/// `'static`, et sur le web ils viennent du réseau, donc de nulle part de
+/// durable.
 ///
-/// Les voix passent par ici : ce sont des MP3 comme les musiques, mais elles
-/// ne vivent pas dans le même dossier embarqué.
-pub fn decode_bytes(octets: &'static [u8], extension: &str) -> Option<Decoded> {
+/// Renvoie `None` si le fichier est illisible.
+pub fn decode_bytes(octets: Vec<u8>, extension: &str) -> Option<Decoded> {
     let stream = MediaSourceStream::new(Box::new(Cursor::new(octets)), Default::default());
 
     // L'extension oriente la détection du format ; symphonia vérifie ensuite le
@@ -352,8 +368,52 @@ pub fn decode_bytes(octets: &'static [u8], extension: &str) -> Option<Decoded> {
 mod tests {
     use super::*;
 
+    fn catalogue() -> Catalogue {
+        toml::from_str(PISTES).expect("le catalogue des pistes est lisible")
+    }
+
     fn playlists() -> [Playlist; 2] {
-        [Playlist::new(&MENU_MUSIC), Playlist::new(&GAME_MUSIC)]
+        let catalogue = catalogue();
+        [
+            Playlist::new("menu", &catalogue.menu),
+            Playlist::new("game", &catalogue.manche),
+        ]
+    }
+
+    /// Les octets d'une piste, lus sur le disque : les tests tournent sur une
+    /// machine qui a le dépôt sous la main, et n'ont pas besoin du binaire.
+    fn octets(chemin: &str) -> Vec<u8> {
+        std::fs::read(chemin).unwrap_or_else(|_| panic!("« {chemin} » est illisible"))
+    }
+
+    #[test]
+    fn le_catalogue_correspond_aux_dossiers() {
+        // Le catalogue est ce que lit le navigateur, qui ne sait pas parcourir
+        // un dossier. S'il diverge, une piste ajoutée ne serait jamais jouée
+        // sur le web — ou pire, une piste retirée y serait demandée en vain.
+        let catalogue = catalogue();
+
+        for (dossier, annonce) in [("menu", &catalogue.menu), ("game", &catalogue.manche)] {
+            let mut reel: Vec<String> = std::fs::read_dir(format!("assets/music/{dossier}"))
+                .expect("le dossier existe")
+                .filter_map(|entree| entree.ok())
+                .map(|entree| entree.file_name().to_string_lossy().into_owned())
+                .filter(|nom| {
+                    nom.rsplit_once('.').is_some_and(|(_, extension)| {
+                        AUDIO_EXTENSIONS.contains(&extension.to_lowercase().as_str())
+                    })
+                })
+                .collect();
+            reel.sort();
+
+            let mut annonce = annonce.clone();
+            annonce.sort();
+
+            assert_eq!(
+                annonce, reel,
+                "assets/music/pistes.toml ne correspond plus au dossier {dossier}"
+            );
+        }
     }
 
     #[test]
@@ -362,12 +422,10 @@ mod tests {
         // retrouver dans la playlist.
         for playlist in playlists() {
             for track in &playlist.tracks {
-                let extension =
-                    track.path().extension().and_then(|value| value.to_str()).unwrap_or("");
+                let extension = track.rsplit('.').next().unwrap_or("");
                 assert!(
                     AUDIO_EXTENSIONS.contains(&extension.to_lowercase().as_str()),
-                    "« {} » n'est pas un fichier audio",
-                    track.path().display()
+                    "« {track} » n'est pas un fichier audio"
                 );
             }
         }
@@ -379,12 +437,12 @@ mod tests {
         // mieux vaut le savoir en lancant les tests.
         for playlist in playlists() {
             for track in &playlist.tracks {
-                let decoded = decode(track);
-                assert!(decoded.is_some(), "« {} » est illisible", track.path().display());
+                let extension = track.rsplit('.').next().unwrap_or("");
+                let decoded = decode_bytes(octets(track), extension);
+                assert!(decoded.is_some(), "« {track} » est illisible");
                 assert!(
                     decoded.unwrap().seconds > 0.5,
-                    "« {} » ne dure presque rien : le decodage a echoue en cours de route",
-                    track.path().display()
+                    "« {track} » ne dure presque rien : le decodage a echoue en cours de route"
                 );
             }
         }
@@ -408,7 +466,7 @@ mod tests {
     fn a_new_round_never_opens_on_the_track_that_just_played() {
         // Sur une poignee de pistes, le hasard redonnerait assez souvent deux
         // fois la meme d'affilee, ce qui s'entend comme un bug.
-        let mut playlist = Playlist::new(&GAME_MUSIC);
+        let mut playlist = Playlist::new("game", &catalogue().manche);
         if playlist.tracks.len() < 2 {
             return;
         }
@@ -425,7 +483,7 @@ mod tests {
     #[test]
     fn an_empty_folder_is_not_an_error() {
         // Le jeu doit se lancer avant que la moindre musique n'ait ete ajoutee.
-        let mut playlist = Playlist::new(&GAME_MUSIC);
+        let mut playlist = Playlist::new("game", &catalogue().manche);
         playlist.tracks.clear();
         playlist.reshuffle();
 

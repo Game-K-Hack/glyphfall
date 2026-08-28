@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="icone-192.png">
+    <title>Conditions d'utilisation — Glyphfall</title>
+    <style>
+        /* La palette « Sweetie 16 », celle du jeu. */
+        :root {
+            --fond: #1a1c2c;
+            --panneau: #333c57;
+            --trait: #566c86;
+            --texte: #f4f4f4;
+            --or: #ffcd75;
+            --ciel: #41a6f6;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem 1rem 4rem;
+            background: var(--fond);
+            color: var(--texte);
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            line-height: 1.7;
+        }
+
+        main {
+            max-width: 42rem;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--or);
+            font-size: 1.6rem;
+            letter-spacing: 0.04em;
+        }
+
+        h2 {
+            color: var(--ciel);
+            font-size: 1.1rem;
+            margin-top: 2.5rem;
+        }
+
+        a {
+            color: var(--ciel);
+        }
+
+        .date {
+            color: var(--trait);
+            font-size: 0.9rem;
+        }
+
+        /* La barre de navigation : le retour au jeu, et l'autre page légale.
+           Les deux pages se citent l'une l'autre — arriver sur les conditions
+           depuis un magasin sans pouvoir atteindre la confidentialité serait
+           une impasse. */
+        .barre {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--panneau);
+        }
+
+        .bouton {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1.1rem;
+            border: 1px solid var(--trait);
+            background: var(--panneau);
+            color: var(--texte);
+            font-weight: 600;
+            text-decoration: none;
+            transition: border-color 0.15s, background 0.15s, color 0.15s;
+        }
+
+        /* La flèche recule d'un cheveu au survol : le mouvement dit le sens
+           avant que le mot ne soit lu. */
+        .bouton .fleche {
+            color: var(--or);
+            transition: transform 0.15s;
+        }
+
+        .bouton:hover,
+        .bouton:focus-visible {
+            border-color: var(--or);
+            background: #3d4766;
+            color: var(--or);
+        }
+
+        .bouton:hover .fleche,
+        .bouton:focus-visible .fleche {
+            transform: translateX(-0.25rem);
+        }
+
+        .voisine {
+            margin-left: auto;
+            color: var(--trait);
+            font-size: 0.95rem;
+        }
+
+        .voisine:hover,
+        .voisine:focus-visible {
+            color: var(--ciel);
+        }
+
+        /* Au clavier, on doit voir ou l'on est. */
+        a:focus-visible {
+            outline: 2px solid var(--or);
+            outline-offset: 3px;
+        }
+
+        ul {
+            padding-left: 1.2rem;
+        }
+
+        code {
+            background: var(--panneau);
+            padding: 0.1rem 0.35rem;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <nav class="barre">
+            <a class="bouton" href="./"><span class="fleche" aria-hidden="true">&#8592;</span> Retour au jeu</a>
+            <a class="voisine" href="confidentialite.html">Politique de confidentialité</a>
+        </nav>
+        <h1>Conditions d'utilisation</h1>
+        <p class="date">Version 0.2.1 — 28 août 2026</p>
+
+        <p>
+            Glyphfall est un jeu gratuit et libre, qui enseigne le hangeul
+            coréen, les kana et les premiers kanji japonais. Ces conditions
+            décrivent ce que vous pouvez en faire et ce que nous ne garantissons
+            pas.
+        </p>
+
+        <h2>Utilisation</h2>
+        <p>
+            Le jeu s'utilise sans compte, sans frais et sans limite. Il n'y a
+            rien à accepter pour jouer, rien à acheter, et aucun service en
+            ligne dont vous dépendriez.
+        </p>
+
+        <h2>Licence</h2>
+        <p>
+            Le code est publié sous
+            <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General
+            Public License v3.0</a>. Vous pouvez l'utiliser, l'étudier, le
+            modifier et le redistribuer. Toute version modifiée que vous
+            distribuez doit l'être sous la même licence, code source compris,
+            et conserver les mentions d'auteur.
+        </p>
+        <p>
+            Les polices de caractères gardent la leur, la
+            <a href="https://openfontlicense.org">SIL Open Font License
+            1.1</a>&nbsp;; leurs mentions sont reproduites dans le dépôt, dans
+            <code>assets/fonts/LICENCES.md</code>. Les musiques sont produites
+            par synthèse et libres de droits.
+        </p>
+
+        <h2>Absence de garantie</h2>
+        <p>
+            Le jeu est fourni tel quel, sans aucune garantie, comme le prévoit
+            la licence. Il est un support d'apprentissage et non un ouvrage de
+            référence&nbsp;: les prononciations et les moyens mnémotechniques
+            sont des approximations pédagogiques, pas une transcription
+            phonétique savante.
+        </p>
+
+        <h2>Vos données</h2>
+        <p>
+            Voir la <a href="confidentialite.html">politique de
+            confidentialité</a>&nbsp;: il n'y en a pas qui sortent de votre
+            appareil.
+        </p>
+
+        <h2>Nous écrire</h2>
+        <p>
+            <a href="https://github.com/Game-K-Hack/glyphfall/issues">Le suivi
+            du dépôt</a> accueille questions, anomalies et corrections.
+        </p>
+    </main>
+</body>
+
+</html>

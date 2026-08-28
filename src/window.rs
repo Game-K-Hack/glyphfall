@@ -44,6 +44,20 @@ pub fn window_conf() -> Conf {
         // reviendrait à flouter ce que l'agrandissement au pixel garantit.
         high_dpi: false,
         icon: Some(icon),
+        // WebGL 2 dans le navigateur, alors que miniquad demande WebGL 1 par
+        // défaut.
+        //
+        // Le jeu dessine tout sur une toile virtuelle avant de l'agrandir à
+        // l'écran, et cette cible de rendu passe par des appels — `readBuffer`,
+        // `bindFramebuffer` sur les cibles de lecture — qui n'existent pas en
+        // WebGL 1. La page se chargeait donc, restait noire, et lâchait
+        // « gl.readBuffer is not a function » à la première image.
+        //
+        // Ce réglage est ignoré partout ailleurs.
+        platform: miniquad::conf::Platform {
+            webgl_version: miniquad::conf::WebGLVersion::WebGL2,
+            ..Default::default()
+        },
         ..Default::default()
     }
 }

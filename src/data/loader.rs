@@ -14,8 +14,31 @@ use include_dir::{Dir, include_dir};
 use super::catalog::{Catalog, DataError};
 use super::model::{Language, Level};
 
+// --- Ce qui voyage dans le binaire ----------------------------------------
+//
+// Les leçons et les polices servent dès le premier écran et pèsent trois
+// mégaoctets : elles sont embarquées partout.
 static LANGUAGES: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/assets/languages");
 static FONTS: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/assets/fonts");
+
+// Les enregistrements, eux, pèsent huit mégaoctets et ne servent qu'à la
+// demande. Dans un navigateur, les embarquer reviendrait à faire attendre
+// avant le premier écran quelque chose qui ne sera peut-être jamais joué : la
+// page les récupère au moment où on les demande.
+//
+// C'est aussi pourquoi ils vivent dans `assets/voices/` et non dans l'arbre
+// des langues, où ils seraient pourtant mieux rangés : `include_dir!` embarque
+// un dossier entier, sans filtre. Les laisser à l'intérieur aurait obligé à
+// choisir entre embarquer les leçons avec les huit mégaoctets de voix, ou
+// n'embarquer ni les unes ni les autres.
+#[cfg(not(target_arch = "wasm32"))]
+static VOICES: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/assets/voices");
+
+// Les musiques suivent la même règle, pour la même raison, en soixante fois
+// plus lourd. Leur catalogue est un fichier à part, embarqué lui aussi : voir
+// `music::PISTES`.
+#[cfg(not(target_arch = "wasm32"))]
+static MUSIC: Dir<'static> = include_dir!("$CARGO_MANIFEST_DIR/assets/music");
 
 /// Charge et valide toutes les langues disponibles.
 pub fn load_catalog() -> Result<Catalog, DataError> {
@@ -82,13 +105,39 @@ pub fn font_bytes(file_name: &str) -> Option<&'static [u8]> {
     FONTS.get_file(file_name).map(|file| file.contents())
 }
 
-/// Un fichier du dossier `voices/` d'une langue.
+/// L'index qui dit quel enregistrement prononce quel signe.
 ///
-/// Les enregistrements vivent dans l'arbre de la langue qu'ils prononcent, et
-/// sont donc embarqués par le même `include_dir` que ses niveaux : rien à
-/// installer à côté du binaire, y compris dans le navigateur.
-pub fn voice_bytes(language: &str, file_name: &str) -> Option<&'static [u8]> {
-    LANGUAGES.get_file(format!("{language}/voices/{file_name}")).map(|file| file.contents())
+/// Il reste dans l'arbre de la langue, et donc embarqué partout : c'est lui
+/// qui tient lieu de catalogue là où l'on ne peut pas parcourir un dossier.
+pub fn voice_index(language: &str) -> Option<&'static [u8]> {
+    LANGUAGES.get_file(format!("{language}/voices.toml")).map(|file| file.contents())
+}
+
+/// Les octets d'une ressource, désignée par son chemin dans le dépôt.
+///
+/// Embarquée là où on peut se le permettre, récupérée par le réseau dans un
+/// navigateur — où le dossier `assets/` est servi tel quel à côté de la page,
+/// pour que le chemin soit le même des deux côtés.
+///
+/// La copie que fait la version embarquée coûte quelques dizaines de
+/// kilo-octets par son : moins cher que deux chemins de code à maintenir.
+pub async fn asset_bytes(chemin: &str) -> Option<Vec<u8>> {
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        for (prefixe, arbre) in
+            [("assets/voices/", &VOICES), ("assets/music/", &MUSIC)]
+        {
+            if let Some(reste) = chemin.strip_prefix(prefixe) {
+                return arbre.get_file(reste).map(|file| file.contents().to_vec());
+            }
+        }
+        None
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    {
+        macroquad::file::load_file(chemin).await.ok()
+    }
 }
 
 #[cfg(test)]
