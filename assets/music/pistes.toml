@@ -1,0 +1,27 @@
+# Les morceaux joues, par ambiance.
+#
+# Cette liste existe parce qu'un navigateur ne sait pas parcourir un
+# dossier : sur le web, les fichiers ne sont pas embarques mais recuperes
+# un a un, et il faut donc connaitre leurs noms d'avance. Ailleurs, elle
+# est verifiee contre le contenu reel des dossiers par un test.
+
+menu = [
+    "Claude.ogg",
+    "Inside The Wall.ogg",
+    "Key.ogg",
+    "Rehab.ogg",
+    "Reise, Reise.ogg",
+    "Taste.ogg",
+    "The Loop.ogg",
+    "Zeus’s Law.ogg",
+]
+
+manche = [
+    "Addicted.ogg",
+    "Amour.ogg",
+    "Danny.ogg",
+    "Daybreak.ogg",
+    "Don't Smile.ogg",
+    "Escape From Chicago.ogg",
+    "When I’m Home.ogg",
+]
