@@ -1,15 +1,15 @@
 ---
 id: "google-play-2026-08-27"
-status: "todo"
+status: "in-progress"
 priority: "low"
 assignee: null
 epic: null
 dueDate: null
 created: "2026-08-27T14:49:47.529Z"
-modified: "2026-08-27T17:57:44.027Z"
+modified: "2026-08-28T01:40:55.771Z"
 completedAt: null
 labels: []
-order: "a0"
+order: "a1"
 ---
 # Google Play
 
