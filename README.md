@@ -97,12 +97,38 @@ le blip de déplacement suit **ce qui est désigné**, pas la touche appuyée.
 Survoler une autre étape, une autre carte ou un autre bouton sonne donc
 comme une flèche.
 
+## Publier
+
+On ne pose plus d'étiquette à la main. **release-please** lit les messages de
+commit de `master`, tient à jour une pull request de publication — version
+relevée dans `Cargo.toml`, journal des changements écrit — et c'est en la
+fusionnant qu'on publie. L'étiquette naît alors du numéro qui vient d'être
+écrit, si bien que les deux ne peuvent plus diverger : la 0.3.0 avait été
+étiquetée sur un dépôt qui annonçait encore 0.2.1.
+
+Les messages suivent la convention `type: sujet` :
+
+| message | effet sur `0.3.0` |
+|---|---|
+| `fix: ...` | `0.3.1` |
+| `feat: ...` | `0.4.0` |
+| `feat!: ...` | `1.0.0` |
+
+`docs:`, `build:`, `refactor:` ne font pas bouger le numéro mais figurent au
+journal.
+
 ## Construction automatique
 
-`.github/workflows/build.yml` fabrique tout à chaque poussée : Windows, Linux
-x86_64 et ARM avec leurs paquets Debian, macOS Intel et Apple Silicon, l'APK
-Android et la version navigateur. Sur une étiquette de version — `v0.1.0` —,
-les fichiers sont rassemblés dans une publication GitHub.
+`.github/workflows/build.yml` fabrique tout : Windows avec son programme
+d'installation, Linux x86_64 et ARM avec leurs paquets Debian, macOS Intel et
+Apple Silicon, l'APK Android et la version navigateur. Il est **appelé** par le
+workflow de publication, et lançable à la main pour un essai — auquel cas rien
+n'est publié.
+
+Pourquoi appelé plutôt que déclenché : ce qu'un workflow fait avec le jeton par
+défaut n'en déclenche pas un autre. Une release créée par release-please
+n'émettrait aucun événement, et rien ne se construirait. L'appel direct évite
+d'avoir à confier un jeton personnel au dépôt.
 
 Les recettes vivent dans `tools/`, en Python, et tournent aussi bien sur une
 machine que sur un coureur : le workflow ne fait que les appeler. Une chaîne de

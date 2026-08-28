@@ -1,13 +1,26 @@
 name: Construction
 
+# Ce workflow ne se déclenche plus tout seul sur une release : c'est
+# `release-please.yml` qui l'appelle, une fois l'étiquette posée.
+#
+# La raison est une règle de GitHub : ce qu'un workflow fait avec le jeton par
+# défaut ne déclenche pas d'autre workflow. Une release créée par
+# release-please n'émettrait donc aucun événement, et rien ne se construirait.
+# L'appeler directement évite d'avoir à confier un jeton personnel au dépôt.
 on:
-  release:
-    types: [published]
+  workflow_call:
+    inputs:
+      version:
+        description: L'étiquette publiée. Vide pour une construction d'essai.
+        type: string
+        required: false
+        default: ""
   workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
-  GLYPHFALL_VERSION: ${{ github.event.release.tag_name }}
+  # Vide en construction d'essai : les scripts retombent alors sur Cargo.toml.
+  GLYPHFALL_VERSION: ${{ inputs.version }}
 
 jobs:
   verification:
@@ -145,7 +158,7 @@ jobs:
   pages:
     name: Publication web
     needs: web
-    if: github.event_name == 'release'
+    if: inputs.version != ''
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -167,7 +180,7 @@ jobs:
 
   publication:
     name: Publication
-    if: github.event_name == 'release'
+    if: inputs.version != ''
     needs: [windows, linux, macos, android, web]
     runs-on: ubuntu-latest
     permissions:
@@ -178,4 +191,5 @@ jobs:
           path: fichiers
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.version }}
           files: fichiers/**/*

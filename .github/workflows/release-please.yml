@@ -1,0 +1,54 @@
+# La publication, tenue par release-please.
+#
+# Le principe : on ne pose plus d'étiquette à la main. À chaque poussée sur
+# `master`, l'outil lit les messages de commit, tient à jour une pull request
+# de publication — version relevée dans `Cargo.toml`, journal des changements
+# écrit — et c'est en la fusionnant qu'on publie. L'étiquette naît alors du
+# numéro qui vient d'être écrit : les deux ne peuvent plus diverger, ce qui
+# était arrivé pour la 0.3.0.
+#
+# Les messages doivent suivre la convention `type: sujet` :
+#
+#   fix:   corrige quelque chose        -> 0.3.0 devient 0.3.1
+#   feat:  ajoute quelque chose         -> 0.3.0 devient 0.4.0
+#   feat!: casse la compatibilité       -> 0.3.0 devient 1.0.0
+#
+# `docs:`, `build:`, `refactor:` et les autres ne font pas bouger le numéro mais
+# figurent au journal.
+name: Publication
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  preparation:
+    name: Pull request de publication
+    runs-on: ubuntu-latest
+    outputs:
+      publiee: ${{ steps.release.outputs.release_created }}
+      etiquette: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  construction:
+    name: Construction
+    needs: preparation
+    if: needs.preparation.outputs.publiee == 'true'
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    with:
+      version: ${{ needs.preparation.outputs.etiquette }}
