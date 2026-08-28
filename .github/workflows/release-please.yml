@@ -50,5 +50,9 @@ jobs:
       contents: write
       pages: write
       id-token: write
+    # La clé de signature Android n'est visible d'un workflow appelé que si on
+    # la lui passe : sans cette ligne, `build.yml` ne verrait aucun secret et
+    # le bundle pour Google Play serait silencieusement sauté.
+    secrets: inherit
     with:
       version: ${{ needs.preparation.outputs.etiquette }}

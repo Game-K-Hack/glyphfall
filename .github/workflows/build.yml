@@ -156,6 +156,43 @@ jobs:
           name: glyphfall-android
           path: target/android/glyphfall.apk
 
+      # Le bundle pour Google Play, seulement si la clé de signature est là.
+      # Sans elle — une construction d'essai, une fourche du dépôt — le job
+      # s'arrête ici sans échouer : l'APK reste produit, et la publication ne
+      # réclame aucun fichier en particulier.
+      - name: Cle de signature
+        id: cle
+        env:
+          MAGASIN: ${{ secrets.GLYPHFALL_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$MAGASIN" ]; then
+            echo "Pas de cle de signature : le bundle Play est saute."
+            exit 0
+          fi
+          echo "$MAGASIN" | base64 -d > "$RUNNER_TEMP/glyphfall.jks"
+          echo "presente=oui" >> "$GITHUB_OUTPUT"
+      - name: Bundle pour Google Play
+        if: steps.cle.outputs.presente == 'oui'
+        env:
+          GLYPHFALL_KEYSTORE: ${{ runner.temp }}/glyphfall.jks
+          GLYPHFALL_KEYSTORE_PASSWORD: ${{ secrets.GLYPHFALL_KEYSTORE_PASSWORD }}
+          GLYPHFALL_KEY_ALIAS: ${{ secrets.GLYPHFALL_KEY_ALIAS }}
+          GLYPHFALL_KEY_PASSWORD: ${{ secrets.GLYPHFALL_KEY_PASSWORD }}
+        run: python tools/bundle.py
+      - name: Effacer la cle
+        if: always()
+        run: rm -f "$RUNNER_TEMP/glyphfall.jks"
+      - uses: actions/upload-artifact@v4
+        if: steps.cle.outputs.presente == 'oui'
+        with:
+          # Volontairement hors du motif `glyphfall-*` de la publication : un
+          # bundle ne s'installe pas, il ne se televerse que dans la Play
+          # Console. L'attacher a la release ajouterait deux cent soixante-dix
+          # megaoctets qu'aucun joueur ne peut ouvrir.
+          name: play-bundle
+          path: target/android/glyphfall.aab
+          retention-days: 14
+
   web:
     name: Navigateur
     needs: verification

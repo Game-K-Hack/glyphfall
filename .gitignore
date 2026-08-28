@@ -18,3 +18,16 @@ vendor
 # Le programme d'installation est fabrique par le workflow, pas versionne :
 # il pese autant que le jeu qu'il contient.
 /installer/*-setup.exe
+
+promo/*.mp4
+promo/*.py
+
+# La cle de signature Android, ou qu'elle soit posee. Play associe
+# l'application a cette cle pour toujours : la publier serait laisser
+# n'importe qui signer une mise a jour a votre nom.
+*.jks
+*.keystore
+
+# Les mots de passe de signature, quand on les range dans un fichier
+# plutot que de les retaper : meme raison que la cle elle-meme.
+*.env
