@@ -22,6 +22,21 @@
             android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|density|uiMode"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
+            <!--
+              Android 16 cesse d'honorer `screenOrientation` et
+              `resizeableActivity` sur tout écran d'au moins 600 dp. Or la
+              toile du jeu est figée en 216x384 à la compilation : sur une
+              tablette, la fenêtre deviendrait paysage avec un jeu qui
+              n'existe qu'en portrait.
+
+              Cette propriété rétablit l'ancien comportement. Elle est
+              temporaire — elle cessera d'agir dès l'API 37 —, et d'ici là il
+              faudra décider de ce que Glyphfall fait sur grand écran.
+            -->
+            <property
+                android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+                android:value="true" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

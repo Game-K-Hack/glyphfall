@@ -16,16 +16,22 @@ def codeDeVersion = parties[0] * 10000 + parties[1] * 100 + parties[2]
 // simplement le projet se construire non signé.
 def magasinDeCles = System.getenv('GLYPHFALL_KEYSTORE')
 
+// Les niveaux d'API viennent de `sdk.properties`, que `tools/android.py` lit
+// aussi : `aapt2` ne sait pas lire un fichier Gradle, et les redire ici les
+// aurait laissés diverger.
+def sdk = new Properties()
+file('../sdk.properties').withInputStream { sdk.load(it) }
+
 android {
     namespace 'fr.harlock.glyphfall'
-    compileSdk 35
+    compileSdk sdk.targetSdk as int
 
     defaultConfig {
         applicationId 'fr.harlock.glyphfall'
         // API 26 : la version que vise la bibliothèque native, et le plancher
         // en dessous duquel OpenGL ES 2 et le son deviennent capricieux.
-        minSdk 26
-        targetSdk 35
+        minSdk sdk.minSdk as int
+        targetSdk sdk.targetSdk as int
         versionCode codeDeVersion
         versionName nomDeVersion
     }

@@ -206,10 +206,18 @@ récupéré dans l'artefact `play-bundle` du workflow.
 ### Nom de la version
 
 ```
-0.3.1 (301)
+0.4.0 (400)
 ```
 
 ### Notes de version — 500 caractères
+
+Ce ne sont **pas** les notes de la release GitHub. Pour qui télécharge depuis
+Play, il n'y a pas eu de 0.3.x : c'est la première fois qu'il voit le jeu.
+Lui parler de la signature de l'APK ou du retour d'un artefact Windows n'a
+aucun sens. On présente donc le jeu, pas le journal des changements.
+
+Le changelog reprendra son rôle à la version suivante, quand les joueurs
+auront quelque chose à comparer.
 
 ```
 Première version publiée sur Google Play.
