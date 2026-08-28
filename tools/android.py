@@ -157,6 +157,65 @@ def compiler(abi, clang):
     return destination / NOM_LIB
 
 
+# Les fichiers où l'on peut ranger les mots de passe de signature plutôt que
+# de les retaper. Tous deux sont ignorés par git.
+FICHIERS_ENV = ("signature.env", ".env")
+
+
+def charger_env():
+    """Lit les mots de passe d'un fichier local, sans dépendance extérieure.
+
+    `python-dotenv` ferait la même chose en une ligne, mais rien n'installe de
+    bibliothèque Python dans le workflow : une dépendance de plus ici, et la
+    construction Android échouerait sur l'intégration continue sans qu'on le
+    voie avant la publication — c'est déjà arrivé avec Pillow.
+
+    Ce que l'environnement porte déjà l'emporte : sur GitHub, les secrets du
+    dépôt doivent primer, quoi qu'un fichier oublié raconte.
+    """
+    for nom in FICHIERS_ENV:
+        chemin = RACINE / nom
+        if not chemin.exists():
+            continue
+        for ligne in chemin.read_text(encoding="utf-8").splitlines():
+            ligne = ligne.strip()
+            if not ligne or ligne.startswith("#") or "=" not in ligne:
+                continue
+            cle, _, valeur = ligne.partition("=")
+            os.environ.setdefault(cle.strip(), valeur.strip().strip("\"'"))
+
+
+def cle_de_signature(outil_keytool):
+    """La clé qui signe l'APK : la vôtre si vous en fournissez une.
+
+    Sans elle, on retombe sur une clé de débogage — commode pour poser le jeu
+    sur son propre téléphone, inutilisable pour une distribution : sur
+    l'intégration continue elle est recréée à chaque construction, si bien que
+    deux releases successives ne se ressemblent pas. Android refuse alors la
+    mise à jour de l'une par l'autre, et le joueur doit désinstaller.
+    """
+    charger_env()
+    magasin = os.environ.get("GLYPHFALL_KEYSTORE")
+    mot_de_passe = os.environ.get("GLYPHFALL_KEYSTORE_PASSWORD")
+
+    if magasin and mot_de_passe and Path(magasin).exists():
+        return {
+            "magasin": magasin,
+            "magasin_pass": mot_de_passe,
+            "cle_pass": os.environ.get("GLYPHFALL_KEY_PASSWORD") or mot_de_passe,
+            "alias": os.environ.get("GLYPHFALL_KEY_ALIAS") or "glyphfall",
+            "debogage": False,
+        }
+
+    return {
+        "magasin": cle_de_debogage(outil_keytool),
+        "magasin_pass": "android",
+        "cle_pass": "android",
+        "alias": "androiddebugkey",
+        "debogage": True,
+    }
+
+
 def cle_de_debogage(outil_keytool):
     """La clé de débogage, créée au premier appel."""
     magasin = SORTIE / "debug.keystore"
@@ -282,12 +341,24 @@ def assembler(abis, o, version):
     executer([o["zipalign"], "-p", "-f", "4", brut, aligne])
 
     keytool = Path(shutil.which("keytool") or outil("keytool"))
-    executer([
+    cles = cle_de_signature(keytool)
+    if cles["debogage"]:
+        print("  signature de débogage : cet APK ne se distribue pas")
+    # `apksigner` dit pourquoi il refuse — « keystore password was incorrect »
+    # par exemple —, mais sur sa sortie d'erreur, que le rapport d'échec
+    # ordinaire ne reprend pas. On la retient donc pour la montrer.
+    resultat = subprocess.run([str(part) for part in [
         o["apksigner"], "sign",
-        "--ks", cle_de_debogage(keytool),
-        "--ks-pass", "pass:android", "--key-pass", "pass:android",
+        "--ks", cles["magasin"],
+        "--ks-pass", f"pass:{cles['magasin_pass']}",
+        "--key-pass", f"pass:{cles['cle_pass']}",
+        "--ks-key-alias", cles["alias"],
         aligne,
-    ])
+    ]], capture_output=True, text=True)
+    if resultat.returncode != 0:
+        premiere = (resultat.stderr + resultat.stdout).strip().splitlines()
+        sys.exit("échec de la signature :\n"
+                 + "\n".join(premiere[:3]))
     return aligne
 
 

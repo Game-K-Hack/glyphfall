@@ -149,28 +149,35 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: Swatinem/rust-cache@v2
-      - name: APK
-        run: python tools/android.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: glyphfall-android
-          path: target/android/glyphfall.apk
 
-      # Le bundle pour Google Play, seulement si la clé de signature est là.
-      # Sans elle — une construction d'essai, une fourche du dépôt — le job
-      # s'arrête ici sans échouer : l'APK reste produit, et la publication ne
-      # réclame aucun fichier en particulier.
+      # La cle est posee avant tout le reste : elle signe l'APK autant que le
+      # bundle. Sans elle — une construction d'essai, une fourche du depot —
+      # `android.py` retombe sur une cle de debogage et le bundle est saute,
+      # sans que rien echoue.
       - name: Cle de signature
         id: cle
         env:
           MAGASIN: ${{ secrets.GLYPHFALL_KEYSTORE_BASE64 }}
         run: |
           if [ -z "$MAGASIN" ]; then
-            echo "Pas de cle de signature : le bundle Play est saute."
+            echo "Pas de cle de signature : APK de debogage, pas de bundle Play."
             exit 0
           fi
           echo "$MAGASIN" | base64 -d > "$RUNNER_TEMP/glyphfall.jks"
           echo "presente=oui" >> "$GITHUB_OUTPUT"
+
+      - name: APK
+        env:
+          GLYPHFALL_KEYSTORE: ${{ runner.temp }}/glyphfall.jks
+          GLYPHFALL_KEYSTORE_PASSWORD: ${{ secrets.GLYPHFALL_KEYSTORE_PASSWORD }}
+          GLYPHFALL_KEY_ALIAS: ${{ secrets.GLYPHFALL_KEY_ALIAS }}
+          GLYPHFALL_KEY_PASSWORD: ${{ secrets.GLYPHFALL_KEY_PASSWORD }}
+        run: python tools/android.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glyphfall-android
+          path: target/android/glyphfall.apk
+
       - name: Bundle pour Google Play
         if: steps.cle.outputs.presente == 'oui'
         env:

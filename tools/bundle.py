@@ -46,12 +46,10 @@ import zipfile
 from pathlib import Path
 
 import android
-from android import ARCHITECTURES, NOM_LIB, PROJET, RACINE, SORTIE, executer
+from android import (ARCHITECTURES, NOM_LIB, PROJET, SORTIE, charger_env,
+                     executer)
 from version import version as numero_de_version
 
-# Les fichiers où l'on peut ranger les mots de passe plutôt que de les retaper.
-# Tous deux sont ignorés par git.
-FICHIERS_ENV = ("signature.env", ".env")
 
 # La version de `bundletool` est figée, et son empreinte vérifiée : c'est un
 # outil téléchargé qui signe indirectement ce que reçoivent des téléphones.
@@ -86,29 +84,6 @@ def empreinte(fichier):
     return hashlib.sha256(fichier.read_bytes()).hexdigest()
 
 
-def charger_env():
-    """Lit les mots de passe d'un fichier local, sans dépendance extérieure.
-
-    `python-dotenv` ferait la même chose en une ligne, mais rien n'installe de
-    bibliothèque Python dans le workflow : une dépendance de plus ici, et la
-    construction Android échouerait sur l'intégration continue sans qu'on le
-    voie avant la publication — c'est déjà arrivé avec Pillow.
-
-    Ce que l'environnement porte déjà l'emporte : sur GitHub, les secrets du
-    dépôt doivent primer, quoi qu'un fichier oublié raconte.
-    """
-    for nom in FICHIERS_ENV:
-        chemin = RACINE / nom
-        if not chemin.exists():
-            continue
-        for ligne in chemin.read_text(encoding="utf-8").splitlines():
-            ligne = ligne.strip()
-            if not ligne or ligne.startswith("#") or "=" not in ligne:
-                continue
-            cle, _, valeur = ligne.partition("=")
-            os.environ.setdefault(cle.strip(), valeur.strip().strip("\"'"))
-
-
 def signature():
     """Les paramètres de signature, ou l'explication de ce qui manque."""
     magasin = os.environ.get("GLYPHFALL_KEYSTORE")
@@ -126,7 +101,7 @@ def signature():
     return {
         "magasin": magasin,
         "mot_de_passe": mot_de_passe,
-        "alias": os.environ.get("GLYPHFALL_KEY_ALIAS", "glyphfall"),
+        "alias": os.environ.get("GLYPHFALL_KEY_ALIAS") or "glyphfall",
         "cle": os.environ.get("GLYPHFALL_KEY_PASSWORD") or mot_de_passe,
     }
 
