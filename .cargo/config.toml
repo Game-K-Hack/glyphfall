@@ -15,3 +15,18 @@
 # à lier.
 [target.wasm32-unknown-unknown]
 rustflags = ["-C", "link-arg=--allow-undefined"]
+
+# Android exige des pages memoire de 16 Ko depuis novembre 2025.
+#
+# Le lieur choisit sa taille de page selon l'architecture : lld aligne deja les
+# segments a 16 Ko sur arm64 et x86_64, mais s'en tient a 4 Ko sur les deux
+# cibles 32 bits. Google Play refuse alors le bundle, sans distinguer les
+# architectures :
+#
+#     Votre appli ne prend pas en charge les tailles de page memoire de 16 ko
+#
+# Les systemes de construction du NDK posent ce drapeau d'eux-memes depuis la
+# r27 ; Cargo appelle clang directement et ne beneficie pas de ce reglage. On le
+# pose donc ici, pour les quatre architectures a la fois.
+[target.'cfg(target_os = "android")']
+rustflags = ["-C", "link-arg=-Wl,-z,max-page-size=16384"]

@@ -33,11 +33,26 @@ NOM_LIB = "libglyphfall_core.so"
 # La balise que les deux empaqueteurs completent avant de la donner a aapt2.
 MANIFESTE_OUVRANT = '<manifest xmlns:android="http://schemas.android.com/apk/res/android">'
 
+def niveaux_sdk():
+    """Le plancher d'installation et le niveau visé, lus une seule fois.
+
+    Ils vivent dans `android/sdk.properties` parce que Gradle les réclame de
+    son côté et qu'`aapt2` ne sait pas lire un fichier Gradle : les écrire
+    deux fois, c'était les laisser diverger.
+    """
+    valeurs = {}
+    for ligne in (RACINE / "android" / "sdk.properties").read_text(
+            encoding="utf-8").splitlines():
+        ligne = ligne.strip()
+        if ligne and not ligne.startswith("#") and "=" in ligne:
+            cle, _, valeur = ligne.partition("=")
+            valeurs[cle.strip()] = int(valeur.strip())
+    return valeurs["minSdk"], valeurs["targetSdk"]
+
+
 # Le niveau d'API visé par la bibliothèque native, et le plancher
-# d'installation. À garder en accord avec android/app/build.gradle, qui les
-# redit pour Gradle — `aapt2`, lui, ne sait pas lire un fichier Gradle.
-API = 26
-CIBLE_SDK = 35
+# d'installation.
+API, CIBLE_SDK = niveaux_sdk()
 
 # Les quatre architectures d'Android, et le triplet Rust de chacune.
 ARCHITECTURES = {
@@ -93,6 +108,28 @@ def plus_recent(dossier, filtre=lambda _: True):
     return max(candidats, key=cle)
 
 
+def signaler_un_niveau_plus_recent(plateforme):
+    """Prévient qu'un niveau d'API plus récent est installé.
+
+    Google Play impose de viser un niveau au plus vieux d'un an, au 31 août de
+    chaque année ; passé cette date, il refuse les téléversements. Le savoir
+    par un refus de la console est la mauvaise façon de l'apprendre.
+
+    On ne relève pas `targetSdk` tout seul pour autant : chaque niveau apporte
+    des changements de comportement — l'API 36 cesse par exemple d'honorer
+    `screenOrientation` sur grand écran — qui peuvent défigurer le jeu sans
+    rien casser de visible à la construction. C'est donc une décision, et ce
+    message n'est qu'un rappel.
+    """
+    disponible = plateforme.name.removeprefix("android-").split(".")[0]
+    if disponible.isdigit() and int(disponible) > CIBLE_SDK:
+        print(f"  note : l'API {disponible} est installée, le jeu vise "
+              f"{CIBLE_SDK}.")
+        print("         Lisez les changements de comportement avant de "
+              "relever `targetSdk`")
+        print("         dans android/sdk.properties.")
+
+
 def outils():
     """Les chemins dont l'assemblage a besoin."""
     racine = sdk()
@@ -100,6 +137,7 @@ def outils():
     plateforme = plus_recent(
         racine / "platforms", lambda c: (c / "android.jar").exists()
     )
+    signaler_un_niveau_plus_recent(plateforme)
     # Le NDK vit d'ordinaire dans le SDK, mais une machine d'intégration
     # continue l'installe souvent à côté et l'annonce par une variable.
     ndk = None
@@ -338,7 +376,11 @@ def assembler(abis, o, version):
 
     aligne = SORTIE / "glyphfall.apk"
     aligne.unlink(missing_ok=True)
-    executer([o["zipalign"], "-p", "-f", "4", brut, aligne])
+    # `-P 16` cale les bibliothèques natives sur des pages de seize kilooctets.
+    # `-p` seul les calait sur quatre, ce qu'Android 15 ne suffit plus à
+    # satisfaire : sur un appareil à pages de 16 Ko, une bibliothèque mal calée
+    # ne peut pas être projetée en mémoire directement depuis l'APK.
+    executer([o["zipalign"], "-P", "16", "-f", "4", brut, aligne])
 
     keytool = Path(shutil.which("keytool") or outil("keytool"))
     cles = cle_de_signature(keytool)
