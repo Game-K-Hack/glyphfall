@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Fabrique le programme d'installation Windows.
 
-    python tools/setup.py [--version 0.2.1] [--sans-compiler]
+    python tools/setup.py [--version 0.3.0] [--sans-compiler]
 
 Le jeu est d'abord compilé en publication, puis Inno Setup assemble
 `installer/glyphfall.iss` autour de lui.
