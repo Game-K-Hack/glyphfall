@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0](https://github.com/Game-K-Hack/glyphfall/compare/0.3.2...0.4.0) (2026-08-28)
+
+
+### Nouveautés
+
+* Android bundle signs for Google Play ([6805235](https://github.com/Game-K-Hack/glyphfall/commit/6805235c05905b0dcf4718ef67747629e7782d32))
+* signed Android bundle for Google Play ([ceff2f8](https://github.com/Game-K-Hack/glyphfall/commit/ceff2f8e9c04ab3a4958e7743bc565a323e63140))
+
+
+### Corrections
+
+* la cle de release signe aussi l'APK, pas seulement le bundle ([271d448](https://github.com/Game-K-Hack/glyphfall/commit/271d44875d856c77e83e5080ebfed201d51137a2))
+* les artefacts Windows et Linux reviennent dans la release ([c65c26f](https://github.com/Game-K-Hack/glyphfall/commit/c65c26fc9c0728a09f447d2ac5a21c3094f4bf3d))
+
 ## [0.3.2](https://github.com/Game-K-Hack/glyphfall/compare/0.3.1...0.3.2) (2026-08-28)
 
 
