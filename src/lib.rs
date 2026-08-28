@@ -37,6 +37,7 @@ mod screens;
 mod session;
 mod settings;
 mod storage;
+mod trace;
 mod window;
 
 use crate::app::{App, Navigator, Screen, Transition};
@@ -80,7 +81,17 @@ pub extern "C" fn quad_main() {
 
 async fn run() {
     // Initialise le générateur de nombres aléatoires
-    rand::srand(miniquad::date::now() as u64);
+    // L'horloge, sauf si l'on demande une graine précise.
+    //
+    // `GLYPHFALL_SEED=7` rejoue exactement la même manche : mêmes signes, même
+    // ordre, mêmes colonnes. C'est ce qui permet de scripter une bande-annonce
+    // — on regarde une prise, on note quand répondre, et la suivante est
+    // identique — et de reproduire un défaut de tirage sans le guetter.
+    let graine = std::env::var("GLYPHFALL_SEED")
+        .ok()
+        .and_then(|valeur| valeur.parse().ok())
+        .unwrap_or(miniquad::date::now() as u64);
+    rand::srand(graine);
 
     // Le contenu est validé au démarrage : mieux vaut un écran d'erreur lisible
     // qu'un chemin d'apprentissage silencieusement cassé.
@@ -164,11 +175,33 @@ async fn run() {
                 index: 0,
                 swipe: None,
             }),
-            Some(("play", target)) => target.split_once('/').and_then(|(language, level)| {
-                let tracings = app.tracings(language);
-                Session::new(&app.catalog, &app.progress, language, level, Mode::Normal, tracings)
-                    .map(|session| Screen::Playing(Box::new(session)))
-            }),
+            // `play:ko/ko-01` lance en Normal, `play:ko/ko-01/ultra` en Ultra :
+            // filmer une bande-annonce demande de montrer les deux, et passer
+            // par le briefing obligerait à simuler un clic de plus.
+            Some(("play", target)) => {
+                let mut parts = target.split('/');
+                match (parts.next(), parts.next()) {
+                    (Some(language), Some(level)) => {
+                        let mode = match parts.next() {
+                            Some("fast") => Mode::Fast,
+                            Some("ultra") => Mode::Ultra,
+                            Some("endless") => Mode::Endless,
+                            _ => Mode::Normal,
+                        };
+                        let tracings = app.tracings(language);
+                        Session::new(
+                            &app.catalog,
+                            &app.progress,
+                            language,
+                            level,
+                            mode,
+                            tracings,
+                        )
+                        .map(|session| Screen::Playing(Box::new(session)))
+                    }
+                    _ => None,
+                }
+            }
             _ => match start.as_str() {
                 "languages" => Some(Screen::LanguageSelect { selected: 0 }),
                 "options" => Some(Screen::Options { selected: 0, dragging: None }),
@@ -299,7 +332,7 @@ async fn run() {
         }
 
         canvas.end();
-        capture.tick();
+        capture.tick(&canvas);
 
         if !navigator.apply(transition) {
             // Sortir de la boucle suffit sur un bureau : la fenêtre se ferme et
@@ -331,10 +364,30 @@ async fn fatal_error_screen(message: &str) {
 ///
 /// `GLYPHFALL_SCREENSHOT=chemin.png` enregistre une image après quelques
 /// frames — le temps que les atlas de police soient remplis — puis quitte.
+///
+/// # Filmer
+///
+/// `GLYPHFALL_FILM=dossier` écrit une image par frame, jusqu'à ce que
+/// `GLYPHFALL_FILM_FRAMES` soit atteint. C'est ce qui permet une bande-annonce
+/// nette : la toile fait 384×216 ou 216×384, qu'un facteur cinq porte
+/// exactement à 1920×1080 et 1080×1920. Un enregistreur d'écran, lui,
+/// rééchantillonne et floute chaque pixel.
+///
+/// Un fichier `temps.txt` note l'instant de chaque image. Écrire un PNG prend
+/// du temps et le jeu ralentit, mais il continue de mesurer le temps réel :
+/// les images ne sont donc pas également espacées. Sans ces horodatages, le
+/// montage rendrait un mouvement saccadé.
 struct Capture {
     path: Option<String>,
     frames: u32,
     delay: u32,
+    /// Où écrire la suite d'images, quand on filme.
+    film: Option<std::path::PathBuf>,
+    /// Combien d'images filmer avant de rendre la main.
+    film_frames: u32,
+    /// L'instant de chaque image, sur la même horloge que la trace : les deux
+    /// se recoupent donc directement.
+    instants: Vec<f64>,
 }
 
 impl Capture {
@@ -349,10 +402,28 @@ impl Capture {
             .and_then(|value| value.parse().ok())
             .unwrap_or(Self::DELAY);
 
-        Self { path: std::env::var("GLYPHFALL_SCREENSHOT").ok(), frames: 0, delay }
+        let film = std::env::var("GLYPHFALL_FILM").ok().map(std::path::PathBuf::from);
+        if let Some(dossier) = &film {
+            let _ = std::fs::create_dir_all(dossier);
+        }
+        let film_frames = std::env::var("GLYPHFALL_FILM_FRAMES")
+            .ok()
+            .and_then(|value| value.parse().ok())
+            .unwrap_or(600);
+
+        Self {
+            path: std::env::var("GLYPHFALL_SCREENSHOT").ok(),
+            frames: 0,
+            delay,
+            film,
+            film_frames,
+            instants: Vec::new(),
+        }
     }
 
-    fn tick(&mut self) {
+    fn tick(&mut self, canvas: &Canvas) {
+        self.filmer(canvas);
+
         let Some(path) = &self.path else { return };
 
         self.frames += 1;
@@ -360,5 +431,27 @@ impl Capture {
             get_screen_data().export_png(path);
             std::process::exit(0);
         }
+    }
+
+    /// Écrit l'image de la frame courante, s'il y a un film en cours.
+    fn filmer(&mut self, canvas: &Canvas) {
+        let Some(dossier) = self.film.clone() else { return };
+
+        let numero = self.instants.len();
+        if numero >= self.film_frames as usize {
+            self.ecrire_les_temps(&dossier);
+            std::process::exit(0);
+        }
+
+        self.instants.push(miniquad::date::now());
+        canvas
+            .image()
+            .export_png(&dossier.join(format!("image-{numero:05}.png")).to_string_lossy());
+    }
+
+    fn ecrire_les_temps(&self, dossier: &std::path::Path) {
+        let lignes: Vec<String> =
+            self.instants.iter().map(|instant| format!("{instant:.6}")).collect();
+        let _ = std::fs::write(dossier.join("temps.txt"), lignes.join("\n"));
     }
 }

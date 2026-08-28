@@ -106,6 +106,16 @@ impl Canvas {
     ///
     /// Peut sortir de la toile si le curseur est sur une bande de letterbox ;
     /// les tests de survol s'en chargent naturellement.
+    /// La toile elle-même, à sa taille de dessin.
+    ///
+    /// Filmer la fenêtre donnerait une image à la taille de l'écran, qu'un
+    /// agrandissement non entier flouterait. La toile fait 384×216 ou 216×384 :
+    /// cinq fois plus, c'est exactement 1920×1080 et 1080×1920, sans qu'un
+    /// seul pixel soit interpolé.
+    pub fn image(&self) -> Image {
+        self.target.texture.get_texture_data()
+    }
+
     pub fn mouse(&self) -> Vec2 {
         let (x, y) = mouse_position();
         (vec2(x, y) - self.origin) / self.scale

@@ -30,6 +30,9 @@ SORTIE = RACINE / "target" / "android"
 PAQUET = "fr.harlock.glyphfall"
 NOM_LIB = "libglyphfall_core.so"
 
+# La balise que les deux empaqueteurs completent avant de la donner a aapt2.
+MANIFESTE_OUVRANT = '<manifest xmlns:android="http://schemas.android.com/apk/res/android">'
+
 # Le niveau d'API visé par la bibliothèque native, et le plancher
 # d'installation. À garder en accord avec android/app/build.gradle, qui les
 # redit pour Gradle — `aapt2`, lui, ne sait pas lire un fichier Gradle.
@@ -171,6 +174,66 @@ def cle_de_debogage(outil_keytool):
     return magasin
 
 
+def dex(travail, o):
+    """Compile le Java du dépôt et celui qu'`aapt2` a engendré, puis le traduit.
+
+    Le Java se limite à l'activité de miniquad et au `R` des ressources : rien
+    ici ne dépend de la forme du paquet, si bien que l'APK et l'AAB partagent
+    exactement le même `classes.dex`.
+    """
+    print("  java")
+    source = PROJET / "app/src/main"
+    (travail / "gen").mkdir(exist_ok=True)
+    sources = list(source.rglob("*.java")) + list((travail / "gen").rglob("*.java"))
+    classes = travail / "classes"
+    classes.mkdir(exist_ok=True)
+
+    # Pas de `-bootclasspath` : depuis Java 9 il est refusé au-delà de la
+    # cible 8, et `android.jar` en simple classpath suffit — d8 se charge
+    # ensuite de traduire vers le format d'Android.
+    executer([
+        "javac", "-source", "17", "-target", "17", "-nowarn",
+        "-classpath", o["android_jar"],
+        "-d", classes, *sources,
+    ])
+
+    executer([
+        o["d8"], "--lib", o["android_jar"], "--output", travail,
+        *classes.rglob("*.class"),
+    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    return travail / "classes.dex"
+
+
+def manifeste_complet(dossier, version):
+    """Le manifeste tel qu'`aapt2` le veut, écrit dans le dossier de travail.
+
+    Gradle tire le paquet, les versions et les niveaux d'API de `build.gradle`
+    et refuse de les voir dans le manifeste ; `aapt2`, lui, ne lit que le
+    manifeste, et prend un minSdk de 1 s'il n'y trouve rien — ce qui ferait
+    tourner le jeu en mode compatibilité, à l'écran rétréci. On complète donc
+    une copie, le manifeste du dépôt restant celui de Gradle.
+
+    L'APK et l'AAB partagent ce manifeste : c'est le même jeu, et laisser
+    diverger leurs versions serait le plus discret des défauts.
+    """
+    source = PROJET / "app/src/main/AndroidManifest.xml"
+    entete = "\n".join([
+        MANIFESTE_OUVRANT[:-1],
+        f'    package="{PAQUET}"',
+        f'    android:versionCode="{code_android(version)}"',
+        f'    android:versionName="{version}">',
+        f'    <uses-sdk android:minSdkVersion="{API}"'
+        f' android:targetSdkVersion="{CIBLE_SDK}" />',
+    ])
+    destination = dossier / "AndroidManifest.xml"
+    destination.write_text(
+        source.read_text(encoding="utf-8").replace(MANIFESTE_OUVRANT, entete, 1),
+        encoding="utf-8",
+    )
+    return destination
+
+
 def assembler(abis, o, version):
     """Compile les ressources et le Java, puis fabrique l'APK signé."""
     travail = SORTIE / "assemblage"
@@ -186,29 +249,7 @@ def assembler(abis, o, version):
         "-o", travail / "res.zip",
     ])
 
-    # Gradle tire le paquet, les versions et les niveaux d'API de
-    # `build.gradle` et refuse de les voir dans le manifeste ; `aapt2`, lui, ne
-    # lit que le manifeste, et prend un minSdk de 1 s'il n'y trouve rien — ce
-    # qui ferait tourner le jeu en mode compatibilité, à l'écran rétréci. On
-    # complète donc une copie, le manifeste du dépôt restant celui de Gradle.
-    manifeste = travail / "AndroidManifest.xml"
-    contenu = (source / "AndroidManifest.xml").read_text(encoding="utf-8")
-    entete = (
-        '<manifest xmlns:android="http://schemas.android.com/apk/res/android"\n'
-        f'    package="{PAQUET}"\n'
-        f'    android:versionCode="{code_android(version)}"\n'
-        f'    android:versionName="{version}">\n'
-        f'    <uses-sdk android:minSdkVersion="{API}"'
-        f' android:targetSdkVersion="{CIBLE_SDK}" />'
-    )
-    manifeste.write_text(
-        contenu.replace(
-            '<manifest xmlns:android="http://schemas.android.com/apk/res/android">',
-            entete,
-            1,
-        ),
-        encoding="utf-8",
-    )
+    manifeste = manifeste_complet(travail, version)
 
     base = travail / "base.apk"
     executer([
@@ -220,24 +261,7 @@ def assembler(abis, o, version):
         travail / "res.zip",
     ])
 
-    print("  java")
-    (travail / "gen").mkdir(exist_ok=True)
-    sources = list(source.rglob("*.java")) + list((travail / "gen").rglob("*.java"))
-    classes = travail / "classes"
-    classes.mkdir()
-    # Pas de `-bootclasspath` : depuis Java 9 il est refusé au-delà de la
-    # cible 8, et `android.jar` en simple classpath suffit — d8 se charge
-    # ensuite de traduire vers le format d'Android.
-    executer([
-        "javac", "-source", "17", "-target", "17", "-nowarn",
-        "-classpath", o["android_jar"],
-        "-d", classes, *sources,
-    ])
-
-    executer([
-        o["d8"], "--lib", o["android_jar"], "--output", travail,
-        *classes.rglob("*.class"),
-    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    dex(travail, o)
 
     print("  paquet")
     brut = travail / "brut.apk"

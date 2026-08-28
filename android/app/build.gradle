@@ -1,5 +1,21 @@
 plugins { id 'com.android.application' }
 
+// Le numéro de version vient de `Cargo.toml`, comme pour tous les autres
+// paquets : `tools/version.py` y puise, et le graver ici une seconde fois
+// l'aurait laissé diverger — ce qui était déjà le cas, `0.3.0` figé face à
+// une `0.3.1` publiée. La formule est celle de `code_android` : deux chiffres
+// par partie, si bien qu'une version plus récente donne toujours un entier
+// plus grand.
+def nomDeVersion = (System.getenv('GLYPHFALL_VERSION') ?: '').replaceFirst(/^v/, '') ?:
+        (file('../../Cargo.toml').text =~ /(?m)^version = "(.*?)"/)[0][1]
+def parties = (nomDeVersion =~ /\d+/).collect { it as int } + [0, 0, 0]
+def codeDeVersion = parties[0] * 10000 + parties[1] * 100 + parties[2]
+
+// La clé de signature ne vit pas dans le dépôt : elle vient de
+// l'environnement, comme pour `tools/bundle.py`, et son absence laisse
+// simplement le projet se construire non signé.
+def magasinDeCles = System.getenv('GLYPHFALL_KEYSTORE')
+
 android {
     namespace 'fr.harlock.glyphfall'
     compileSdk 35
@@ -10,8 +26,20 @@ android {
         // en dessous duquel OpenGL ES 2 et le son deviennent capricieux.
         minSdk 26
         targetSdk 35
-        versionCode 1
-        versionName '0.3.0'
+        versionCode codeDeVersion
+        versionName nomDeVersion
+    }
+
+    signingConfigs {
+        release {
+            if (magasinDeCles) {
+                storeFile file(magasinDeCles)
+                storePassword System.getenv('GLYPHFALL_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('GLYPHFALL_KEY_ALIAS') ?: 'glyphfall'
+                keyPassword System.getenv('GLYPHFALL_KEY_PASSWORD') ?:
+                        System.getenv('GLYPHFALL_KEYSTORE_PASSWORD')
+            }
+        }
     }
 
     sourceSets {
@@ -27,6 +55,9 @@ android {
             // Rien à réduire : tout le code est natif, le Java se limite à
             // l'activité de miniquad.
             minifyEnabled false
+            if (magasinDeCles) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 

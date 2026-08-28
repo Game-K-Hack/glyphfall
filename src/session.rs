@@ -597,6 +597,12 @@ impl Session {
         let column = rand::gen_range(0, self.rules.columns);
         let font = rand::gen_range(0, self.tracings);
 
+        crate::trace::note(&format!(
+            "apparition {} {}",
+            glyph.char,
+            glyph.primary_answer()
+        ));
+
         self.tiles.push(Tile { column, y: -TILE_HEIGHT, glyph, cleared: None, font });
         self.spawned += 1;
         self.since_retry += 1;
