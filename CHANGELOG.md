@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/Game-K-Hack/glyphfall/compare/0.4.1...0.5.0) (2026-08-28)
+
+
+### Nouveautés
+
+* web version welcome page ([8497b28](https://github.com/Game-K-Hack/glyphfall/commit/8497b28540b169407a27f2548934ead4f7ca4b69))
+
 ## [0.4.1](https://github.com/Game-K-Hack/glyphfall/compare/0.4.0...0.4.1) (2026-08-28)
 
 
