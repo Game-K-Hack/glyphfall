@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/Game-K-Hack/glyphfall/compare/0.3.0...0.3.1) (2026-08-28)
+
+
+### Corrections
+
+* le job web n'a plus besoin de pillow ([68eef11](https://github.com/Game-K-Hack/glyphfall/commit/68eef11e43c1ca3bc7ea6c6e5c46afdf1615b47a))
+
 ## [0.3.0](https://github.com/Game-K-Hack/glyphfall/compare/0.2.1...0.3.0) (2026-08-28)
 
 
