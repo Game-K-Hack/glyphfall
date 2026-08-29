@@ -1,479 +1,94 @@
+<p align="center">
+  <img src="promo/banniere-1024x500.png" alt="Glyphfall — hangeul, kana, kanji. Apprendre en jouant." width="640">
+</p>
+
+<p align="center">
+  <a href="https://github.com/Game-K-Hack/glyphfall/releases/latest"><img alt="Dernière version" src="https://img.shields.io/github/v/release/Game-K-Hack/glyphfall?label=version&color=ffcd75"></a>
+  <a href="LICENSE"><img alt="Licence" src="https://img.shields.io/badge/licence-GPL--3.0-41a6f6"></a>
+  <img alt="Plateformes" src="https://img.shields.io/badge/plateformes-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux%20%C2%B7%20Android%20%C2%B7%20Web-566c86">
+</p>
+
 # Glyphfall
 
-Un jeu pour apprendre les alphabets qui ne s'écrivent pas en lettres latines :
-hangeul, hiragana, katakana, kanji. Les signes tombent, vous tapez leur lecture
-avant qu'ils ne franchissent la ligne rouge. Interface entièrement en 8-bit.
+Les signes tombent. Vous tapez leur lecture avant qu'ils touchent le sol. Au
+bout de quelques parties, vous lisez le hangeul — personne ne vous a demandé de
+réviser.
 
-Écrit en Rust avec [macroquad](https://macroquad.rs), donc le même code tourne
-sur Windows, macOS, Linux, Android et dans un navigateur.
+Un jeu d'arcade en 8-bit qui enseigne les écritures coréenne et japonaise :
+hangeul, hiragana, katakana et premiers kanji. Écrit en Rust avec
+[macroquad](https://macroquad.rs), donc le même code tourne sur cinq
+plateformes.
 
-L'écran suit la machine : **couché** sur un bureau, **debout** sur un
-téléphone. C'est une constante de compilation, `canvas::PORTRAIT`, et les
-écrans posent leurs coordonnées en paires — `canvas::pick(debout, couché)`. Le
-compilateur efface la branche inutile : les deux mises en page ne coûtent rien
-à l'exécution.
+## Jouer
 
-Pour regarder la mise en page téléphone depuis un bureau :
-`cargo run --features portrait`.
+**[Jouer tout de suite dans le navigateur →](https://game-k-hack.github.io/glyphfall/)**
+Rien à installer, rien à créer.
 
-## Le parcours
+Ou installer, toujours dans la dernière version publiée :
 
-1. **Choix de l'alphabet** — chaque écriture s'annonce dans ses propres signes.
-2. **Chemin d'apprentissage** — les étapes s'enchaînent, une étoile suffit à
-   ouvrir la suivante. Chaque écriture en compte une quinzaine : trois à cinq
-   signes nouveaux par étape, et une révision toutes les deux ou trois.
-3. **Briefing** — tous les signes de l'étape avec leur lecture, les règles et
-   les seuils à viser. Cliquez un signe pour sa fiche.
-4. **Fiche d'un signe** — en cliquant un signe du briefing : le caractère en
-   grand, ses lectures, comment le retenir, et où vous en êtes avec lui.
-5. **La manche** — trois vies et un chronomètre, dans le mode choisi. Chaque
-   tuile tire sa police au sort si les **tracés variés** sont activés.
-6. **Résultats** — de zéro à trois étoiles, et surtout la liste des signes
-   ratés avec la lecture qu'il fallait taper.
-
-La progression est enregistrée automatiquement, tout comme les réglages.
-
-Au premier lancement, le jeu demande **combien de temps par jour** vous comptez
-apprendre, et prévient une fois ce temps atteint. Seul le temps réellement
-passé à apprendre est compté : une manche en cours, ou la fiche d'un signe que
-l'on étudie. Ni les menus, ni le briefing, que l'on peut laisser ouvert sans
-rien apprendre. L'alerte n'apparaît **jamais pendant une
-partie** : elle attend le retour aux menus, sinon elle coûterait des vies et
-passerait pour une punition. Tout cela se modifie ou se coupe dans les
-options.
-
-Il demande aussi si les **tracés doivent varier** : un signe tombe alors dans
-l'une des sept mains de son écriture — imprimé, manuscrit au stylo, au crayon,
-au pinceau, tracé d'affiche. C'est plus difficile, et c'est le but : un signe
-reconnu dans une seule police est reconnu comme une image, pas comme un
-caractère. La question se repose depuis
-les options, à tout moment. Quel que soit le réglage, la fiche d'un signe
-montre toujours tous ses tracés côte à côte : on peut les comparer sans que
-rien ne tombe.
-
-## Les quatre modes
-
-Chaque étape se rejoue de plus en plus vite. Un mode s'ouvre en maîtrisant le
-précédent — on ne saute pas de marche.
-
-| Mode | S'ouvre quand | Rapporte |
-|---|---|---|
-| Normal | toujours | 0 à 3 étoiles dorées, à la précision |
-| Rapide | le normal a ses 3 étoiles | une **étoile bleue**, au sans-faute |
-| Ultra | le rapide est sans faute | une **étoile violette**, au sans-faute |
-| Infini | l'ultra est sans faute | rien qu'un meilleur score |
-
-Un niveau vaut donc jusqu'à cinq étoiles. Les deux dernières ne s'obtiennent
-qu'**au sans-faute** : aucun signe manqué, aucune réponse fausse. Une manche
-presque parfaite reste une manche à refaire.
-
-Le mode infini n'a pas de chronomètre. Il démarre plus doucement que le normal
-mais son accélération n'a pas de plafond : c'est elle qui finit la partie.
-
-Les modes fermés restent affichés au briefing, et **se sélectionnent** pour
-qu'on puisse lire ce qu'ils demandent — seul le bouton START s'éteint. Une
-étoile pas encore gagnée est dessinée dans sa propre teinte, assombrie : une
-étoile bleue sombre annonce qu'il y a une étoile bleue à décrocher.
-
-## Commandes
-
-| Touche | Effet |
+| | |
 |---|---|
-| Lettres et chiffres | Composer la lecture |
-| `Entrée` / `Espace` | Valider la saisie |
-| `Retour arrière` | Corriger |
-| `↑` `↓` | Naviguer dans les menus |
-| `←` `→` | Changer de mode, régler un volume |
-| `Échap` | Revenir en arrière |
+| **Windows** | [programme d'installation](https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall-windows-x86_64-setup.exe) · [exécutable seul](https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall.exe) |
+| **macOS** | [Apple Silicon](https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall-macos-arm64.tar.gz) · [Intel](https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall-macos-x86_64.tar.gz) |
+| **Linux** | [`.deb` et archives](https://github.com/Game-K-Hack/glyphfall/releases/latest) — Debian, Ubuntu, ou n'importe quelle distribution |
+| **Android** | <a href="https://play.google.com/store/apps/details?id=fr.harlock.glyphfall"><img alt="Disponible sur Google Play" src="web/google-play.png" height="30"></a> · [fichier APK](https://github.com/Game-K-Hack/glyphfall/releases/latest/download/glyphfall.apk) |
 
-Au doigt, tout se touche. La manche affiche **son propre clavier**, chiffres
-compris — celui du système couvrirait la moitié de l'écran et sa hauteur dépend
-de celui qu'a installé le joueur, ce qui interdirait de placer quoi que ce soit
-en dessous. Les listes défilent avec l'élan, la fiche d'un signe se feuillette
-au glissement, et la touche retour d'Android remonte d'un écran comme `Échap`.
+## Ce qu'il y a dedans
 
-La souris fonctionne partout où le clavier fonctionne, et s'entend pareil :
-le blip de déplacement suit **ce qui est désigné**, pas la touche appuyée.
-Survoler une autre étape, une autre carte ou un autre bouton sonne donc
-comme une flèche.
+| | | | |
+|:-:|:-:|:-:|:-:|
+| **4** | **58** | **208** | **4** |
+| parcours | niveaux | signes | modes |
 
-## Publier
+- Le **hangeul** coréen, ses quatorze consonnes et ses dix voyelles, puis les
+  syllabes.
+- Les **hiragana** et les **katakana**, soixante-et-onze signes chacun.
+- Vingt premiers **kanji** : les nombres, les jours de la semaine.
+- Chaque signe a sa fiche : le tracé trait par trait, un moyen de le retenir,
+  sa prononciation — et la voix d'un locuteur pour le coréen et les kana.
+- Quatre modes, du *normal* noté en étoiles à l'*infini*, où la chute accélère
+  jusqu'à ce que vous cédiez.
 
-On ne pose plus d'étiquette à la main. **release-please** lit les messages de
-commit de `master`, tient à jour une pull request de publication — version
-relevée dans `Cargo.toml`, journal des changements écrit — et c'est en la
-fusionnant qu'on publie. L'étiquette naît alors du numéro qui vient d'être
-écrit, si bien que les deux ne peuvent plus diverger : la 0.3.0 avait été
-étiquetée sur un dépôt qui annonçait encore 0.2.1.
+<p align="center">
+  <img src="promo/captures/1-jeu.png" alt="Une manche en cours" width="200">
+  <img src="promo/captures/2-fiche.png" alt="La fiche d'un signe" width="200">
+  <img src="promo/captures/4-chemin.png" alt="Le chemin d'apprentissage" width="200">
+</p>
 
-Les messages suivent la convention `type: sujet` :
+## Sans rien demander
 
-| message | effet sur `0.3.0` |
+Pas de publicité, pas d'achat, pas de compte. Aucune permission demandée sur
+Android. Tout fonctionne hors ligne, et votre progression reste chez vous.
+
+## Documentation
+
+| | |
 |---|---|
-| `fix: ...` | `0.3.1` |
-| `feat: ...` | `0.4.0` |
-| `feat!: ...` | `1.0.0` |
+| **[Guide du joueur](docs/JOUER.md)** | Comment jouer, les modes, les commandes, ce que fait chaque écran |
+| **[Guide du développeur](docs/DEVELOPPEMENT.md)** | Comment le jeu est bâti, comment le compiler, quoi modifier pour ajouter une langue, une police ou une musique |
+| [Conditions d'utilisation](web/cgu.html) · [Confidentialité](web/confidentialite.html) | Les deux pages légales, publiées sur le site |
 
-`docs:`, `build:`, `refactor:` ne font pas bouger le numéro mais figurent au
-journal.
-
-## Construction automatique
-
-`.github/workflows/build.yml` fabrique tout : Windows avec son programme
-d'installation, Linux x86_64 et ARM avec leurs paquets Debian, macOS Intel et
-Apple Silicon, l'APK Android et la version navigateur. Il est **appelé** par le
-workflow de publication, et lançable à la main pour un essai — auquel cas rien
-n'est publié.
-
-Pourquoi appelé plutôt que déclenché : ce qu'un workflow fait avec le jeton par
-défaut n'en déclenche pas un autre. Une release créée par release-please
-n'émettrait aucun événement, et rien ne se construirait. L'appel direct évite
-d'avoir à confier un jeton personnel au dépôt.
-
-Les recettes vivent dans `tools/`, en Python, et tournent aussi bien sur une
-machine que sur un coureur : le workflow ne fait que les appeler. Une chaîne de
-compilation qui n'existerait que dans l'intégration continue finirait par
-diverger de celle qu'on utilise pour de vrai.
-
-## Lancer et construire
+## Compiler
 
 ```sh
 cargo run --release
 ```
 
-Pour Linux, depuis n'importe quel système — Zig fournit la chaîne croisée, ni
-machine virtuelle ni conteneur :
-
-```sh
-pip install ziglang && cargo install cargo-zigbuild
-python tools/linux.py
-```
-
-Il en sort un binaire et son archive dans `target/linux/`. Le jeu demande une
-glibc 2.31 ou plus récente — Ubuntu 20.04 et au-delà — et, sur la machine du
-joueur, `libasound2`, `libX11`, `libXi`, `libGL` et `libxkbcommon`. Seule la
-première est inscrite dans le fichier : miniquad ouvre les autres à
-l'exécution, si bien que leur absence ne se voit qu'au lancement.
-
-Et son paquet Debian, qu'`apt` installe avec ses dépendances :
-
-```sh
-python tools/deb.py
-sudo apt install ./target/deb/glyphfall_0.1.0_amd64.deb
-```
-
-Le jeu se lance ensuite depuis le menu des applications, ou par `glyphfall`
-dans un terminal — `/usr/games` est sur le chemin d'un bureau Debian ou Ubuntu.
-Le paquet est fabriqué à la main, un `.deb` n'étant qu'une archive `ar` de
-trois membres : aucun outil Debian n'est donc nécessaire pour le produire, ce
-qui permet de le construire depuis Windows.
-
-Pour un `apt install glyphfall` sans chemin de fichier, il faudrait un **dépôt**
-— une arborescence de fichiers statiques, un index `Packages`, un `Release`
-signé par une clé GPG, et un hébergement. Rien de difficile, mais rien
-d'utile non plus tant que le jeu n'est pas publié quelque part.
-
-Pour Android — SDK, NDK et Java 17 requis, ni Gradle ni Docker :
-
-```sh
-python tools/android.py              # arm64, le plus courant
-python tools/android.py --toutes     # les quatre architectures
-python tools/android.py --abi x86_64 # pour l'émulateur
-adb install -r target/android/glyphfall.apk
-```
-
-L'APK sort signé d'une clé de débogage : il s'installe par sideload mais ne se
-publie pas. Le dossier `android/` est un projet Gradle ouvrable dans Android
-Studio, pour signer de votre propre clé. Les deux se partagent le manifeste, le
-script y ajoutant à la volée ce que Gradle refuse d'y voir — le paquet, les
-versions, les niveaux d'API.
-
-Pour le navigateur :
-
-```sh
-python tools/web.py
-python -m http.server --directory target/web 8080
-```
-
-Ouvrir `index.html` depuis le disque ne marche pas : le navigateur refuse de
-charger un `.wasm` en `file://`. Il faut passer par HTTP, même en local.
-
-**Ce que le binaire embarque, et ce qu'il ne porte plus.** Les polices et les
-leçons voyagent dans le `.wasm` — trois mégaoctets, disponibles dès la première
-image. Les musiques et les voix, soixante-huit de plus, sont recopiées à côté
-de la page et récupérées à la demande : les embarquer ferait attendre, avant le
-premier écran, un contenu qui ne sera peut-être jamais joué. Le `.wasm` tombe
-ainsi de 72 Mo à 5.
-
-C'est la seule différence entre le navigateur et les autres plateformes, où
-tout reste embarqué et où il n'y a rien à distribuer à côté de l'exécutable.
-`data::asset_bytes` cache cet écart derrière une seule fonction, et les chemins
-sont les mêmes des deux côtés — d'où le `assets/` recopié tel quel par
-`tools/web.py`.
-
-Le workflow publie le tout sur GitHub Pages à chaque release, avec la politique
-de confidentialité et les conditions d'utilisation, qui vivent dans `web/`.
-
-## Ajouter une langue
-
-Créez un dossier dans `assets/languages/`, puis recompilez. **Rien à déclarer
-dans le code** : le dossier est découvert tout seul.
-
-```
-assets/languages/el-grec/
-├── language.toml
-└── levels/
-    ├── 01-voyelles.toml
-    └── 02-consonnes.toml
-```
-
-`language.toml` :
-
-```toml
-id = "el-grec"                     # identifiant stable, utilisé par la sauvegarde
-name = "Grec"                      # nom affiché, en français
-native_name = "Ελληνικά"           # nom dans l'écriture elle-même
-description = "L'alphabet grec, 24 lettres."
-fonts = [                          # fichiers de assets/fonts/, au moins deux
-  "NotoSansGreek-Regular.ttf",     # le tracé de référence
-  "GreekHandwriting-Regular.ttf",  # les autres, tirés au sort en jeu
-]
-```
-
-Un fichier par étape dans `levels/` :
-
-```toml
-id = "el-01"                       # unique dans TOUT le catalogue
-title = "Les voyelles"
-subtitle = "Sept lettres pour commencer"
-order = 1                          # position sur le chemin
-requires = []                      # étapes à finir avant celle-ci
-mode = "tile_fall"
-
-[rules]
-lives = 3
-duration = 90                      # secondes ; 0 = sans limite
-columns = 4
-spawn_interval = 1.4               # secondes entre deux signes
-speed = { start = 55.0, ramp = 1.5, max = 170.0 }
-review_ratio = 0.25                # part des signes puisée dans `requires`
-
-[stars]                            # précision minimale pour chaque étoile
-one = 0.50
-two = 0.75
-three = 0.90
-
-[[glyphs]]
-char = "α"
-answers = ["a"]                    # toutes les lectures acceptées
-mnemonics = [                      # au moins un, obligatoire
-  "Le premier signe de l'alphabet, l'ancetre de notre A.",
-  "Un a minuscule dont la boucle s'est ouverte.",
-]
-```
-
-La fiche du signe les montre tous. **N'y mettez aucun caractère de l'écriture enseignée** : ils
-sont rendus par la police pixel, qui ne connaît que le latin. Nommez plutôt le
-signe (« le giyeok », « le ha ») — un test le vérifie. La fiche n'en affiche
-que **sept lignes** en tout, bande des tracés oblige ; le signe le plus bavard
-du catalogue les occupe déjà toutes.
-
-### Comment découper un chemin
-
-Un niveau qui présente quatorze signes d'un coup n'en apprend aucun. Le
-découpage suit trois règles simples :
-
-- **Trois à cinq signes nouveaux par étape**, pas plus. Une étape doit se
-  gagner du premier coup ou presque.
-- **Une révision toutes les deux ou trois étapes**, qui ne présente aucun signe
-  nouveau et rebrasse ce qui précède.
-- **`review_ratio` monte avec le chemin.** Il puise dans **toute** la chaîne de
-  `requires`, pas seulement dans l'étape précédente : à la quinzième étape, un
-  tirage sur deux revient sur ce qui a été appris depuis le début.
-
-Les étapes de découverte sont volontairement lentes et courtes — `duration`
-autour de 50 s, `speed.start` vers 42 — et se durcissent au fil du chemin. Un
-signe qu'on découvre demande le temps de le reconnaître ; un signe qu'on révise
-doit venir tout seul.
-
-### Ce que le moteur fait de son côté
-
-Le découpage des fichiers ne fait que la moitié du travail. Pendant la manche,
-le tirage des tuiles n'est pas uniforme :
-
-- **Les signes neufs passent d'abord**, un par un, dans l'ordre du fichier. Un
-  tirage purement aléatoire pourrait montrer le même trois fois de suite et en
-  oublier un autre jusqu'à la fin.
-- **Un signe raté revient** trois tuiles plus tard. C'est le seul moment où la
-  correction porte encore ; le laisser filer, c'est le laisser mal appris.
-- **Le tirage favorise ce qui est mal su.** Chaque signe porte une note de
-  maîtrise, gardée d'une partie à l'autre : une réussite la monte d'un point,
-  une erreur la descend de deux. Plus elle est basse, plus le signe revient.
-  Ces notes suivent le signe, pas son tracé : changer de police ne remet pas
-  la maîtrise à zéro. Ces notes sont rangées **par alphabet** : un signe n'existe pas en dehors du
-  sien, et les mélanger empêcherait de dire ce qui a été appris d'une écriture
-  donnée.
-
-Le chemin d'apprentissage offre enfin un bouton **révision**, qui rejoue tous
-les signes déjà croisés dans l'alphabet, du plus fragile au mieux su. Elle ne
-rapporte pas d'étoiles — elle ne correspond à aucune étape — mais elle nourrit
-la maîtrise comme n'importe quelle manche.
-
-Cette asymétrie entre réussite et erreur est volontaire : sans elle, un signe
-raté une fois sur trois finirait par passer pour acquis.
-
-L'écran de briefing marque en orange les signes dont la note est négative — il
-dit donc quoi travailler, au lieu d'afficher une liste uniforme où les
-faiblesses se noient. Cliquer un signe ouvre sa fiche, seul endroit où l'on
-peut s'arrêter sur un caractère sans qu'il tombe.
-
-### Ce que le jeu vérifie au démarrage
-
-Un contenu incohérent affiche un écran d'erreur explicite plutôt que de casser
-silencieusement le chemin d'apprentissage. Sont refusés : deux identifiants
-identiques, un `requires` qui ne résout pas, un cycle de prérequis, des seuils
-d'étoiles décroissants, un `review_ratio` sans prérequis à réviser, un niveau
-sans signe, une clé mal orthographiée.
-
-`cargo test` va plus loin et vérifie que chaque signe du catalogue est bien
-dessinable par la police de sa langue, et que la police pixel couvre tous les
-textes français — un accent manquant afficherait « Cor en » sans rien casser.
-
-### Deux pièges
-
-- **Tous les textes sont écrits avec la police pixel**, qui ne connaît que le
-  latin : titres, sous-titres, noms, descriptions et moyens mnémotechniques.
-  N'y mettez pas de caractères de l'écriture enseignée, ils s'afficheraient en
-  tofu. Seuls les `char` passent par la police de la langue.
-- **`speed` s'exprime en pixels virtuels par seconde**, sur une toile de
-  384 × 216. Un signe parcourt 200 pixels avant d'atteindre la ligne : à 55, il
-  laisse un peu moins de quatre secondes pour répondre.
-
-## Ajouter une musique
-
-Déposez un `.mp3`, `.ogg` ou `.wav` dans l'un des deux dossiers et recompilez.
-Rien à déclarer : les fichiers sont repérés tout seuls et enchaînés dans un
-ordre aléatoire.
-
-| Dossier | Quand |
-|---|---|
-| `assets/music/menu/` | Partout sauf en partie |
-| `assets/music/game/` | Pendant les manches, à 60 % du volume |
-
-Les deux volumes se règlent séparément dans les options, la manche étant plus
-basse par défaut : l'information y passe par les bruitages — un signe reconnu,
-une vie perdue — qu'une musique trop forte couvrirait au moment où ils
-comptent. Tant que la ligne « musique jeu » est choisie, elle s'entend au
-volume de la manche, faute de quoi on réglerait à l'aveugle.
-
-Le passage d'une ambiance à l'autre coupe net : laisser finir un morceau de
-menu par-dessus une partie déjà lancée serait pire qu'une coupure.
-
-Le moteur audio ne sait pas lire le MP3 : le jeu décode lui-même les morceaux
-puis les lui confie en WAV brut. C'est ce décodage qui donne aussi leur durée
-exacte, dont la playlist a besoin pour savoir quand enchaîner.
-
-Une seule piste est décodée à la fois, au moment où elle démarre : un morceau
-de cinq minutes prend environ trois dixièmes de seconde à décoder et occupe
-une cinquantaine de mégaoctets pendant qu'il joue. Des morceaux courts sont
-plus économes. Leur poids s'ajoute par ailleurs directement à celui de
-l'exécutable, puisque tout est embarqué.
-
-Le dossier peut rester vide : le jeu se lance alors sans musique.
-
-### Ajouter une police
-
-Déposez le `.ttf` dans `assets/fonts/` et nommez-le dans la liste `fonts` de
-`language.toml`. **Une écriture en déclare au moins deux** — un test le vérifie
-— parce que les tuiles y puisent au hasard, et qu'une liste d'un seul élément
-priverait les joueurs du réglage des tracés variés. Prenez des tracés
-**franchement** différents. Une sans empattement et une avec ne suffit pas :
-sur du hangeul comme sur du kana, sans et serif se ressemblent trop à
-24 pixels. Ce qui marche, ce sont des familles de mains différentes —
-imprimé, manuscrit, enseigne :
-
-Chaque écriture en compte sept — assez pour qu'un signe ne revienne jamais
-deux fois de suite dans la même main :
-
-| Rôle | Coréen | Japonais |
-|---|---|---|
-| Imprimé, sans empattement | Noto Sans KR | Noto Sans JP |
-| Imprimé, à empattements | Nanum Myeongjo | Shippori Mincho |
-| Manuscrit, stylo | Nanum Pen Script | Klee One |
-| Manuscrit, crayon | Gaegu | — |
-| Manuscrit, pinceau | Nanum Brush Script | Yuji Syuku |
-| Manuscrit, feutre | — | Yusei Magic |
-| Affiche, ronde | Jua | Zen Maru Gothic |
-| Affiche, grasse | Do Hyeon | RocknRoll One |
-
-La première de la liste est le **tracé de référence** : c'est elle qui écrit le
-briefing, les aides et le grand signe de la fiche. Les autres n'apparaissent
-qu'en jeu et dans la rangée de comparaison de la fiche.
-
-Une police CJK complète pèse plusieurs mégaoctets et alourdit d'autant le
-binaire. Réduisez-la aux signes du catalogue avant de la déposer — `fonttools`
-fait passer les quatre polices CJK de 50 Mo à moins d'un :
-
-```sh
-pyftsubset NotoSerifJP-Regular.ttf --text-file=signes.txt --output-file=...
-```
-
-## Organisation du code
-
-| Dossier | Rôle |
-|---|---|
-| `src/data/` | Lecture et validation des fichiers de langue |
-| `src/gfx/` | Toile virtuelle, palette, polices, briques d'interface |
-| `src/screens/keyboard.rs` | Le clavier dessiné, pour jouer sans clavier |
-| `src/screens/` | Un fichier par écran |
-| `src/session.rs` | Une manche : règles, tuiles, score, bilan |
-| `src/progress.rs` | Étoiles gagnées, déverrouillage |
-| `src/settings.rs` | Réglages du joueur : volumes, objectif quotidien |
-| `src/daily.rs` | Temps d'apprentissage du jour |
-| `src/storage.rs` | Sauvegardes, fichiers ou stockage navigateur |
-| `src/audio.rs` | Bruitages synthétisés au démarrage |
-| `src/music.rs` | Playlist des menus, décodage des morceaux |
-| `src/compose.rs` | Le générateur de la musique « Claude » |
-| `src/app.rs` | État global et pile de navigation |
-
-Tout est dessiné sur une toile de 384 × 216 agrandie d'un facteur **entier** en
-filtrage au plus proche. C'est ce qui donne de vrais pixels carrés ; les écrans
-raisonnent donc en pixels virtuels et n'appellent jamais `screen_width()`.
-
-### Raccourcis de développement
-
-```sh
-GLYPHFALL_START=languages           cargo run
-GLYPHFALL_START=options             cargo run
-GLYPHFALL_START=path:ja-hiragana    cargo run
-GLYPHFALL_START=briefing:ko/ko-01   cargo run
-GLYPHFALL_START=briefing:ko/ko-04/ultra cargo run   # sur un mode donné
-GLYPHFALL_START=play:ko/ko-03       cargo run
-GLYPHFALL_START=sign:ko/ko-01       cargo run   # la fiche du premier signe
-GLYPHFALL_START=fonts               cargo run   # la question des tracés variés
-
-# Capture une image après N frames puis quitte, pour vérifier un écran.
-GLYPHFALL_SCREENSHOT=ecran.png GLYPHFALL_SCREENSHOT_AFTER=120 cargo run
-
-# Régénère la musique d'ambiance après avoir retouché src/compose.rs.
-GLYPHFALL_COMPOSE=assets/music/menu/Claude.wav cargo run --release
-```
+C'est tout ce qu'il faut pour lancer le jeu depuis les sources. Les autres
+plateformes ont chacune leur recette d'une ligne, décrites dans le
+**[guide du développeur](docs/DEVELOPPEMENT.md)**.
 
 ## Crédits
 
-- Polices : [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P),
-  [Noto Sans KR](https://fonts.google.com/noto/specimen/Noto+Sans+KR) et
-  [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP),
-  Nanum Myeongjo, Nanum Pen Script, Nanum Brush Script, Gaegu, Jua, Do Hyeon,
-  Shippori Mincho, Klee One, Yuji Syuku, Yusei Magic, Zen Maru Gothic et
-  RocknRoll One — toutes sur [Google Fonts](https://fonts.google.com), sous SIL
-  Open Font License, réduites aux signes du catalogue. Les mentions exigées
-  par cette licence sont reproduites dans
+- **Polices** : Press Start 2P, Noto Sans KR et JP, Nanum Myeongjo, Nanum Pen
+  Script, Nanum Brush Script, Gaegu, Jua, Do Hyeon, Shippori Mincho, Klee One,
+  Yuji Syuku, Yusei Magic, Zen Maru Gothic et RocknRoll One — toutes sur
+  [Google Fonts](https://fonts.google.com), sous SIL Open Font License,
+  réduites aux signes du catalogue. Mentions dans
   [`assets/fonts/LICENCES.md`](assets/fonts/LICENCES.md).
-- Palette : « Sweetie 16 » de GrafxKid, domaine public.
-- Bruitages : synthétisés par le jeu lui-même, voir `src/audio.rs` et
-  `src/compose.rs`.
-- Musique : générée par un modèle libre exécuté en local, voir les
+- **Palette** : « Sweetie 16 » de GrafxKid, domaine public.
+- **Bruitages** : synthétisés par le jeu lui-même, voir `src/audio.rs`.
+- **Musique** : générée par un modèle libre exécuté en local, voir les
   `LISEZ-MOI.md` de `assets/music/`.
 
 ## Licence
@@ -487,15 +102,12 @@ vous distribuez doit l'être sous cette même licence, code source compris, et
 garder les mentions d'auteur. Une version fermée dérivée de ce code n'est pas
 autorisée.
 
-Rien n'interdit à quiconque de vendre des copies : c'est une liberté que la
-GPL protège volontairement. Mais il devra livrer le source avec, sous GPL, et
-tout acheteur pourra le repartager gratuitement — ce qui ôte à l'exercice son
+Rien n'interdit à quiconque de vendre des copies : c'est une liberté que la GPL
+protège volontairement. Mais il devra livrer le source avec, sous GPL, et tout
+acheteur pourra le repartager gratuitement — ce qui ôte à l'exercice son
 intérêt commercial.
 
 Les polices échappent à cette licence et gardent la leur, la SIL Open Font
-License 1.1 : voir [`assets/fonts/LICENCES.md`](assets/fonts/LICENCES.md).
-
-De même pour [`patches/quad-snd`](patches/quad-snd/LISEZ-MOI-GLYPHFALL.md), une
-copie corrigée de la bibliothèque audio de macroquad, sous MIT ou Apache-2.0.
-Sa mise en place ALSA échouait sur des machines Linux saines ; le correctif et
-son motif sont expliqués dans ce dossier.
+License 1.1. De même pour
+[`patches/quad-snd`](patches/quad-snd/LISEZ-MOI-GLYPHFALL.md), une copie
+corrigée de la bibliothèque audio de macroquad, sous MIT ou Apache-2.0.
