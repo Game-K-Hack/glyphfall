@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/Game-K-Hack/glyphfall/compare/0.5.0...0.6.0) (2026-08-29)
+
+
+### Nouveautés
+
+* Update README ([611139a](https://github.com/Game-K-Hack/glyphfall/commit/611139a0fecf1d15f8b1e6f02a45533e933234b2))
+
 ## [0.5.0](https://github.com/Game-K-Hack/glyphfall/compare/0.4.1...0.5.0) (2026-08-28)
 
 
